@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="js/Person.js"></script>
+    <script src="js/Game.js"></script>
+    <script src="js/Console.js"></script>
+    <script src="js/PersonActions.js"></script>
+    <script src="js/ProjectilesActions.js"></script>
+    
+    <title>Apache Tomcat WebSocket Examples: Multiplayer Snake</title>
+    <link href="css/style.css"  rel="stylesheet"/>
+</head>
+<body>
+<div class="noscript">
+    <h2 style="color: #ff0000">
+        Seems your browser doesn't support Javascript!
+        Websockets rely on Javascript being enabled. Please enable
+    Javascript and reload this page!
+    </h2>
+</div>
+<div style="float: left">
+    <canvas id="playground" width="640" height="480"></canvas>
+</div>
+<div id="console-container">
+    <div id="console"></div>
+</div>
+<script type="application/javascript">
+
+
+
+Game.initialize();
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Remove elements with "noscript" class - <noscript> is not allowed in XHTML
+    var noscripts = document.getElementsByClassName("noscript");
+    for (var i = 0; i < noscripts.length; i++) {
+        noscripts[i].parentNode.removeChild(noscripts[i]);
+    }
+}, false);
+
+</script>
+</body>
+</html>
