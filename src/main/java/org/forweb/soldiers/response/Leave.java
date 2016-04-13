@@ -1,4 +1,4 @@
-package websocket.response;
+package org.forweb.soldiers.response;
 
 public class Leave {
 

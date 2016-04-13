@@ -21,19 +21,15 @@ PersonActions.startMovement = function(e){
         e.preventDefault();
         switch (code) {
             case 37:
-                console.log("left 37");
                 PersonActions.buttonLeft = true;
                 break;
             case 38:
-                console.log("top 38");
                 PersonActions.buttonTop = true;
                 break;
             case 39:
-                console.log("right 39");
                 PersonActions.buttonRight= true;
                 break;
             case 40:
-                console.log("bottom 40");
                 PersonActions.buttonBottom = true;
                 break;
         }
@@ -91,6 +87,66 @@ PersonActions.stopMovement = function(e){
         PersonActions.setDirection(direction);
     }
 };
+
+PersonActions._quadrantCalculation = function (angle, pa, same) {
+    if(angle > pa - (same ? 0 : 180)) {
+        Game.updatePersonViewAngle(same ? 1 : -1);
+    } else if(angle < pa - (same ? 0 : 90)) {
+        Game.updatePersonViewAngle(same ? -1 : 1);
+    } else {
+        Game.updatePersonViewAngle(0);
+    }
+};
+PersonActions.updateMouseDirectionByXy = function(x, y, person) {
+    var angle = Math.floor(PersonActions.angle(person.x, person.y, x, y));
+    if(angle < 0) {
+        angle = 360 + angle;
+    }
+    Game.angle = angle;
+    var pa = person.angle;
+    if(pa >= 0 && pa <= 90) {
+        if(angle > 0 && angle <= 90) {
+            PersonActions._quadrantCalculation(angle, pa, true);
+        } else if (angle > 90 && angle <= 180) {
+            Game.updatePersonViewAngle(1)
+        } else if (angle > 180 && angle <= 270) {
+            PersonActions._quadrantCalculation(angle, pa, false);
+        } else {
+            Game.updatePersonViewAngle(-1)
+        }
+    } else if (pa > 90 && pa <= 180) {
+        if(angle > 0 && angle <= 90) {
+            Game.updatePersonViewAngle(-1)
+        } else if (angle > 90 && angle <= 180) {
+            PersonActions._quadrantCalculation(angle, pa, true);
+        } else if (angle > 180 && angle <= 270) {
+            Game.updatePersonViewAngle(1)
+        } else {
+            PersonActions._quadrantCalculation(angle, pa, false);
+        }
+    } else if (pa > 180 && pa <= 270) {
+        if(angle > 0 && angle <= 90) {
+            PersonActions._quadrantCalculation(angle, pa, false);
+        } else if (angle > 90 && angle <= 180) {
+            Game.updatePersonViewAngle(-1)
+        } else if (angle > 180 && angle <= 270) {
+            PersonActions._quadrantCalculation(angle, pa, true);
+        } else {
+            Game.updatePersonViewAngle(1)
+        }
+    } else {
+        if(angle > 0 && angle <= 90) {
+            Game.updatePersonViewAngle(1)
+        } else if (angle > 90 && angle <= 180) {
+            PersonActions._quadrantCalculation(angle, pa, false);
+        } else if (angle > 180 && angle <= 270) {
+            Game.updatePersonViewAngle(-1)
+        } else {
+            PersonActions._quadrantCalculation(angle, pa, true);
+        }
+    }
+};
+
 PersonActions.updateMouseDirection = function(e){
     e = e || window.event;
     if("undefined" == typeof e.clientX) {
@@ -98,4 +154,16 @@ PersonActions.updateMouseDirection = function(e){
     }
     Game.xMouse = e.clientX;
     Game.yMouse = e.clientY;
+    var person = Game.getPerson();
+    if(person) {
+        PersonActions.updateMouseDirectionByXy(e.clientX, e.clientY, person);
+    }
+};
+PersonActions.angle = function(cx, cy, ex, ey) {
+    var dy = ey - cy;
+    var dx = ex - cx;
+    var theta = Math.atan2(dy, dx); // range (-PI, PI]
+    theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
+    //if (theta < 0) theta = 360 + theta; // range [0, 360)
+    return theta;
 };

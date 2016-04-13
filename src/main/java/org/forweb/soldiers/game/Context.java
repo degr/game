@@ -1,19 +1,16 @@
-package websocket.game;
+package org.forweb.soldiers.game;
 
 
-import websocket.entity.Room;
+import org.forweb.soldiers.entity.Room;
+import org.springframework.stereotype.Component;
 
 import javax.websocket.Session;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Component
 public class Context {
-    static Context context = new Context();
-
-    public static Context getInstance() {
-        return context;
-    }
 
     private Room room;
 

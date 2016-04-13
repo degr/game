@@ -1,22 +1,19 @@
-package websocket.service;
+package org.forweb.soldiers.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import websocket.entity.Person;
-import websocket.game.Context;
+import org.forweb.soldiers.entity.Person;
+import org.forweb.soldiers.game.Context;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.websocket.CloseReason;
 import java.io.IOException;
 
+@Service
 public class ResponseService {
-    private Context gameContext = Context.getInstance();
-    private static ResponseService responseService = new ResponseService();
-    private ResponseService(){
-        
-    }
-    public static ResponseService getInstance(){
-        return responseService;
-    }
     
+    @Autowired
+    private Context gameContext;
     
     public void sendMessage(Person person, String msg) {
         try {

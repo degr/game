@@ -1,9 +1,7 @@
-package websocket.entity;
+package org.forweb.soldiers.entity;
 
-import websocket.entity.ammo.Projectile;
+import org.forweb.soldiers.entity.ammo.Projectile;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Room {

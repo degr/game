@@ -1,4 +1,4 @@
-package websocket.entity.ammo;
+package org.forweb.soldiers.entity.ammo;
 
 import java.util.Date;
 
@@ -15,6 +15,7 @@ public abstract class Projectile {
     private Long creationTime = new Date().getTime();
     private Long lifeTime;
     public abstract boolean isInstant();
+    public abstract int getDamage();
     
     
     public Integer getyEnd() {

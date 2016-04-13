@@ -1,30 +1,33 @@
-package websocket.service;
+package org.forweb.soldiers.service;
 
-import websocket.entity.Room;
-import websocket.entity.Location;
-import websocket.controller.PersonController;
+import org.forweb.soldiers.controller.PersonController;
+import org.forweb.soldiers.entity.Person;
+import org.forweb.soldiers.entity.Room;
+import org.springframework.stereotype.Service;
 
 import java.awt.*;
 import java.util.Random;
 
+@Service
 public class LocationService {
 
     private static final Random random = new Random();
-    
-    public Location getRandomLocation(Room room) {
+
+    public void getRandomLocation(Room room, Person person) {
         int x = roundByGridSize(random.nextInt(room.getWidth()), room.getWidth());
         int y = roundByGridSize(random.nextInt(room.getHeight()), room.getHeight());
-        return new Location(x, y);
+        person.setX(x);
+        person.setY(y);
     }
 
 
     private int roundByGridSize(int value, int limit) {
-        if(value < PersonController.PERSON_RADIUS) {
+        if (value < PersonController.PERSON_RADIUS) {
             return PersonController.PERSON_RADIUS;
-        } else if(value + PersonController.PERSON_RADIUS > limit) {
+        } else if (value + PersonController.PERSON_RADIUS > limit) {
             return limit - PersonController.PERSON_RADIUS;
         } else {
-            return  value;
+            return value;
         }
     }
 
@@ -50,7 +53,7 @@ public class LocationService {
     public boolean canGoNorth(int y) {
         return y > PersonController.PERSON_RADIUS;
     }
-    
+
     public boolean canGoSouth(int y, Integer height) {
         return y < height - PersonController.PERSON_RADIUS;
     }

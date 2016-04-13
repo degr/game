@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package websocket.entity;
+package org.forweb.soldiers.entity;
 
 public enum Direction {
     NONE, NORTH, NORTH_WEST, NORTH_EAST, SOUTH, SOUTH_EAST, SOUTH_WEST, EAST, WEST

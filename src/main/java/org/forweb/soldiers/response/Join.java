@@ -1,16 +1,16 @@
-package websocket.response;
+package org.forweb.soldiers.response;
 
-import websocket.entity.Person;
-import websocket.entity.ammo.Projectile;
+import org.forweb.soldiers.entity.Person;
+import org.forweb.soldiers.entity.ammo.Projectile;
 
 import java.util.Collection;
 import java.util.List;
 
 
-public class Join {
+public class Join { 
     private final String type = "join";
     private Integer id;
-    private Collection<Person> data;
+    private Person person;
     private List<Projectile> projectiles;
     
     public List<Projectile> getProjectiles() {
@@ -19,14 +19,6 @@ public class Join {
 
     public void setProjectiles(List<Projectile> projectiles) {
         this.projectiles = projectiles;
-    }
-
-    public Collection<Person> getData() {
-        return data;
-    }
-
-    public void setData(Collection<Person> data) {
-        this.data = data;
     }
 
     public Integer getId() {
@@ -40,4 +32,13 @@ public class Join {
     public String getType() {
         return type;
     }
+    
+    public Person getPerson() {
+        return person;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
+    }
+
 }

@@ -1,7 +1,7 @@
-package websocket.response;
+package org.forweb.soldiers.response;
 
-import websocket.entity.Person;
-import websocket.entity.ammo.Projectile;
+import org.forweb.soldiers.entity.Person;
+import org.forweb.soldiers.entity.ammo.Projectile;
 
 import java.util.Collection;
 
