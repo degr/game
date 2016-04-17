@@ -6,13 +6,19 @@ Game.socket = null;
 Game.nextFrame = null;
 Game.interval = null;
 Game.radius = 15;
+Game.angle = 0;
 Game.xMouse = null;//current mouse x position
 Game.yMouse = null;//current mouse y position
 Game.rect = null;//game square rectangle
 Game.id = null;//your person id
 Game.entities = null;//all person (include your)
 Game.projectiles = null;//all person (include your)
-
+Game.clientKey = null;
+Game.viewAngleDirection = null;
+Game.getPerson = function(id){
+    if(!id)id = Game.id;
+    return Game.entities[id];
+};
 Game.initialize = function() {
     Game.entities = {};
     canvas = document.getElementById('playground');
@@ -28,13 +34,11 @@ Game.initialize = function() {
     window.addEventListener('keyup', PersonActions.stopMovement, false);
     canvas.addEventListener('mousemove', PersonActions.updateMouseDirection);
     if (window.location.protocol == 'http:') {
-        Game.connect('ws://' + window.location.host + '/examples/websocket/snake');
+        Game.connect('ws://' + window.location.host + '/soldiers');
     } else {
-        Game.connect('wss://' + window.location.host + '/examples/websocket/snake');
+        Game.connect('wss://' + window.location.host + '/soldiers');
     }
 };
-
-
 
 Game.startGameLoop = function() {
     if (window.webkitRequestAnimationFrame) {
@@ -70,14 +74,25 @@ Game.draw = function() {
     }
 };
 
-Game.addPerson = function(id, hexColor) {
-    Game.entities[id] = new Person();
-    Game.entities[id].hexColor = hexColor;
+Game.addPerson = function(person) {
+    var p = new Person();
+    p.angle = person.angle;
+    p.x = person.x;
+    p.y = person.y;
+    Game.entities[person.id] = p;
 };
 
-Game.updatePerson = function(id, location) {
+Game.updatePerson = function(personDto) {
+    var id = personDto.id;
     if (typeof Game.entities[id] != "undefined") {
-        Game.entities[id].location = location;
+        var p = Game.entities[id]; 
+        p.x = personDto.x;
+        p.y = personDto.y;
+        p.angle = personDto.angle;
+        if(Game.id == id) {
+            PersonActions.updateMouseDirectionByXy(Game.xMouse, Game.yMouse, p);
+        }
+        
     }
 };
 
@@ -100,7 +115,16 @@ Game.run = (function() {
         }
     };
 })();
-
+Game.createSelfPerson = function(){
+    Game.clientKey = "r" + Math.random().toString(36).substring(1, 4);
+    Game.socket.send("join:" + Game.clientKey);
+};
+Game.updatePersonViewAngle = function(direction) {
+    if(Game.viewAngleDirection !== direction) {
+        Game.viewAngleDirection = direction;
+        Game.socket.send('angle:' + direction);
+    }
+};
 Game.connect = (function(host) {
     if ('WebSocket' in window) {
         Game.socket = new WebSocket(host);
@@ -115,6 +139,7 @@ Game.connect = (function(host) {
         // Socket open.. start the game loop.
         Console.log('Info: WebSocket connection opened.');
         Console.log('Info: Press an arrow key to begin.');
+        Game.createSelfPerson();
         Game.startGameLoop();
         setInterval(function() {
             // Prevent server read timeout.
@@ -132,16 +157,17 @@ Game.connect = (function(host) {
         var packet = eval('(' + message.data + ')');
         switch (packet.type) {
             case 'update':
-                for (var i = 0; i < packet.data.length; i++) {
-                    Game.updatePerson(packet.data[i].id, packet.data[i].location);
+                for (var i = 0; i < packet.persons.length; i++) {
+                    var person = packet.persons[i];
+                    if (Game.id === null && person.clientKey === Game.clientKey) {
+                        Game.id = person.id;
+                    }
+                    if(!Game.entities[person.id]) {
+                        Game.addPerson(person);
+                    }
+                    Game.updatePerson(person);
                 }
                 Game.projectiles = packet.projectiles;
-                break;
-            case 'join':
-                Game.id = packet.id;
-                for (var j = 0; j < packet.data.length; j++) {
-                    Game.addPerson(packet.data[j].id, packet.data[j].hexColor);
-                }
                 break;
             case 'leave':
                 Game.removePerson(packet.id);

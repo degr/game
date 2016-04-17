@@ -13,7 +13,7 @@ PersonActions.setDirection  = function(direction) {
 PersonActions.doShot = function(e){
     e = e || window.event;
     e.preventDefault();
-    Game.socket.send("shot:" + e.clientX + ":"+ e.clientY);
+    Game.socket.send("shot");
 };
 PersonActions.startMovement = function(e){
     var code = e.keyCode;
@@ -21,19 +21,15 @@ PersonActions.startMovement = function(e){
         e.preventDefault();
         switch (code) {
             case 37:
-                console.log("left 37");
                 PersonActions.buttonLeft = true;
                 break;
             case 38:
-                console.log("top 38");
                 PersonActions.buttonTop = true;
                 break;
             case 39:
-                console.log("right 39");
                 PersonActions.buttonRight= true;
                 break;
             case 40:
-                console.log("bottom 40");
                 PersonActions.buttonBottom = true;
                 break;
         }
@@ -91,6 +87,54 @@ PersonActions.stopMovement = function(e){
         PersonActions.setDirection(direction);
     }
 };
+
+PersonActions.updateMouseDirectionByXy = function(x, y, person) {
+    var angle = Math.floor(PersonActions.angle(person.x, person.y, x, y));
+    var pa = person.angle;
+    if(pa > 180) {
+        pa = pa - 360;
+    }
+    var clockAngle = null;
+    var antiClockAngle = null;
+    if(pa >= 0) {
+        if(angle >= 0) {
+            if(angle > pa) {
+                clockAngle = angle - pa;
+            } else if (angle < pa) {
+                antiClockAngle = pa - angle;
+            } else {
+                clockAngle = 180;
+            }
+        } else {
+            antiClockAngle = pa + (-1 * angle);
+        }
+    } else {
+        if(angle >= 0) {
+            clockAngle = angle + (-1 * pa);
+        } else {
+            if(angle < pa) {
+                antiClockAngle = (angle - pa) * -1;
+            } else if (angle > pa) {
+                clockAngle = (pa - angle) * -1;
+            } else {
+                clockAngle = 180;
+            }
+        }
+    }
+    if(clockAngle == null) {
+        clockAngle = 360 - antiClockAngle;
+    } else {
+        antiClockAngle = 360 - clockAngle;
+    }
+    if(clockAngle < antiClockAngle) {
+        Game.updatePersonViewAngle(clockAngle > 5 ? 2 : 1);
+    } else if(clockAngle > antiClockAngle) {
+        Game.updatePersonViewAngle(antiClockAngle > 5 ? -2 : -1);
+    } else {
+        Game.updatePersonViewAngle(0);
+    }
+};
+
 PersonActions.updateMouseDirection = function(e){
     e = e || window.event;
     if("undefined" == typeof e.clientX) {
@@ -98,4 +142,16 @@ PersonActions.updateMouseDirection = function(e){
     }
     Game.xMouse = e.clientX;
     Game.yMouse = e.clientY;
+    var person = Game.getPerson();
+    if(person) {
+        PersonActions.updateMouseDirectionByXy(e.clientX, e.clientY, person);
+    }
+};
+PersonActions.angle = function(cx, cy, ex, ey) {
+    var dy = ey - cy;
+    var dx = ex - cx;
+    var theta = Math.atan2(dy, dx); // range (-PI, PI]
+    theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
+    //if (theta < 0) theta = 360 + theta; // range [0, 360)
+    return theta;
 };
