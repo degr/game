@@ -8,6 +8,6 @@ public class AssaultRifle extends AbstractWeapon<Bullet> {
         this.setRadius(250);
         this.setShotTimeout(100);
         this.setReloadTimeout(3000);
-        setSpread(10);
+        setSpread(7);
     }
 }

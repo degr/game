@@ -1,7 +1,9 @@
 package org.forweb.soldiers.entity;
 
 import org.forweb.soldiers.entity.ammo.Projectile;
+import org.forweb.soldiers.entity.zone.AbstractZone;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Room {
@@ -10,6 +12,14 @@ public class Room {
     private Integer width;
     private ConcurrentHashMap<Integer, Person> persons;
     private ConcurrentHashMap<Integer, Projectile> projectiles;
+    private List<AbstractZone> zones;
+
+    public List<AbstractZone> getZones() {
+        return zones;
+    }
+    public void setZones(List<AbstractZone> zones) {
+        this.zones = zones;
+    }
 
     public ConcurrentHashMap<Integer, Person> getPersons() {
         return persons;

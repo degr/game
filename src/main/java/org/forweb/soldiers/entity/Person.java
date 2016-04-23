@@ -1,8 +1,9 @@
 package org.forweb.soldiers.entity;
 
-import org.forweb.soldiers.controller.PersonController;
+import org.forweb.soldiers.controller.PersonWebSocketEndpoint;
 import org.forweb.soldiers.entity.weapon.AbstractWeapon;
-import org.forweb.soldiers.entity.weapon.Pistol;
+import org.forweb.soldiers.entity.weapon.Minigun;
+import org.forweb.soldiers.entity.weapon.SniperRifle;
 
 public class Person {
 
@@ -14,14 +15,16 @@ public class Person {
     private float angle;
     private int turnDirection;
     private String hexColor;
-    private Integer life = PersonController.LIFE_AT_START;
+    private Integer life = PersonWebSocketEndpoint.LIFE_AT_START;
     
     private AbstractWeapon weapon;
+    private boolean isFire;
+    private long shotCooldown;
 
     public Person(int id, String clientKey) {
         this.id = id;
         this.clientKey = clientKey;
-        this.weapon = new Pistol();
+        this.weapon = new SniperRifle();
     }
 
     public int getId() {
@@ -94,5 +97,25 @@ public class Person {
 
     public void setWeapon(AbstractWeapon weapon) {
         this.weapon = weapon;
+    }
+
+    public void setIsFire(boolean isFire) {
+        this.isFire = isFire;
+    }
+
+    public boolean isFire() {
+        return isFire;
+    }
+
+    public void setFire(boolean isFire) {
+        this.isFire = isFire;
+    }
+
+    public void setShotCooldown(long shotCooldown) {
+        this.shotCooldown = shotCooldown;
+    }
+
+    public long getShotCooldown() {
+        return shotCooldown;
     }
 }

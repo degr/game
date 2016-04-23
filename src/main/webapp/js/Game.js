@@ -11,6 +11,7 @@ Game.xMouse = null;//current mouse x position
 Game.yMouse = null;//current mouse y position
 Game.rect = null;//game square rectangle
 Game.id = null;//your person id
+Game.zones = null;//all person (include your)
 Game.entities = null;//all person (include your)
 Game.projectiles = null;//all person (include your)
 Game.clientKey = null;
@@ -29,7 +30,8 @@ Game.initialize = function() {
 
     Game.rect = canvas.getBoundingClientRect();
     Game.context = canvas.getContext('2d');
-    canvas.addEventListener('click', PersonActions.doShot);
+    canvas.addEventListener('mousedown', PersonActions.startFire);
+    canvas.addEventListener('mouseup', PersonActions.stopFire);
     window.addEventListener('keydown', PersonActions.startMovement, false);
     window.addEventListener('keyup', PersonActions.stopMovement, false);
     canvas.addEventListener('mousemove', PersonActions.updateMouseDirection);
@@ -66,19 +68,23 @@ Game.stopGameLoop = function () {
 
 Game.draw = function() {
     Game.context.clearRect(0, 0, 640, 480);
+    if(Game.zones != null) {
+        for (var zoneId in Game.zones) {
+            ZoneActions.drawZone(Game.zones[zoneId], Game.context);
+        }
+    }
     for (var id in Game.entities) {
         Game.entities[id].draw(Game.context);
     }
-    for (var id in Game.projectiles) {
-        ProjectilesActions.draw(Game.projectiles[id]);
+    if(Game.projectiles != null) {
+        for (var i = 0; i < Game.projectiles.length; i++) {
+            ProjectilesActions.draw(Game.projectiles[i]);
+        }
     }
 };
 
 Game.addPerson = function(person) {
-    var p = new Person();
-    p.angle = person.angle;
-    p.x = person.x;
-    p.y = person.y;
+    var p = new Person(person);
     Game.entities[person.id] = p;
 };
 
@@ -167,6 +173,7 @@ Game.connect = (function(host) {
                     }
                     Game.updatePerson(person);
                 }
+                Game.zones = packet.zones;
                 Game.projectiles = packet.projectiles;
                 break;
             case 'leave':

@@ -1,9 +1,9 @@
 package org.forweb.soldiers.service;
 
-import org.forweb.soldiers.controller.PersonController;
+import org.forweb.soldiers.controller.PersonWebSocketEndpoint;
 import org.forweb.soldiers.entity.Person;
+import org.forweb.soldiers.entity.Room;
 import org.forweb.soldiers.game.Context;
-import org.forweb.soldiers.response.Join;
 import org.forweb.soldiers.response.Leave;
 import org.forweb.soldiers.response.Update;
 import org.forweb.soldiers.service.person.TurnService;
@@ -19,10 +19,10 @@ import java.util.TimerTask;
 public class SpringDelegationService {
 
     private static final String MESSAGE_JOIN = "join";
-    private static final String MESSAGE_SHOT = "shot";
+    private static final String MESSAGE_SHOT = "fire";
     private static final String MESSAGE_DIRECTION = "direction";
     private static final String MESSAGE_ANGLE = "angle";
-    
+
     @Autowired
     private Context gameContext;
     @Autowired
@@ -37,7 +37,7 @@ public class SpringDelegationService {
     private ProjectileService projectilesService;
 
 
-    public void onOpen(Session session, Integer personId, String clientKey) {
+    private void onOpen(Session session, Integer personId, String clientKey) {
         gameContext.getSessionStorage().put(personId, session);
         Person person = new Person(personId, clientKey);
         person.setHexColor(locationService.getRandomHexColor());
@@ -57,7 +57,7 @@ public class SpringDelegationService {
                 turnService.updatePersonViewAngle(person, Integer.parseInt(parts[1]));
                 break;
             case MESSAGE_SHOT:
-                personService.doShot(person);
+                projectilesService.doShot(person, parts[1]);
                 break;
             case MESSAGE_DIRECTION:
                 personService.handleDirection(person, parts[1]);
@@ -70,41 +70,19 @@ public class SpringDelegationService {
 
     public void onClose(Integer personId) {
         removePerson(personId);
-        broadcast(responseService.prepareJson(
-                new Leave(personId)
-        ));
+        responseService.broadcast(new Leave(personId), gameContext.getRoom());
     }
 
-
-    protected void broadcast(String message) {
-        for (Person snake : gameContext.getRoom().getPersons().values()) {
-            try {
-                responseService.sendMessage(snake, message);
-            } catch (IllegalStateException ise) {
-                // An ISE can occur if an attempt is made to write to a
-                // WebSocket connection after it has been closed. The
-                // alternative to catching this exception is to synchronise
-                // the writes to the clients along with the addPerson() and
-                // removePerson() methods that are already synchronised.
-            }
-        }
-    }
-
-
-    protected void tick() {
+    private void tick() {
         Collection<Person> persons = gameContext.getRoom().getPersons().values();
         personService.handlePersons(persons, gameContext.getRoom());
         projectilesService.onProjectileLifecycle(gameContext.getRoom().getProjectiles());
-        broadcast(responseService.prepareJson(
-                new Update(
-                        gameContext.getRoom().getPersons().values(),
-                        gameContext.getRoom().getProjectiles().values()
-                )
-        ));
+        Room room = gameContext.getRoom();
+        responseService.broadcast(new Update(room),room);
     }
 
-    public void startTimer() {
-        gameContext.setGameTimer(new Timer(PersonController.class.getSimpleName() + " Timer"));
+    private void startTimer() {
+        gameContext.setGameTimer(new Timer(PersonWebSocketEndpoint.class.getSimpleName() + " Timer"));
         gameContext.getGameTimer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -118,21 +96,21 @@ public class SpringDelegationService {
     }
 
 
-    protected synchronized void addPerson(Person person) {
+    private synchronized void addPerson(Person person) {
         if (gameContext.getRoom().getPersons().size() == 0) {
             startTimer();
         }
         gameContext.getRoom().getPersons().put(person.getId(), person);
     }
 
-    protected synchronized void removePerson(Integer personId) {
+    private synchronized void removePerson(Integer personId) {
         gameContext.getRoom().getPersons().remove(personId);
         if (gameContext.getRoom().getPersons().size() == 0) {
             stopTimer();
         }
     }
-    
-    public void stopTimer() {
+
+    private void stopTimer() {
         if (gameContext.getGameTimer() != null) {
             gameContext.getGameTimer().cancel();
         }

@@ -2,6 +2,7 @@ package org.forweb.soldiers.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.forweb.soldiers.entity.Person;
+import org.forweb.soldiers.entity.Room;
 import org.forweb.soldiers.game.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class ResponseService {
         }
     }
 
-    public String prepareJson(Object object) {
+    private String prepareJson(Object object) {
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.writeValueAsString(object);
@@ -37,4 +38,20 @@ public class ResponseService {
             return null;
         }
     }
+
+    public void broadcast(Object object, Room room) {
+        String message = prepareJson(object);
+        for (Person person: room.getPersons().values()) {
+            try {
+                sendMessage(person, message);
+            } catch (IllegalStateException ise) {
+                // An ISE can occur if an attempt is made to write to a
+                // WebSocket connection after it has been closed. The
+                // alternative to catching this exception is to synchronise
+                // the writes to the clients along with the addPerson() and
+                // removePerson() methods that are already synchronised.
+            }
+        }
+    }
+
 }

@@ -10,29 +10,38 @@ var PersonActions = {
 PersonActions.setDirection  = function(direction) {
     Game.socket.send("direction:" + direction);
 };
-PersonActions.doShot = function(e){
+PersonActions.startFire = function(e){
     e = e || window.event;
     e.preventDefault();
-    Game.socket.send("shot");
+    Game.socket.send("fire:1");
+};
+PersonActions.stopFire = function(e){
+    e = e || window.event;
+    e.preventDefault();
+    Game.socket.send("fire:0");
 };
 PersonActions.startMovement = function(e){
+    e = e || window.event;
     var code = e.keyCode;
     if (code > 36 && code < 41) {
         e.preventDefault();
         switch (code) {
-            case 37:
+            case Controls.left:
                 PersonActions.buttonLeft = true;
                 break;
-            case 38:
+            case Controls.top:
                 PersonActions.buttonTop = true;
                 break;
-            case 39:
+            case Controls.right:
                 PersonActions.buttonRight= true;
                 break;
-            case 40:
+            case Controls.botton:
                 PersonActions.buttonBottom = true;
                 break;
+            default:
         }
+
+        console.log(code);
         var direction = PersonActions.handleDirectionAfterButtons();
         PersonActions.setDirection(direction);
     }

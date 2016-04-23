@@ -8,6 +8,6 @@ public class Minigun extends AbstractWeapon<Bullet> {
         this.setRadius(250);
         this.setShotTimeout(100);
         this.setReloadTimeout(3000);
-        this.setSpread(12);
+        this.setSpread(9);
     }
 }

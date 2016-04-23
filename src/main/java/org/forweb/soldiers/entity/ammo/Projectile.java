@@ -3,6 +3,7 @@ package org.forweb.soldiers.entity.ammo;
 import java.util.Date;
 
 public abstract class Projectile {
+    private Integer id;
     private String type;
     private Integer xStart;
     private Integer yStart;
@@ -10,8 +11,11 @@ public abstract class Projectile {
     private Integer yEnd;
     private Integer speed;
     private Long creationTime = new Date().getTime();
+    private long now;
     private Long lifeTime;
     private float angle;
+
+    private boolean piercing = false;
 
     public abstract boolean isInstant();
     public abstract int getDamage();
@@ -89,4 +93,27 @@ public abstract class Projectile {
     public float getAngle() {
         return angle;
     }
+
+    public Integer getId() {
+        return id;
+    }
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void setNow(long now) {
+        this.now = now;
+    }
+
+    public long getNow() {
+        return now;
+    }
+
+    public boolean isPiercing() {
+        return piercing;
+    }
+    public void setPiercing(boolean piercing) {
+        this.piercing = piercing;
+    }
+
 }

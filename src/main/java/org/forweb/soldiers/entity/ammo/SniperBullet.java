@@ -7,6 +7,7 @@ public class SniperBullet extends Projectile {
     public SniperBullet(int xStart, int yStart, float angle) {
         super(xStart, yStart, angle);
         this.setLifeTime(100L);
+        setPiercing(true);
     }
 
     @Override
