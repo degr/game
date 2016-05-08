@@ -4,7 +4,7 @@ var Controls = {
     right: 39,
     botton: 40,
     nextWeapon: 0,
-    previousWeapon: 0,
+    previousWeapon: null,
     knife: 1,
     pistol: 2,
     assaultRifle: 3,

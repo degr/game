@@ -3,6 +3,39 @@
     height: 480px;
     background-color: #ccc;
 }
+#appstore {
+    display: none;
+}
+ul.games {
+    padding: 0;
+    margin: 0;
+}
+ul.games li{
+    width: 234px;
+    float: left;
+    height: 300px;
+    overflow: hidden;
+}
+ul.games li p{
+    overflow: auto;
+    height: 75px;
+}
+.overlay {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    background-color: rgba(100, 100, 100, 0.5);
+}
+.window {
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    width: 468px;
+    margin-left: -234px;
+    background-color: white;
+    border: 1px solid black;
+    padding: 10px;
+}
 body, html{
     margin: 0;
     padding:0;
@@ -20,18 +53,78 @@ body, html{
     width: 300px;
 }
 
-#console {
+
+#map_editor_table {
+    border-collapse: collapse;
+}
+
+.editor td {
+    width: 10px;
+    height: 10px;
+    border: 1px solid black;
+    box-sizing: border-box;
+}
+.editor td.respawn, .editor .item-respawn {
+    background: #35ff4c;
+}
+.editor td.wall, .editor .item-wall{
+    background: rgba(145, 150, 157, 0.82);
+}
+.editor td.shotgun, .editor .item-shotgun {
+     background: #ffcb9a;
+}
+.editor td.sniper, .editor .item-sniper{
+    background: rgba(94, 53, 79, 0.79);
+}
+.editor td.assault, .editor .item-assault{
+    background: rgba(234, 120, 71, 0.82);
+}
+.editor td.minigun, .editor .item-minigun{
+    background: rgba(65, 29, 234, 0.82);
+}
+.editor td.flame, .editor .item-flame{
+    background: rgba(234, 0, 19, 0.82);
+}
+.editor td.rocket, .editor .item-rocket{
+    background: rgba(230, 234, 76, 0.82);
+}
+.editor td.medkit, .editor .item-medkit{
+    background: rgba(106, 231, 234, 0.82);
+}
+.editor td.armor, .editor .item-armor{
+    background: rgba(195, 234, 171, 1);
+}
+.editor td.helm, .editor .item-helm{
+    background: rgb(234, 145, 145);
+}
+.editor .mounted {
+    float: right;
+    max-width: 200px;
+}
+
+.editor canvas {
+    border: 1px solid black;
+}
+.control {
+    float: right;
+}
+.mounted input[type="text"] {
+    width: 36px;
+    display: inline-block;
+}
+.mounted p {
+    margin-bottom: 5px;
+}
+.mounted p input {
+    margin-left: 5px;
+}
+#editor_console {
     border: 1px solid #CCCCCC;
     border-right-color: #999999;
     border-bottom-color: #999999;
-    height: 480px;
+    height: 100px;
     overflow-y: scroll;
-    padding-left: 5px;
-    padding-right: 5px;
-    width: 100%;
-}
-
-#console p {
+    width: 98%;
     padding: 0;
-    margin: 0;
+    margin: 1%;
 }

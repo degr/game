@@ -18,6 +18,7 @@ public abstract class Projectile {
     private boolean piercing = false;
 
     public abstract boolean isInstant();
+    public abstract String getName();
     public abstract int getDamage();
     
     public Projectile(int xStart, int yStart, float angle) {

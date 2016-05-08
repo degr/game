@@ -1,4 +1,4 @@
-package org.forweb.soldiers.utils;
+package org.forweb.soldiers.utils.shapes;
 
 public class Point {
 

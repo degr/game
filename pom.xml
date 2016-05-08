@@ -7,6 +7,11 @@
   <version>1.0-SNAPSHOT</version>
   <name>comandos Maven Webapp</name>
   <url>http://maven.apache.org</url>
+
+  <properties>
+    <jackson>2.7.3</jackson>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -28,14 +33,22 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>2.7.3</version>
+      <version>${jackson}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.7.3</version>
+      <version>${jackson}</version>
     </dependency>
-    
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <version>${jackson}</version>
+    </dependency>
+
+
+
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>

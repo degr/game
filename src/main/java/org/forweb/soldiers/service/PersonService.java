@@ -2,7 +2,7 @@ package org.forweb.soldiers.service;
 
 import org.forweb.soldiers.service.person.MovementService;
 import org.forweb.soldiers.service.person.TurnService;
-import org.forweb.soldiers.utils.Point;
+import org.forweb.soldiers.utils.shapes.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.forweb.soldiers.controller.PersonWebSocketEndpoint;

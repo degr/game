@@ -1,8 +1,5 @@
 package org.forweb.soldiers.entity.ammo;
 
-/**
- * Created by Ror on 15.04.2016.
- */
 public class SniperBullet extends Projectile {
     public SniperBullet(int xStart, int yStart, float angle) {
         super(xStart, yStart, angle);
@@ -13,6 +10,11 @@ public class SniperBullet extends Projectile {
     @Override
     public boolean isInstant() {
         return true;
+    }
+
+    @Override
+    public String getName() {
+        return "slug";
     }
 
     @Override

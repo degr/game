@@ -12,5 +12,9 @@ public class Knife extends AbstractWeapon<KnifeAmmo>{
         this.setCurrentClip(1);
         setSpread(1);
     }
-    
+
+    @Override
+    public String getName() {
+        return "knife";
+    }
 }

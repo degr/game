@@ -19,6 +19,7 @@ public abstract class AbstractZone {
     private String type;
     private boolean passable;
     private boolean isShootable;
+    private boolean isStaticSize;
 
     public boolean isShootable() {
         return isShootable;
@@ -73,4 +74,13 @@ public abstract class AbstractZone {
     public void setHeight(int height) {
         this.height = height;
     }
+
+    public boolean isStaticSize() {
+        return isStaticSize;
+    }
+
+    public void setStaticSize(boolean staticSize) {
+        isStaticSize = staticSize;
+    }
+
 }

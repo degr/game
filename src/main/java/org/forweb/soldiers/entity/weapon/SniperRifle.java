@@ -10,4 +10,9 @@ public class SniperRifle extends AbstractWeapon<SniperBullet> {
         this.setRadius(500);
         this.setSpread(3);
     }
+
+    @Override
+    public String getName() {
+        return "sniper";
+    }
 }

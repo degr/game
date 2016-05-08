@@ -5,7 +5,7 @@ Game.fps = 30;
 Game.socket = null;
 Game.nextFrame = null;
 Game.interval = null;
-Game.radius = 15;
+Game.radius = 20;
 Game.angle = 0;
 Game.xMouse = null;//current mouse x position
 Game.yMouse = null;//current mouse y position
@@ -14,8 +14,10 @@ Game.id = null;//your person id
 Game.zones = null;//all person (include your)
 Game.entities = null;//all person (include your)
 Game.projectiles = null;//all person (include your)
-Game.clientKey = null;
 Game.viewAngleDirection = null;
+Game.rocketRadius = 5;
+Game.fireRadius = 7;
+
 Game.getPerson = function(id){
     if(!id)id = Game.id;
     return Game.entities[id];
@@ -122,8 +124,7 @@ Game.run = (function() {
     };
 })();
 Game.createSelfPerson = function(){
-    Game.clientKey = "r" + Math.random().toString(36).substring(1, 4);
-    Game.socket.send("join:" + Game.clientKey);
+    Game.socket.send("join");
 };
 Game.updatePersonViewAngle = function(direction) {
     if(Game.viewAngleDirection !== direction) {
@@ -165,15 +166,18 @@ Game.connect = (function(host) {
             case 'update':
                 for (var i = 0; i < packet.persons.length; i++) {
                     var person = packet.persons[i];
-                    if (Game.id === null && person.clientKey === Game.clientKey) {
-                        Game.id = person.id;
-                    }
+                    
                     if(!Game.entities[person.id]) {
                         Game.addPerson(person);
                     }
                     Game.updatePerson(person);
                 }
-                Game.zones = packet.zones;
+                if(packet.zones) {
+                    Game.zones = packet.zones;
+                }
+                if (Game.id === null && packet.owner) {
+                    Game.id = packet.owner.id;
+                }
                 Game.projectiles = packet.projectiles;
                 break;
             case 'leave':

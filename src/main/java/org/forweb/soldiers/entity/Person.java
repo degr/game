@@ -1,14 +1,14 @@
 package org.forweb.soldiers.entity;
 
 import org.forweb.soldiers.controller.PersonWebSocketEndpoint;
-import org.forweb.soldiers.entity.weapon.AbstractWeapon;
-import org.forweb.soldiers.entity.weapon.Minigun;
-import org.forweb.soldiers.entity.weapon.SniperRifle;
+import org.forweb.soldiers.entity.weapon.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Person {
 
     private int id;
-    private final String clientKey;
     private Direction direction;
     private int x;
     private int y;
@@ -16,15 +16,32 @@ public class Person {
     private int turnDirection;
     private String hexColor;
     private Integer life = PersonWebSocketEndpoint.LIFE_AT_START;
-    
     private AbstractWeapon weapon;
-    private boolean isFire;
-    private long shotCooldown;
+    private int score;
+    private boolean aNew = true;
+    private boolean inPool = true;
+    public List<AbstractWeapon> getWeaponList() {
+        return weaponList;
+    }
 
-    public Person(int id, String clientKey) {
+    public void setWeaponList(List<AbstractWeapon> weaponList) {
+        this.weaponList = weaponList;
+    }
+
+    private List<AbstractWeapon> weaponList;
+    private boolean isFire;
+    private long shotCooldown = 0;
+    private long reloadCooldown = 0;
+    private boolean isReload;
+    private int armor;
+
+    public Person(int id) {
         this.id = id;
-        this.clientKey = clientKey;
-        this.weapon = new SniperRifle();
+        this.weapon = new Pistol();
+        this.weaponList = new ArrayList<>();
+        this.weaponList.add(new Knife());
+        this.weaponList.add(this.weapon);
+
     }
 
     public int getId() {
@@ -55,6 +72,13 @@ public class Person {
         this.hexColor = hexColor;
     }
 
+    public long getReloadCooldown() {
+        return reloadCooldown;
+    }
+
+    public void setReloadCooldown(long reloadCooldown) {
+        this.reloadCooldown = reloadCooldown;
+    }
 
     public int getX() {
         return x;
@@ -88,9 +112,6 @@ public class Person {
         this.turnDirection = turnDirection;
     }
 
-    public String getClientKey() {
-        return clientKey;
-    }
     public AbstractWeapon getWeapon() {
         return weapon;
     }
@@ -118,4 +139,49 @@ public class Person {
     public long getShotCooldown() {
         return shotCooldown;
     }
+
+    public void setIsReload(boolean isReload) {
+        this.isReload = isReload;
+    }
+
+    public boolean isReload() {
+        return isReload;
+    }
+
+    public void setReload(boolean isReload) {
+        this.isReload = isReload;
+    }
+
+    public void setArmor(int armor) {
+        this.armor = armor;
+    }
+
+    public int getArmor() {
+        return armor;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public boolean isNew() {
+        return aNew;
+    }
+
+    public void setNew(boolean aNew) {
+        this.aNew = aNew;
+    }
+
+    public boolean isInPool() {
+        return inPool;
+    }
+
+    public void setInPool(boolean inPool) {
+        this.inPool = inPool;
+    }
+
 }

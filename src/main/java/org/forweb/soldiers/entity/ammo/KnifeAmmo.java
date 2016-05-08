@@ -1,7 +1,5 @@
 package org.forweb.soldiers.entity.ammo;
 
-import java.util.Date;
-
 public class KnifeAmmo extends Projectile {
 
     public KnifeAmmo(int xStart, int yStart, float angle) {
@@ -12,6 +10,11 @@ public class KnifeAmmo extends Projectile {
     @Override
     public boolean isInstant() {
         return true;
+    }
+
+    @Override
+    public String getName() {
+        return "blade";
     }
 
     @Override

@@ -1,45 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="js/Control.js"></script>
+    <script src="js/utils/Ajax.js"></script>
+    <script src="js/utils/Rest.js"></script>
+    <script src="js/utils/Dom.js"></script>
+    <script src="js/components/Pagination.js"></script>
+
+    <script src="js/applications/Greetings.js"></script>
+    <script src="js/applications/MapEditor.js"></script>
+    <script src="js/applications/RoomsList.js"></script>
+    <script src="js/applications/MapList.js"></script>
+    <script src="js/applications/PlayGround.js"></script>
+    <script src="js/applications/Dispatcher.js"></script>
+
+
+   <!--<script src="js/Control.js"></script>
     <script src="js/ZoneActions.js"></script>
     <script src="js/Person.js"></script>
     <script src="js/Game.js"></script>
     <script src="js/Console.js"></script>
     <script src="js/PersonActions.js"></script>
-    <script src="js/ProjectilesActions.js"></script>
-    
-    <title>Apache Tomcat WebSocket Examples: Multiplayer Snake</title>
+    <script src="js/ProjectilesActions.js"></script>-->
+
+    <title>Soldiers</title>
     <link href="css/style.css"  rel="stylesheet"/>
 </head>
 <body>
-<div class="noscript">
-    <h2 style="color: #ff0000">
-        Seems your browser doesn't support Javascript!
-        Websockets rely on Javascript being enabled. Please enable
-    Javascript and reload this page!
-    </h2>
+<div id="application">
+
 </div>
-<div style="float: left">
-    <canvas id="playground" width="640" height="480"></canvas>
+<div id="appstore">
 </div>
-<div id="console-container">
+
+<!--<div id="console-container">
     <div id="console"></div>
-</div>
+</div>-->
+
+
+
 <script type="application/javascript">
-
-
-
-Game.initialize();
-
-
-document.addEventListener("DOMContentLoaded", function() {
-    // Remove elements with "noscript" class - <noscript> is not allowed in XHTML
-    var noscripts = document.getElementsByClassName("noscript");
-    for (var i = 0; i < noscripts.length; i++) {
-        noscripts[i].parentNode.removeChild(noscripts[i]);
-    }
-}, false);
+    Ajax.headers = {
+        Accept: "application/json"
+    };
+    Rest.host = 'http://localhost:8080/server/';
+    Dispatcher.init();
+/*
+    Rest.doGet("http://localhost:8080/server/map/pingGet");
+    Rest.doPost("http://localhost:8080/server/map/pingPost");
+    Rest.doPut("http://localhost:8080/server/map/pingPut");
+    Rest.doDelete("http://localhost:8080/server/map/pingDel");*/
+/*
+    Game.initialize();*/
 
 </script>
 </body>

@@ -1,6 +1,7 @@
-package org.forweb.soldiers.entity.zone;
+package org.forweb.soldiers.entity.zone.interactive;
 
 import org.forweb.soldiers.controller.PersonWebSocketEndpoint;
+import org.forweb.soldiers.entity.zone.AbstractZone;
 
 import java.awt.*;
 
@@ -16,5 +17,6 @@ public class Respawn extends AbstractZone {
         );
         setPassable(true);
         setShootable(true);
+        setStaticSize(true);
     }
 }

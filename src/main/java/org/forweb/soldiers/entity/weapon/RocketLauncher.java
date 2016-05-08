@@ -10,4 +10,9 @@ public class RocketLauncher extends AbstractWeapon<Rocket> {
         this.setShotTimeout(2000);
         setSpread(7);
     }
+
+    @Override
+    public String getName() {
+        return "rocket";
+    }
 }

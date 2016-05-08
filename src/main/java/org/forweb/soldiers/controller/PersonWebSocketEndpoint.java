@@ -12,7 +12,7 @@ import java.io.EOFException;
 public class PersonWebSocketEndpoint {
 
 
-    public static final int PERSON_RADIUS = 15;
+    public static final int PERSON_RADIUS = 20;
     public static final Integer LIFE_AT_START = 100;
 
     @Autowired

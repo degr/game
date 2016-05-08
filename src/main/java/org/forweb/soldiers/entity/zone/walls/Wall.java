@@ -1,4 +1,6 @@
-package org.forweb.soldiers.entity.zone;
+package org.forweb.soldiers.entity.zone.walls;
+
+import org.forweb.soldiers.entity.zone.AbstractZone;
 
 import java.awt.*;
 
@@ -13,5 +15,6 @@ public class Wall extends AbstractZone {
         super(TITLE, rectangle);
         setPassable(false);
         setShootable(false);
+        setStaticSize(false);
     }
 }

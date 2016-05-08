@@ -2,14 +2,20 @@ package org.forweb.soldiers.entity.weapon;
 
 import org.forweb.soldiers.entity.ammo.Projectile;
 
-public class AbstractWeapon<T extends Projectile> {
+public abstract class AbstractWeapon<T extends Projectile> {
     private int shotTimeout;
     private int reloadTimeout;
     private double radius;
+
     private int maxClip;
     private int currentClip = 0;
-    private int spread;
 
+    private int totalClip = 0;
+    private int spread;
+    private int bulletsPerShot = 1;
+
+
+    public abstract String getName();
 
     public double getRadius() {
         return radius;
@@ -57,5 +63,23 @@ public class AbstractWeapon<T extends Projectile> {
 
     public void setSpread(int spread) {
         this.spread = spread;
+    }
+
+
+    public int getTotalClip() {
+        return totalClip;
+    }
+
+    public void setTotalClip(int totalClip) {
+        this.totalClip = totalClip;
+    }
+
+
+    public void setBulletsPerShot(int bulletsPerShot) {
+        this.bulletsPerShot = bulletsPerShot;
+    }
+
+    public int getBulletsPerShot() {
+        return bulletsPerShot;
     }
 }

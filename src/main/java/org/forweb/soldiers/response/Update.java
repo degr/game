@@ -1,23 +1,23 @@
 package org.forweb.soldiers.response;
 
-import org.forweb.soldiers.entity.Person;
-import org.forweb.soldiers.entity.Room;
-import org.forweb.soldiers.entity.ammo.Projectile;
 import org.forweb.soldiers.entity.zone.AbstractZone;
+import org.forweb.soldiers.response.dto.BulletDto;
+import org.forweb.soldiers.response.dto.OwnerDto;
+import org.forweb.soldiers.response.dto.PersonDto;
 
-import java.util.Collection;
+import java.util.List;
 
 public class Update {
+
+    private OwnerDto owner;
     private final String type = "update";
+    private List<PersonDto> persons;
+    private List<BulletDto> projectiles;
+    private List<AbstractZone> zones;
 
-    private Collection<AbstractZone> zones;
-
-    private Collection<Person> persons;
-    private Collection<Projectile> projectiles;
-    public Update(Room room) {
-        this.persons = room.getPersons().values();
-        this.projectiles = room.getProjectiles().values();
-        this.zones = room.getZones();
+    public Update(List<PersonDto> personDto, List<BulletDto> projectiles) {
+        this.persons = personDto;
+        this.projectiles = projectiles;
     }
 
     public String getType() {
@@ -25,14 +25,27 @@ public class Update {
     }
 
 
-    public Collection<Projectile> getProjectiles() {
+    public List<BulletDto> getProjectiles() {
         return projectiles;
     }
-    public Collection<Person> getPersons() {
+
+    public List<PersonDto> getPersons() {
         return persons;
     }
-    public Collection<AbstractZone> getZones() {
-        return zones;
+
+    public OwnerDto getOwner() {
+        return owner;
     }
 
+    public void setOwner(OwnerDto owner) {
+        this.owner = owner;
+    }
+
+    public void setZones(List<AbstractZone> zones) {
+        this.zones = zones;
+    }
+
+    public List<AbstractZone> getZones() {
+        return zones;
+    }
 }

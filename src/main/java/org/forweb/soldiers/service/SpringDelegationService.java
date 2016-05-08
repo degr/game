@@ -37,11 +37,11 @@ public class SpringDelegationService {
     private ProjectileService projectilesService;
 
 
-    private void onOpen(Session session, Integer personId, String clientKey) {
+    private void onOpen(Session session, Integer personId) {
         gameContext.getSessionStorage().put(personId, session);
-        Person person = new Person(personId, clientKey);
+        Person person = new Person(personId);
         person.setHexColor(locationService.getRandomHexColor());
-        personService.resetState(person, gameContext.getRoom());
+        personService.resetState(person, gameContext.getRoom(0));
         addPerson(person);
     }
 
@@ -50,7 +50,7 @@ public class SpringDelegationService {
     }
 
     public void onTextMessage(Session session, String message, Integer personId) {
-        Person person = gameContext.getRoom().getPersons().get(personId);
+        Person person = gameContext.getRoom(0).getPersons().get(personId);
         String[] parts = message.split(":");
         switch ((parts[0])) {
             case MESSAGE_ANGLE:
@@ -63,22 +63,28 @@ public class SpringDelegationService {
                 personService.handleDirection(person, parts[1]);
                 break;
             case MESSAGE_JOIN:
-                onOpen(session, personId, parts[1]);
+                onOpen(session, personId);
                 break;
         }
     }
 
     public void onClose(Integer personId) {
         removePerson(personId);
-        responseService.broadcast(new Leave(personId), gameContext.getRoom());
+        responseService.flushToAll(new Leave(personId), gameContext.getRoom(0));
     }
 
     private void tick() {
-        Collection<Person> persons = gameContext.getRoom().getPersons().values();
-        personService.handlePersons(persons, gameContext.getRoom());
-        projectilesService.onProjectileLifecycle(gameContext.getRoom().getProjectiles());
-        Room room = gameContext.getRoom();
-        responseService.broadcast(new Update(room),room);
+        Collection<Person> persons = gameContext.getRoom(0).getPersons().values();
+        personService.handlePersons(persons, gameContext.getRoom(0));
+        projectilesService.onProjectileLifecycle(gameContext.getRoom(0).getProjectiles());
+        Room room = gameContext.getRoom(0);
+        responseService.broadcast(
+                new Update(
+                    responseService.mapPersons(gameContext.getRoom(0).getPersons()),
+                    responseService.mapProjectiles(gameContext.getRoom(0).getProjectiles())
+                ),
+                room
+        );
     }
 
     private void startTimer() {
@@ -97,15 +103,15 @@ public class SpringDelegationService {
 
 
     private synchronized void addPerson(Person person) {
-        if (gameContext.getRoom().getPersons().size() == 0) {
+        if (gameContext.getRoom(0).getPersons().size() == 0) {
             startTimer();
         }
-        gameContext.getRoom().getPersons().put(person.getId(), person);
+        gameContext.getRoom(0).getPersons().put(person.getId(), person);
     }
 
     private synchronized void removePerson(Integer personId) {
-        gameContext.getRoom().getPersons().remove(personId);
-        if (gameContext.getRoom().getPersons().size() == 0) {
+        gameContext.getRoom(0).getPersons().remove(personId);
+        if (gameContext.getRoom(0).getPersons().size() == 0) {
             stopTimer();
         }
     }

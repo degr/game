@@ -7,12 +7,16 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Room {
-    
+
+
+    private String name;
+    private String description;
     private Integer height;
     private Integer width;
     private ConcurrentHashMap<Integer, Person> persons;
     private ConcurrentHashMap<Integer, Projectile> projectiles;
     private List<AbstractZone> zones;
+    private int totalPlayers;
 
     public List<AbstractZone> getZones() {
         return zones;
@@ -51,5 +55,29 @@ public class Room {
 
     public void setProjectiles(ConcurrentHashMap<Integer, Projectile> projectiles) {
         this.projectiles = projectiles;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public int getTotalPlayers() {
+        return totalPlayers;
+    }
+
+    public void setTotalPlayers(int totalPlayers) {
+        this.totalPlayers = totalPlayers;
     }
 }

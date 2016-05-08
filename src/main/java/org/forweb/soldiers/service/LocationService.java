@@ -4,8 +4,10 @@ import org.forweb.soldiers.controller.PersonWebSocketEndpoint;
 import org.forweb.soldiers.entity.Person;
 import org.forweb.soldiers.entity.Room;
 import org.forweb.soldiers.entity.zone.AbstractZone;
-import org.forweb.soldiers.entity.zone.Respawn;
-import org.forweb.soldiers.utils.Point;
+import org.forweb.soldiers.entity.zone.AbstractItem;
+import org.forweb.soldiers.entity.zone.interactive.Respawn;
+import org.forweb.soldiers.utils.shapes.Point;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
@@ -15,6 +17,9 @@ import java.util.Random;
 
 @Service
 public class LocationService {
+
+    @Autowired
+    private ItemService itemService;
 
     private static final Random random = new Random();
 
@@ -67,6 +72,9 @@ public class LocationService {
         );
         for(AbstractZone zone : room.getZones()) {
             if(zone.isPassable()) {
+                if(zone instanceof AbstractItem) {
+                    itemService.onGetItem((AbstractItem)zone, player);
+                }
                 continue;
             }
             if(hasCollisions(playerBounds, GeometryService.getRectangle(zone))) {

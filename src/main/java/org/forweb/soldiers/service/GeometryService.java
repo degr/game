@@ -2,8 +2,8 @@ package org.forweb.soldiers.service;
 
 import org.forweb.soldiers.controller.PersonWebSocketEndpoint;
 import org.forweb.soldiers.entity.zone.AbstractZone;
-import org.forweb.soldiers.utils.Line;
-import org.forweb.soldiers.utils.Point;
+import org.forweb.soldiers.utils.shapes.Line;
+import org.forweb.soldiers.utils.shapes.Point;
 
 import java.awt.Rectangle;
 

@@ -6,8 +6,8 @@ import org.forweb.soldiers.entity.ammo.*;
 import org.forweb.soldiers.entity.weapon.*;
 import org.forweb.soldiers.entity.zone.AbstractZone;
 import org.forweb.soldiers.game.Context;
-import org.forweb.soldiers.utils.Line;
-import org.forweb.soldiers.utils.Point;
+import org.forweb.soldiers.utils.shapes.Line;
+import org.forweb.soldiers.utils.shapes.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -137,55 +137,75 @@ class ProjectileService {
     void doShot(Person person, String status) {
         boolean isFire = "1".equals(status);
         person.setIsFire(isFire);
-        if (isFire && person.getShotCooldown() < System.currentTimeMillis()) {
-            fire(person, gameContext.getRoom());
-        }
+        handleFire(person);
     }
 
     void handleFire(Person person) {
-        if (person.isFire() && person.getShotCooldown() < System.currentTimeMillis()) {
-            fire(person, gameContext.getRoom());
+        if (person.isFire()) {
+            long now = System.currentTimeMillis();
+            if(person.getWeapon().getCurrentClip() <= 0 && !person.isReload()) {
+                person.setIsReload(true);
+                person.setReloadCooldown(person.getWeapon().getReloadTimeout());
+            } else if (person.getShotCooldown() < now && person.getReloadCooldown() < now ) {
+                if(person.isReload()) {
+                    person.setIsReload(false);
+                }
+                fire(person, gameContext.getRoom(0));
+            }
         }
     }
 
     private void fire(Person person, Room room) {
-        person.setShotCooldown(System.currentTimeMillis() + person.getWeapon().getShotTimeout());
-        Projectile out = getCompatibleProjectile(person);
+        AbstractWeapon gun = person.getWeapon();
+        person.setShotCooldown(System.currentTimeMillis() + gun.getShotTimeout());
+        gun.setCurrentClip(gun.getCurrentClip() - 1);
 
-        Integer id = gameContext.getProjectilesIds().getAndIncrement();
-        ConcurrentHashMap<Integer, Projectile> projectiles = room.getProjectiles();
-        projectiles.put(id, out);
+        for(int i = 0; i < gun.getBulletsPerShot(); i++) {
+            Projectile projectile = getCompatibleProjectile(person);
+            Integer id = gameContext.getProjectilesIds().getAndIncrement();
+            room.getProjectiles().put(id, projectile);
 
-        float angle = out.getAngle();
-        if (angle == 90) {
-            out.setxEnd(person.getX());
-            out.setyEnd(room.getHeight());
-        } else if (angle == 270) {
-            out.setxEnd(person.getX());
-            out.setyEnd(0);
-        } else if (angle < 270 && angle > 90) {
-            out.setxEnd(0);
-            out.setyEnd((int) (Math.tan(angle * Math.PI / 180) * (-person.getX()) + person.getY()));
-        } else {
-            out.setxEnd(room.getWidth());
-            out.setyEnd((int) (Math.tan(angle * Math.PI / 180) * (room.getWidth() - person.getX()) + person.getY()));
-        }
-        if (out.isInstant()) {
-            calculateInstantImpacts(person, out, room);
+            float angle = projectile.getAngle();
+            if (angle == 90) {
+                projectile.setxEnd(person.getX());
+                int gunLimit = (int) gun.getRadius() + person.getY();
+                projectile.setyEnd(gunLimit > room.getHeight() ? room.getHeight() : gunLimit);
+            } else if (angle == 180) {
+                projectile.setyEnd(person.getY());
+                int gunLimit = person.getX() - (int) gun.getRadius();
+                projectile.setyEnd(gunLimit > 0 ? gunLimit : 0);
+            } else if (angle == 270) {
+                projectile.setxEnd(person.getX());
+                int gunLimit = person.getY() - (int) gun.getRadius();
+                projectile.setyEnd(gunLimit > 0 ? gunLimit : 0);
+            } else if (angle == 0) {
+                projectile.setyEnd(person.getY());
+                int gunLimit = person.getX() + (int) gun.getRadius();
+                projectile.setyEnd(gunLimit > room.getWidth() ? room.getWidth() : gunLimit);
+            } else {
+                double y = gun.getRadius() * Math.sin(angle * Math.PI / 180);
+                double x = gun.getRadius() * Math.cos(angle * Math.PI / 180);
+                projectile.setxEnd((int) x + person.getX());
+                projectile.setyEnd((int) y + person.getY());
+            }
+            if (projectile.isInstant()) {
+                calculateInstantImpacts(person, projectile, room);
+            }
         }
     }
 
     private Projectile getCompatibleProjectile(Person person) {
+        float angle = getNewProjectileAngle(person);
         if(person.getWeapon() instanceof Knife) {
-            return new KnifeAmmo(person.getX(), person.getY(), person.getAngle());
+            return new KnifeAmmo(person.getX(), person.getY(), angle);
         } else if(person.getWeapon() instanceof Pistol || person.getWeapon() instanceof AssaultRifle || person.getWeapon() instanceof Minigun) {
-            return new Bullet(person.getX(), person.getY(), person.getAngle());
+            return new Bullet(person.getX(), person.getY(), angle);
         } else if(person.getWeapon() instanceof SniperRifle) {
-            return new SniperBullet(person.getX(), person.getY(), person.getAngle());
+            return new SniperBullet(person.getX(), person.getY(), angle);
         } else if(person.getWeapon() instanceof RocketLauncher) {
-            return new Rocket(person.getX(), person.getY(), person.getAngle());
+            return new Rocket(person.getX(), person.getY(), angle);
         }else if(person.getWeapon() instanceof Flamethrower) {
-            return new Gas(person.getX(), person.getY(), person.getAngle());
+            return new Flame(person.getX(), person.getY(), angle);
         } else {
             throw new RuntimeException("Person have no weapon!");
         }

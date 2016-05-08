@@ -14,6 +14,11 @@ public class Rocket extends Projectile {
     }
 
     @Override
+    public String getName() {
+        return "rocket";
+    }
+
+    @Override
     public int getDamage() {
         return 120;
     }

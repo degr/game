@@ -40,8 +40,6 @@ PersonActions.startMovement = function(e){
                 break;
             default:
         }
-
-        console.log(code);
         var direction = PersonActions.handleDirectionAfterButtons();
         PersonActions.setDirection(direction);
     }
