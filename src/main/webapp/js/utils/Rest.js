@@ -20,7 +20,7 @@ var Rest = {
             Ajax.ajax({
                 type: type,
                 url: url,
-                data: data
+                data: typeof data === 'string' || typeof data === 'number' ? data : JSON.stringify(data)
             }, resololve, reject)
         })
     }

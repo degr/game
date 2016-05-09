@@ -38,9 +38,9 @@ Game.initialize = function() {
     window.addEventListener('keyup', PersonActions.stopMovement, false);
     canvas.addEventListener('mousemove', PersonActions.updateMouseDirection);
     if (window.location.protocol == 'http:') {
-        Game.connect('ws://' + window.location.host + '/soldiers');
+        Game.connect('ws://' + window.location.host + '/commandos');
     } else {
-        Game.connect('wss://' + window.location.host + '/soldiers');
+        Game.connect('wss://' + window.location.host + '/commandos');
     }
 };
 
