@@ -47,7 +47,7 @@ class ProjectileService {
         Point closestPoint = null;
 
 
-        for (AbstractZone zone : room.getZones()) {
+        for (AbstractZone zone : room.getMap().getZones()) {
             if (zone.isShootable()) {
                 continue;
             }
@@ -169,7 +169,7 @@ class ProjectileService {
             if (angle == 90) {
                 projectile.setxEnd(person.getX());
                 int gunLimit = (int) gun.getRadius() + person.getY();
-                projectile.setyEnd(gunLimit > room.getHeight() ? room.getHeight() : gunLimit);
+                projectile.setyEnd(gunLimit > room.getMap().getY() ? room.getMap().getY() : gunLimit);
             } else if (angle == 180) {
                 projectile.setyEnd(person.getY());
                 int gunLimit = person.getX() - (int) gun.getRadius();
@@ -181,7 +181,7 @@ class ProjectileService {
             } else if (angle == 0) {
                 projectile.setyEnd(person.getY());
                 int gunLimit = person.getX() + (int) gun.getRadius();
-                projectile.setyEnd(gunLimit > room.getWidth() ? room.getWidth() : gunLimit);
+                projectile.setyEnd(gunLimit > room.getMap().getX() ? room.getMap().getX() : gunLimit);
             } else {
                 double y = gun.getRadius() * Math.sin(angle * Math.PI / 180);
                 double x = gun.getRadius() * Math.cos(angle * Math.PI / 180);

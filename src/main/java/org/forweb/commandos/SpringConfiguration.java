@@ -1,7 +1,6 @@
 package org.forweb.commandos;
 
 import org.forweb.commandos.database.Db;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;

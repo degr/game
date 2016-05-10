@@ -18,7 +18,6 @@ public class Person {
     private Integer life = PersonWebSocketEndpoint.LIFE_AT_START;
     private AbstractWeapon weapon;
     private int score;
-    private boolean aNew = true;
     private boolean inPool = true;
     public List<AbstractWeapon> getWeaponList() {
         return weaponList;
@@ -166,14 +165,6 @@ public class Person {
 
     public void setScore(int score) {
         this.score = score;
-    }
-
-    public boolean isNew() {
-        return aNew;
-    }
-
-    public void setNew(boolean aNew) {
-        this.aNew = aNew;
     }
 
     public boolean isInPool() {

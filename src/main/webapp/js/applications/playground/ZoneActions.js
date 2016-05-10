@@ -1,5 +1,6 @@
 var ZoneActions = {
-    drawZone: function(zone, context) {
+    drawZone: function(zone) {
+        var context = PlayGround.context;
         context.beginPath();
         switch (zone.type) {
             case 'respawn':
@@ -37,6 +38,7 @@ var ZoneActions = {
                 context.rect(zone.x, zone.y, zone.width, zone.height);
                 context.stroke();
         }
+        context.strokeText(zone.type, zone.x + 3, zone.y + 20, zone.width - 6);
 
     }
 };

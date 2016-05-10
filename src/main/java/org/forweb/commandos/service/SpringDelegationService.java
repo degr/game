@@ -18,11 +18,6 @@ import java.util.TimerTask;
 @Service
 public class SpringDelegationService {
 
-    private static final String MESSAGE_JOIN = "join";
-    private static final String MESSAGE_SHOT = "fire";
-    private static final String MESSAGE_DIRECTION = "direction";
-    private static final String MESSAGE_ANGLE = "angle";
-
     @Autowired
     private Context gameContext;
     @Autowired
@@ -35,14 +30,19 @@ public class SpringDelegationService {
     private ResponseService responseService;
     @Autowired
     private ProjectileService projectilesService;
+    @Autowired
+    private MapService mapService;
+    @Autowired
+    private RoomService roomService;
 
 
-    private void onOpen(Session session, Integer personId) {
+    public void onJoin(Session session, Integer personId, Integer roomId) {
         gameContext.getSessionStorage().put(personId, session);
         Person person = new Person(personId);
         person.setHexColor(locationService.getRandomHexColor());
-        personService.resetState(person, gameContext.getRoom(0));
-        addPerson(person);
+        person.setInPool(false);//@todo add observers logic
+        personService.resetState(person, gameContext.getRoom(roomId));
+        addPerson(person, roomId);
     }
 
     public int addAndIncrementPersonId() {
@@ -50,50 +50,38 @@ public class SpringDelegationService {
     }
 
     public void onTextMessage(Session session, String message, Integer personId) {
-        Person person = gameContext.getRoom(0).getPersons().get(personId);
-        String[] parts = message.split(":");
-        switch ((parts[0])) {
-            case MESSAGE_ANGLE:
-                turnService.updatePersonViewAngle(person, Integer.parseInt(parts[1]));
-                break;
-            case MESSAGE_SHOT:
-                projectilesService.doShot(person, parts[1]);
-                break;
-            case MESSAGE_DIRECTION:
-                personService.handleDirection(person, parts[1]);
-                break;
-            case MESSAGE_JOIN:
-                onOpen(session, personId);
-                break;
-        }
+
     }
 
-    public void onClose(Integer personId) {
-        removePerson(personId);
+    public Integer createRoom(Integer mapId, String roomName) {
+        return roomService.createRoom(mapId, roomName);
+    }
+
+    public void onClose(Integer personId, Integer roomId) {
+        removePerson(personId, roomId);
         responseService.flushToAll(new Leave(personId), gameContext.getRoom(0));
     }
 
-    private void tick() {
-        Collection<Person> persons = gameContext.getRoom(0).getPersons().values();
-        personService.handlePersons(persons, gameContext.getRoom(0));
-        projectilesService.onProjectileLifecycle(gameContext.getRoom(0).getProjectiles());
-        Room room = gameContext.getRoom(0);
+    private void tick(Room room) {
+        Collection<Person> persons = room.getPersons().values();
+        personService.handlePersons(persons, room);
+        projectilesService.onProjectileLifecycle(room.getProjectiles());
         responseService.broadcast(
                 new Update(
-                    responseService.mapPersons(gameContext.getRoom(0).getPersons()),
-                    responseService.mapProjectiles(gameContext.getRoom(0).getProjectiles())
+                        responseService.mapPersons(room.getPersons()),
+                        responseService.mapProjectiles(room.getProjectiles())
                 ),
                 room
         );
     }
 
-    private void startTimer() {
+    private void startTimer(Room room) {
         gameContext.setGameTimer(new Timer(PersonWebSocketEndpoint.class.getSimpleName() + " Timer"));
         gameContext.getGameTimer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 try {
-                    tick();
+                    tick(room);
                 } catch (RuntimeException e) {
                     System.out.println("Caught to prevent timer from shutting down" + e.getMessage());
                 }
@@ -102,16 +90,17 @@ public class SpringDelegationService {
     }
 
 
-    private synchronized void addPerson(Person person) {
-        if (gameContext.getRoom(0).getPersons().size() == 0) {
-            startTimer();
+    private synchronized void addPerson(Person person, Integer roomId) {
+        Room room = gameContext.getRoom(roomId);
+        if (room.getPersons().size() == 0) {
+            startTimer(room);
         }
-        gameContext.getRoom(0).getPersons().put(person.getId(), person);
+        room.getPersons().put(person.getId(), person);
     }
 
-    private synchronized void removePerson(Integer personId) {
-        gameContext.getRoom(0).getPersons().remove(personId);
-        if (gameContext.getRoom(0).getPersons().size() == 0) {
+    private synchronized void removePerson(Integer personId, Integer roomId) {
+        gameContext.getRoom(roomId).getPersons().remove(personId);
+        if (gameContext.getRoom(roomId).getPersons().size() == 0) {
             stopTimer();
         }
     }
@@ -120,5 +109,17 @@ public class SpringDelegationService {
         if (gameContext.getGameTimer() != null) {
             gameContext.getGameTimer().cancel();
         }
+    }
+
+    public void updatePersonViewAngle(Person person, int direction) {
+        turnService.updatePersonViewAngle(person, direction);
+    }
+
+    public void handleDirection(Person person, String part) {
+        personService.handleDirection(person, part);
+    }
+
+    public void doShot(Person person, String status) {
+        projectilesService.doShot(person, status);
     }
 }

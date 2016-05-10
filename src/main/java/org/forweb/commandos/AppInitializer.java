@@ -3,6 +3,7 @@ package org.forweb.commandos;
 
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
+import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
@@ -23,6 +24,7 @@ public class AppInitializer implements WebApplicationInitializer {
         rootContext.register(SpringConfiguration.class);
         addServlet(new DispatcherServlet(rootContext), "dispatcher", "/server/*", container);
         container.addListener(new ContextLoaderListener(rootContext));
+        container.addListener(new RequestContextListener());
     }
 
     private void addServlet(Servlet servlet, String servletName, String mapping, ServletContext container) {

@@ -11,19 +11,11 @@ public class Room {
 
     private String name;
     private String description;
-    private Integer height;
-    private Integer width;
     private ConcurrentHashMap<Integer, Person> persons;
     private ConcurrentHashMap<Integer, Projectile> projectiles;
-    private List<AbstractZone> zones;
     private int totalPlayers;
 
-    public List<AbstractZone> getZones() {
-        return zones;
-    }
-    public void setZones(List<AbstractZone> zones) {
-        this.zones = zones;
-    }
+    private GameMap map;
 
     public ConcurrentHashMap<Integer, Person> getPersons() {
         return persons;
@@ -31,22 +23,6 @@ public class Room {
 
     public void setPersons(ConcurrentHashMap<Integer, Person> persons) {
         this.persons = persons;
-    }
-            
-    public Integer getWidth() {
-        return width;
-    }
-
-    public void setWidth(Integer width) {
-        this.width = width;
-    }
-
-    public Integer getHeight() {
-        return height;
-    }
-
-    public void setHeight(Integer height) {
-        this.height = height;
     }
     
     public ConcurrentHashMap<Integer, Projectile> getProjectiles() {
@@ -79,5 +55,13 @@ public class Room {
 
     public void setTotalPlayers(int totalPlayers) {
         this.totalPlayers = totalPlayers;
+    }
+
+    public void setMap(GameMap map) {
+        this.map = map;
+    }
+
+    public GameMap getMap() {
+        return map;
     }
 }

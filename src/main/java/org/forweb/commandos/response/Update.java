@@ -13,7 +13,6 @@ public class Update {
     private final String type = "update";
     private List<PersonDto> persons;
     private List<BulletDto> projectiles;
-    private List<AbstractZone> zones;
 
     public Update(List<PersonDto> personDto, List<BulletDto> projectiles) {
         this.persons = personDto;
@@ -41,11 +40,4 @@ public class Update {
         this.owner = owner;
     }
 
-    public void setZones(List<AbstractZone> zones) {
-        this.zones = zones;
-    }
-
-    public List<AbstractZone> getZones() {
-        return zones;
-    }
 }

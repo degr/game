@@ -1,6 +1,7 @@
 package org.forweb.commandos.controller;
 
 import org.forweb.commandos.dto.RoomForJoinDto;
+import org.forweb.commandos.entity.GameMap;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.game.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,17 +36,16 @@ public class RoomsController {
         int start = (page - 1) * limit;
         int i = 0;
         for (Map.Entry<Integer, Room> entry : rooms.entrySet()) {
-            if (i > start && i < page * limit) {
+            if (i >= start && i < page * limit) {
                 Room room = entry.getValue();
+                GameMap map = room.getMap();
                 RoomForJoinDto item = new RoomForJoinDto();
                 item.setId(entry.getKey());
                 item.setDescription(room.getDescription());
                 item.setName(room.getName());
                 item.setPersonsCount(room.getPersons().size());
                 item.setTotalSpace(room.getTotalPlayers());
-                item.setZones(room.getZones());
-                item.setX(room.getWidth());
-                item.setY(room.getHeight());
+                item.setMap(map);
                 out.add(item);
             }
             i++;

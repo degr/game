@@ -25,7 +25,7 @@ public class LocationService {
 
     public Point getRespawnCenter(Room room){
         List<Respawn> list = new ArrayList<>();
-        for(AbstractZone zone : room.getZones()) {
+        for(AbstractZone zone : room.getMap().getZones()) {
             if(zone instanceof Respawn) {
                 list.add((Respawn) zone);
             }
@@ -48,7 +48,7 @@ public class LocationService {
     }
 
     public boolean canGoEast(Person player, Room room) {
-        return player.getX() < room.getWidth() - PersonWebSocketEndpoint.PERSON_RADIUS && calculateCollistions(player, room, 1, 0);
+        return player.getX() < room.getMap().getX() - PersonWebSocketEndpoint.PERSON_RADIUS && calculateCollistions(player, room, 1, 0);
 
     }
     public boolean canGoWest(Person player, Room room) {
@@ -60,7 +60,7 @@ public class LocationService {
     }
 
     public boolean canGoSouth(Person player, Room room) {
-        return player.getY() < room.getHeight() - PersonWebSocketEndpoint.PERSON_RADIUS && calculateCollistions(player, room, 0, 1);
+        return player.getY() < room.getMap().getY() - PersonWebSocketEndpoint.PERSON_RADIUS && calculateCollistions(player, room, 0, 1);
     }
 
     private boolean calculateCollistions(Person player, Room room, int xShift, int yShift){
@@ -70,7 +70,7 @@ public class LocationService {
                 PersonWebSocketEndpoint.PERSON_RADIUS * 2,
                 PersonWebSocketEndpoint.PERSON_RADIUS * 2
         );
-        for(AbstractZone zone : room.getZones()) {
+        for(AbstractZone zone : room.getMap().getZones()) {
             if(zone.isPassable()) {
                 if(zone instanceof AbstractItem) {
                     itemService.onGetItem((AbstractItem)zone, player);
@@ -103,7 +103,6 @@ public class LocationService {
         boolean yCol = false;
         if ((personNewBounds.x + personNewBounds.width >= zoneObject.x) && (personNewBounds.x <= zoneObject.x + zoneObject.width)) xCol = true;
         if ((personNewBounds.y + personNewBounds.height >= zoneObject.y) && (personNewBounds.y <= zoneObject.y + zoneObject.height)) yCol = true;
-
         return xCol & yCol;
     }
 }

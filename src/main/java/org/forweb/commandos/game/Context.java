@@ -34,27 +34,6 @@ public class Context {
     
     private Context() {
         rooms = new LinkedHashMap<>();
-        for(int i = 0; i < 20;i++) {
-            Room room = new Room();
-            room.setHeight(480);
-            room.setWidth(640);
-            room.setPersons(new ConcurrentHashMap<>());
-            room.setProjectiles(new ConcurrentHashMap<>());
-            List<AbstractZone> zones = new ArrayList<>();
-            zones.add(new Wall(40, 40, 60, 60));
-            zones.add(new Wall(200, 240, 290, 330));
-            zones.add(new Wall(100, 100, 150, 180));
-            zones.add(new Wall(300, 140, 450, 160));
-            zones.add(new Wall(350, 10, 390, 120));
-            zones.add(new Wall(150, 370, 250, 415));
-            zones.add(new Wall(550, 400, 600, 480));
-            zones.add(new Wall(550, 400, 600, 480));
-            zones.add(new SniperZone(500, 400));
-            zones.add(new Respawn(0, 0));
-            zones.add(new Respawn(200, 200));
-            room.setZones(zones);
-            rooms.put(i, room);
-        }
     }
 
 
@@ -80,5 +59,18 @@ public class Context {
 
     public AtomicInteger getProjectilesIds() {
         return projectilesIds;
+    }
+
+    public Integer addRoom(Room room) {
+        Integer candidate = 0;
+        for(int i = 0; i < getRooms().size(); i++) {
+            if(getRooms().containsKey(candidate)) {
+                candidate++;
+            } else {
+                break;
+            }
+        }
+        getRooms().put(candidate, room);
+        return candidate;
     }
 }

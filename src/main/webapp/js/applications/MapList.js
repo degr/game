@@ -39,7 +39,14 @@ var MapList = {
     buildMap: function(map) {
         var clb = function (e) {
             e.preventDefault();
-            alert("on map select");
+            var name = prompt(
+                "You want to create game on map " + map.name + ". \n Please specify game name:",
+                "unnamed-" + StringUtils.unique()
+            );
+            if(name !== null) {
+                Dispatcher.placeApplication("PlayGround");
+                PlayGround.createGame(name, map);
+            }
         };
         var descriptionLink;
         if (map.description) {

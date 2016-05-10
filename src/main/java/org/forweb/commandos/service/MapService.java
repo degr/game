@@ -9,7 +9,6 @@ import org.forweb.commandos.entity.zone.ZoneDto;
 import org.forweb.commandos.entity.zone.interactive.Respawn;
 import org.forweb.commandos.entity.zone.items.*;
 import org.forweb.commandos.entity.zone.walls.Wall;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
@@ -22,8 +21,6 @@ import java.util.stream.Collectors;
 @Service
 public class MapService {
 
-    @Autowired
-    private Db db;
 
     public String saveMap(GameMap map) throws NoSuchAlgorithmException {
         if (map.getName() == null || "".equals(map.getName())) {
@@ -48,6 +45,7 @@ public class MapService {
 
 
     private void saveMapZones(List<ZoneDto> zones, Integer mapId) {
+        Db db = new Db();
         String deleteQuery = "delete from zone where map = ?";
         db.query(deleteQuery, mapId);
 
@@ -58,27 +56,47 @@ public class MapService {
     }
 
     private Integer saveMapGeneral(GameMap map, Integer maxPlayers) {
+        Db db = new Db();
         String query = "insert into map (title, x, y, max_players) values (?, ?, ?, ?)";
         db.query(query, map.getName(), map.getX(), map.getY(), maxPlayers);
         return db.getCellInt("select max(id) from map");
     }
 
+    public GameMap loadMap(Integer mapId) {
+        List<GameMap> maps = loadMaps(null, null, null, mapId);
+        if(maps.size() > 0) {
+            return maps.get(0);
+        } else {
+            return null;
+        }
+    }
     public List<GameMap> loadMaps(String mapName, Integer page, Integer size) {
+        return loadMaps(mapName, page, size, null);
+    }
+
+    public List<GameMap> loadMaps(String mapName, Integer page, Integer size, Integer mapId) {
         String query = "select * from map ";
         Object [] params;
-        page = (page - 1) * size;
-        if(mapName != null && !"".equals(mapName)) {
-            query += "where title like ? ";
-            params = new Object[3];
-            params[0] = mapName + "%";
-            params[1] = page;
-            params[2] = size;
+        if(mapId == null) {
+            page = (page - 1) * size;
+            if (mapName != null && !"".equals(mapName)) {
+                query += "where title like ? ";
+                params = new Object[3];
+                params[0] = mapName + "%";
+                params[1] = page;
+                params[2] = size;
+            } else {
+                params = new Object[2];
+                params[0] = page;
+                params[1] = size;
+            }
+            query += "limit ?, ?";
         } else {
-            params = new Object[2];
-            params[0] = page;
-            params[1] = size;
+            query += "where id = ?";
+            params = new Object[1];
+            params[0] = mapId;
         }
-        query += "limit ?, ?";
+        Db db = new Db();
         Table table = db.getTable(query, params);
         List<GameMap> out = new ArrayList<>(table.size());
         List<Integer> mapIds = new ArrayList<>();
@@ -160,6 +178,7 @@ public class MapService {
 
 
     public Boolean nameEmpty(String name) {
+        Db db = new Db();
         Integer out = db.getCellInt("select id from map where title = ?", name);
         return out == null;
     }

@@ -7,7 +7,7 @@ var RoomsList = {
     mapForeground: '#000000',
     mapWidth: 200,
     rooms: [],
-    selectedRoomId: -1,
+    selectedRoomId: -1,//@todo unused
     beforeOpen: function() {
         if(!RoomsList.mapsLoaded) {
             RoomsList.openPage(RoomsList.pageNumber);
@@ -47,8 +47,8 @@ var RoomsList = {
         var descriptionLink = Dom.el('a', {'href':'#'});
         var clb = function(e){
             e.preventDefault();
-            RoomsList.selectedRoomId = room.id;
-            Dispatcher.placeApplication('PlayGround')
+            Dispatcher.placeApplication('PlayGround');
+            PlayGround.joinGame(room.map, room.id);
         };
         descriptionLink.onclick = clb;
         descriptionLink.innerText = room.description;
@@ -60,7 +60,7 @@ var RoomsList = {
         var description = Dom.el('p', null, descriptionLink);
         var name = Dom.el('h3', null, titleLink);
         
-        var map = RoomsList.doSimpleMap(room.zones, room.x, room.y);
+        var map = RoomsList.doSimpleMap(room.map.zones, room.map.x, room.map.y);
         return Dom.el('li', null, [name, map, description]);
     },
     doSimpleMap: function(zones, x, y) {

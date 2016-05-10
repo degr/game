@@ -29,6 +29,9 @@ public class ItemService {
             case "flame":
                 handleWeaponPick(player, new Flamethrower());
                 break;
+            case "shotgun":
+                handleWeaponPick(player, new Shotgun());
+                break;
                 //items
             case "medkit":
                 int life = player.getLife();

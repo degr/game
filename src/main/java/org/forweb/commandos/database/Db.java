@@ -1,22 +1,16 @@
 package org.forweb.commandos.database;
 
-import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.control.Tab;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.stereotype.Component;
-
 import java.sql.*;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.DoubleAccumulator;
 
-@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-@Component
 public class Db {
     private Connection connection;
     private static String url;
     private static String user;
     private static String password;
+
+    private static Map<Thread, Connection> connectionPool = new HashMap<>();
 
     public static void init(String host, String user, String password, String database) {
         Db.url = "jdbc:mysql://" + host + "/" + database;
@@ -32,16 +26,30 @@ public class Db {
 
 
     public Db() {
-        try {
-            connection = DriverManager.getConnection(url, user, password);
-            connection.setAutoCommit(true);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            this.connection = null;
-        }
+
     }
 
-    public Table getTable(String query, Object ... args) {
+    private Connection getConnection(){
+        if(this.connection == null) {
+            if(connectionPool.containsKey(Thread.currentThread())) {
+                this.connection = connectionPool.get(Thread.currentThread());
+            } else {
+                try {
+                    connection = DriverManager.getConnection(url, user, password);
+                    connection.setAutoCommit(true);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    this.connection = null;
+                }
+                connectionPool.put(Thread.currentThread(), this.connection);
+            }
+        }
+        return this.connection;
+    }
+
+    public Table getTable(String query, Object... args) {
+
+
         Table out = new Table();
         try {
             ResultSet rs = getResultSet(query, args);
@@ -63,7 +71,7 @@ public class Db {
 
     public Row getRow(String query, Object... args) {
         Table out = getTable(query, args);
-        if(out.size() > 0) {
+        if (out.size() > 0) {
             return out.get(0);
         } else {
             return null;
@@ -72,7 +80,7 @@ public class Db {
 
     public String getCell(String query, Object... args) {
         Row row = getRow(query, args);
-        if(row != null) {
+        if (row != null) {
             return row.values().iterator().next();
         } else {
             return null;
@@ -81,7 +89,7 @@ public class Db {
 
     public Integer getCellInt(String query, Object... args) {
         String out = getCell(query, args);
-        if(out == null) {
+        if (out == null) {
             return null;
         }
         try {
@@ -92,19 +100,19 @@ public class Db {
         }
     }
 
-    private ResultSet getResultSet(String query, Object ... args) {
+    private ResultSet getResultSet(String query, Object... args) {
         try {
             if (args != null) {
-                PreparedStatement statement = connection.prepareStatement(query,
+                PreparedStatement statement = getConnection().prepareStatement(query,
                         ResultSet.TYPE_SCROLL_INSENSITIVE,
                         ResultSet.CONCUR_READ_ONLY);
                 for (int i = 0; i < args.length; i++) {
                     Object arg = args[i];
-                    if(arg instanceof Integer) {
+                    if (arg instanceof Integer) {
                         statement.setInt(i + 1, (Integer) arg);
-                    } else if(arg instanceof Float) {
+                    } else if (arg instanceof Float) {
                         statement.setFloat(i + 1, (Float) arg);
-                    } else if(arg instanceof Double) {
+                    } else if (arg instanceof Double) {
                         statement.setDouble(i + 1, (Double) arg);
                     } else {
                         statement.setString(i + 1, arg.toString());
@@ -112,7 +120,7 @@ public class Db {
                 }
                 return statement.executeQuery();
             } else {
-                Statement statement = connection.createStatement(
+                Statement statement = getConnection().createStatement(
                         ResultSet.TYPE_SCROLL_INSENSITIVE,
                         ResultSet.CONCUR_READ_ONLY);
                 return statement.executeQuery(query);
@@ -127,13 +135,13 @@ public class Db {
     public void query(String query, Object... args) {
         try {
             if (args != null) {
-                PreparedStatement statement = connection.prepareStatement(query);
+                PreparedStatement statement = getConnection().prepareStatement(query);
                 for (int i = 0; i < args.length; i++) {
                     statement.setString(i + 1, args[i].toString());
                 }
                 statement.execute();
             } else {
-                Statement statement = connection.createStatement();
+                Statement statement = getConnection().createStatement();
                 statement.executeQuery(query);
             }
         } catch (SQLException e) {

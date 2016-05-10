@@ -62,15 +62,8 @@ public class ResponseService {
             if(!person.isInPool()) {
                 try {
                     update.setOwner(mapOwner(person));
-                    if (person.isNew()) {
-                        update.setZones(room.getZones());
-                    }
                     String message = prepareJson(update);
                     sendMessage(person, message);
-                    if (person.isNew()) {
-                        person.setNew(false);
-                        update.setZones(null);
-                    }
                 } catch (IllegalStateException ise) {
                     // An ISE can occur if an attempt is made to write to a
                     // WebSocket connection after it has been closed. The
@@ -121,6 +114,7 @@ public class ResponseService {
             dto.setX(person.getX());
             dto.setY(person.getY());
             dto.setAngle(person.getAngle());
+            dto.setId(person.getId());
             out.add(dto);
         }
         return out;
