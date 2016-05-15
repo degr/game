@@ -1,13 +1,17 @@
 package org.forweb.commandos.service;
 
+import org.forweb.commandos.controller.PersonWebSocketEndpoint;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.ammo.*;
 import org.forweb.commandos.entity.weapon.*;
 import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.game.Context;
-import org.forweb.commandos.utils.shapes.Line;
-import org.forweb.commandos.utils.shapes.Point;
+import org.forweb.geometry.services.LineService;
+import org.forweb.geometry.shapes.Circle;
+import org.forweb.geometry.shapes.Line;
+import org.forweb.geometry.shapes.Point;
+import org.forweb.geometry.shapes.Bounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,8 +55,8 @@ class ProjectileService {
             if (zone.isShootable()) {
                 continue;
             }
-            Rectangle zoneBounds = GeometryService.getRectangle(zone);
-            Point[] zoneIntersection = GeometryService.getIntersectionPoint(
+            Bounds zoneBounds = GeometryService.getRectangle(zone);
+            Point[] zoneIntersection = LineService.lineBoundsIntersections(
                     new Line(
                             new Point(shooter.getX(), shooter.getY()),
                             new Point(projectile.getxEnd(), projectile.getyEnd())
@@ -78,10 +82,12 @@ class ProjectileService {
             }
 
             Point linePointB = new Point((double) projectile.getxEnd(), (double) projectile.getyEnd());
-            Point[] intersectionPoints = GeometryService.getCircleLineIntersectionPoint(
-                    new Point((double) xStart, (double) yStart),
-                    linePointB,
-                    new Point((double) person.getX(), (double) person.getY())
+            Point[] intersectionPoints = LineService.lineIntersectCircle(
+                    new Line(
+                            new Point((double) xStart, (double) yStart),
+                            linePointB
+                    ),
+                    new Circle(person.getX(), person.getY(), PersonWebSocketEndpoint.PERSON_RADIUS)
             );
             if (intersectionPoints != null && intersectionPoints.length > 0) {
                 Point closest = isMoreClose(shooter.getX(), shooter.getY(), closestPoint, intersectionPoints);

@@ -1,16 +1,17 @@
 package org.forweb.commandos.entity.zone;
 
 import org.forweb.commandos.controller.PersonWebSocketEndpoint;
+import org.forweb.geometry.shapes.Bounds;
 
-import java.awt.*;
 
 public abstract class AbstractItem extends AbstractZone{
 
     private boolean isAvailable;
     private long timeout;
+    private long time;
 
-    public AbstractItem(int topX, int topY, String itemName) {
-        super(itemName, new Rectangle(
+    public AbstractItem(int topX, int topY, String itemName, int id) {
+        super(itemName, new Bounds(
                 topX,
                 topY,
                 PersonWebSocketEndpoint.PERSON_RADIUS * 2,
@@ -20,6 +21,8 @@ public abstract class AbstractItem extends AbstractZone{
         setShootable(true);
         setAvailable(true);
         setStaticSize(true);
+        time = 30000;
+        this.setId(id);
     }
 
     public boolean isAvailable() {
@@ -38,4 +41,7 @@ public abstract class AbstractItem extends AbstractZone{
         this.timeout = timeout;
     }
 
+    public long getTime() {
+        return time;
+    }
 }

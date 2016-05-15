@@ -1,4 +1,27 @@
 var ZoneActions = {
+    images: {},
+    init: function() {
+        ZoneActions.images.armor = new Image();
+        ZoneActions.images.armor.src = 'images/map/armor.jpg';
+        ZoneActions.images.assault = new Image();
+        ZoneActions.images.assault.src = 'images/map/assault.jpg';
+        ZoneActions.images.flame = new Image();
+        ZoneActions.images.flame.src = 'images/map/flame.png';
+        ZoneActions.images.helm = new Image();
+        ZoneActions.images.helm.src = 'images/map/helm.jpg';
+        ZoneActions.images.medkit = new Image();
+        ZoneActions.images.medkit.src = 'images/map/medkit.jpg';
+        ZoneActions.images.minigun = new Image();
+        ZoneActions.images.minigun.src = 'images/map/minigun.png';
+        ZoneActions.images.rocket = new Image();
+        ZoneActions.images.rocket.src = 'images/map/rocket.png';
+        ZoneActions.images.shotgun = new Image();
+        ZoneActions.images.shotgun.src = 'images/map/shotgun.jpg';
+        ZoneActions.images.sniper = new Image();
+        ZoneActions.images.sniper.src = 'images/map/sniper.png';
+        ZoneActions.images.pistol = new Image();
+        ZoneActions.images.pistol.src = 'images/map/pistol.jpg';
+    },
     drawZone: function(zone) {
         var context = PlayGround.context;
         context.beginPath();
@@ -6,39 +29,35 @@ var ZoneActions = {
             case 'respawn':
                 context.fillStyle = '#3dbe2f';
                 context.fillRect(zone.x, zone.y, zone.width, zone.height);
-                context.stroke();
                 break;
-            case 'item':
-                switch (zone.item) {
-                    case "assault":
-                    case "sniper":
-                    case "minigun":
-                    case "rocket":
-                    case "flame":
-                        context.strokeStyle = '#000000';
-                        context.rect(zone.x, zone.y, zone.width, zone.height);
-                        context.strokeText(zone.item, zone.x, zone.y);
-                        context.stroke();
-                        break;
-                    //items
-                    case "medkit":
-                    case "armor":
-                    case "helm":
-                        context.strokeStyle = '#000000';
-                        context.rect(zone.x, zone.y, zone.width, zone.height);
-                        context.strokeText(zone.item, zone.x, zone.y);
-                        context.stroke();
-                        break;
-                    default:
-                        console.log('undefined item: ', zone);
-                }
+            case "shotgun":
+            case "assault":
+            case "sniper":
+            case "minigun":
+            case "rocket":
+            case "flame":
+            case "medkit":
+            case "armor":
+            case "helm":
+                ZoneActions.drawImage(zone);
+                break;
+            case 'wall':
+                context.fillStyle = '#000000';
+                context.fillRect(zone.x, zone.y, zone.width, zone.height);
                 break;
             default:
                 context.strokeStyle = '#000000';
                 context.rect(zone.x, zone.y, zone.width, zone.height);
                 context.stroke();
+                context.strokeText(zone.type, zone.x + 3, zone.y + 20, zone.width - 6);
         }
-        context.strokeText(zone.type, zone.x + 3, zone.y + 20, zone.width - 6);
-
+        //
+    },
+    drawImage: function(zone) {
+        if(zone.available) {
+            PlayGround.context.drawImage(ZoneActions.images[zone.type], zone.x, zone.y);
+        }
     }
 };
+
+

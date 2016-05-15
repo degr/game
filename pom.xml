@@ -14,6 +14,13 @@
         <hibernate>5.1.0.Final</hibernate>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <dependencies>
 
         <dependency>
@@ -67,7 +74,15 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.38</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.github.degr</groupId>
+            <artifactId>geometry</artifactId>
+            <version>36c420de62</version>
+        </dependency>
+
     </dependencies>
+
     <build>
         <finalName>comandos</finalName>
         <plugins>

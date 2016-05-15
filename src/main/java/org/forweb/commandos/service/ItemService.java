@@ -40,6 +40,8 @@ public class ItemService {
                     if(life > 100) {
                         life = 100;
                     }
+                } else {
+                    return;
                 }
                 player.setLife(life);
                 break;
@@ -50,6 +52,8 @@ public class ItemService {
                     if(armor > 100) {
                         armor = 100;
                     }
+                } else {
+                    return;
                 }
                 player.setArmor(armor);
                 break;
@@ -60,12 +64,16 @@ public class ItemService {
                     if(armor1 > 150) {
                         armor1 = 150;
                     }
+                } else {
+                    return;
                 }
                 player.setArmor(armor1);
                 break;
             default:
                 throw new RuntimeException("Unknonwn weapon name - " + item.getType());
         }
+        item.setAvailable(false);
+        item.setTimeout(System.currentTimeMillis() + item.getTime());
     }
 
     private void handleWeaponPick(Person player, AbstractWeapon weapon) {

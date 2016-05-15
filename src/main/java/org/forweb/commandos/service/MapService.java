@@ -4,6 +4,7 @@ import org.forweb.commandos.database.Db;
 import org.forweb.commandos.database.Row;
 import org.forweb.commandos.database.Table;
 import org.forweb.commandos.entity.GameMap;
+import org.forweb.commandos.entity.zone.AbstractItem;
 import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.entity.zone.ZoneDto;
 import org.forweb.commandos.entity.zone.interactive.Respawn;
@@ -135,39 +136,40 @@ public class MapService {
 
     private AbstractZone getZone(Row row) {
         AbstractZone zone;
+        Integer x = row.getInt("x"), y = row.getInt("y"), id = row.getInt("id");
         switch (row.get("type")) {
             case "shotgun":
-                zone = new ShotgunZone(row.getInt("x"), row.getInt("y"));
+                zone = new ShotgunZone(x, y, id);
                 break;
             case "assault":
-                zone = new AssaultZone(row.getInt("x"), row.getInt("y"));
+                zone = new AssaultZone(x, y, id);
                 break;
             case "sniper":
-                zone = new SniperZone(row.getInt("x"), row.getInt("y"));
+                zone = new SniperZone(x, y, id);
                 break;
             case "minigun":
-                zone = new MinigunZone(row.getInt("x"), row.getInt("y"));
+                zone = new MinigunZone(x, y, id);
                 break;
             case "rocket":
-                zone = new RocketZone(row.getInt("x"), row.getInt("y"));
+                zone = new RocketZone(x, y, id);
                 break;
             case "flame":
-                zone = new FlameZone(row.getInt("x"), row.getInt("y"));
+                zone = new FlameZone(x, y, id);
                 break;
             case "medkit":
-                zone = new MedkitZone(row.getInt("x"), row.getInt("y"));
+                zone = new MedkitZone(x, y, id);
                 break;
             case "armor":
-                zone = new ArmorZone(row.getInt("x"), row.getInt("y"));
+                zone = new ArmorZone(x, y, id);
                 break;
             case "helm":
-                zone = new HelmZone(row.getInt("x"), row.getInt("y"));
+                zone = new HelmZone(x, y, id);
                 break;
             case "respawn":
-                zone = new Respawn(row.getInt("x"), row.getInt("y"));
+                zone = new Respawn(x, y);
                 break;
             case "wall":
-                zone = new Wall(row.getInt("x"), row.getInt("y"), row.getInt("width"), row.getInt("height"));
+                zone = new Wall(x, y, row.getInt("width"), row.getInt("height"));
                 break;
             default:
                 System.out.println("Unknown zone type: " + row.get("type"));
@@ -181,5 +183,16 @@ public class MapService {
         Db db = new Db();
         Integer out = db.getCellInt("select id from map where title = ?", name);
         return out == null;
+    }
+
+    public void onItemsLifecycle(List<AbstractZone> zones) {
+        for(AbstractZone zone : zones) {
+            if(zone instanceof AbstractItem) {
+                AbstractItem item = (AbstractItem) zone;
+                if(!item.isAvailable() && item.getTimeout() < System.currentTimeMillis()) {
+                    item.setAvailable(true);
+                }
+            }
+        }
     }
 }

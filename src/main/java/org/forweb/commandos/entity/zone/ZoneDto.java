@@ -2,6 +2,8 @@ package org.forweb.commandos.entity.zone;
 
 
 public class ZoneDto {
+
+    private int id;
     private int x;
     private int y;
     private int width;
@@ -46,5 +48,12 @@ public class ZoneDto {
 
     public void setType(String type) {
         this.type = type;
+    }
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

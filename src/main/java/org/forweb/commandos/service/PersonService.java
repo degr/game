@@ -2,7 +2,7 @@ package org.forweb.commandos.service;
 
 import org.forweb.commandos.service.person.MovementService;
 import org.forweb.commandos.service.person.TurnService;
-import org.forweb.commandos.utils.shapes.Point;
+import org.forweb.geometry.shapes.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.forweb.commandos.controller.PersonWebSocketEndpoint;

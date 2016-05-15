@@ -66,10 +66,12 @@ public class SpringDelegationService {
         Collection<Person> persons = room.getPersons().values();
         personService.handlePersons(persons, room);
         projectilesService.onProjectileLifecycle(room.getProjectiles());
+        mapService.onItemsLifecycle(room.getMap().getZones());
         responseService.broadcast(
                 new Update(
                         responseService.mapPersons(room.getPersons()),
-                        responseService.mapProjectiles(room.getProjectiles())
+                        responseService.mapProjectiles(room.getProjectiles()),
+                        responseService.mapItems(room.getMap().getZones())
                 ),
                 room
         );

@@ -4,7 +4,7 @@ import org.forweb.commandos.entity.zone.AbstractItem;
 
 
 public class MinigunZone extends AbstractItem {
-    public MinigunZone(int topX, int topY) {
-        super(topX, topY, "minigun");
+    public MinigunZone(int topX, int topY, Integer id) {
+        super(topX, topY, "minigun", id );
     }
 }

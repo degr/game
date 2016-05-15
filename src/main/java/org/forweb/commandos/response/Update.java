@@ -1,5 +1,6 @@
 package org.forweb.commandos.response;
 
+import org.forweb.commandos.dto.ItemDto;
 import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.response.dto.BulletDto;
 import org.forweb.commandos.response.dto.OwnerDto;
@@ -9,14 +10,16 @@ import java.util.List;
 
 public class Update {
 
+    private final List<ItemDto> items;
     private OwnerDto owner;
     private final String type = "update";
     private List<PersonDto> persons;
     private List<BulletDto> projectiles;
 
-    public Update(List<PersonDto> personDto, List<BulletDto> projectiles) {
+    public Update(List<PersonDto> personDto, List<BulletDto> projectiles, List<ItemDto> itemDtos) {
         this.persons = personDto;
         this.projectiles = projectiles;
+        this.items = itemDtos;
     }
 
     public String getType() {
@@ -40,4 +43,7 @@ public class Update {
         this.owner = owner;
     }
 
+    public List<ItemDto> getItems() {
+        return items;
+    }
 }

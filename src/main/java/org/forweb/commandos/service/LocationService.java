@@ -6,7 +6,10 @@ import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.entity.zone.AbstractItem;
 import org.forweb.commandos.entity.zone.interactive.Respawn;
-import org.forweb.commandos.utils.shapes.Point;
+import org.forweb.geometry.services.CircleService;
+import org.forweb.geometry.shapes.Circle;
+import org.forweb.geometry.shapes.Point;
+import org.forweb.geometry.shapes.Bounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -64,45 +67,38 @@ public class LocationService {
     }
 
     private boolean calculateCollistions(Person player, Room room, int xShift, int yShift){
-        Rectangle playerBounds = new Rectangle(
-                player.getX() - PersonWebSocketEndpoint.PERSON_RADIUS + xShift,
-                player.getY() - PersonWebSocketEndpoint.PERSON_RADIUS + yShift,
-                PersonWebSocketEndpoint.PERSON_RADIUS * 2,
-                PersonWebSocketEndpoint.PERSON_RADIUS * 2
+        Circle playerCircle = new Circle(
+                player.getX() + xShift,
+                player.getY() + yShift,
+                PersonWebSocketEndpoint.PERSON_RADIUS
         );
         for(AbstractZone zone : room.getMap().getZones()) {
-            if(zone.isPassable()) {
-                if(zone instanceof AbstractItem) {
-                    itemService.onGetItem((AbstractItem)zone, player);
+            if (CircleService.circleBoundsIntersection(playerCircle, GeometryService.getRectangle(zone)).length > 0) {
+                if(zone.isPassable()) {
+                    if(zone instanceof AbstractItem) {
+                        itemService.onGetItem((AbstractItem)zone, player);
+                    }
+                } else {
+                    return false;
                 }
-                continue;
             }
-            if(hasCollisions(playerBounds, GeometryService.getRectangle(zone))) {
-                return false;
-            }
+
+
         }
         for(Person person : room.getPersons().values()) {
             if(person == player) {
                 continue;
             }
-            Rectangle personBounds = new Rectangle(
-                    person.getX() - PersonWebSocketEndpoint.PERSON_RADIUS,
-                    person.getY() - PersonWebSocketEndpoint.PERSON_RADIUS,
-                    PersonWebSocketEndpoint.PERSON_RADIUS * 2,
-                    PersonWebSocketEndpoint.PERSON_RADIUS * 2
+            Circle circle = new Circle(
+                    person.getX(),
+                    person.getY(),
+                    PersonWebSocketEndpoint.PERSON_RADIUS
             );
-            if(hasCollisions(playerBounds, personBounds)) {
+            Point[] p = CircleService.circleCircleIntersection(circle, playerCircle);
+            if(p == null || p.length > 0) {
                 return false;
             }
         }
         return true;
-    }
-
-    private boolean hasCollisions(Rectangle personNewBounds, Rectangle zoneObject){
-        boolean xCol = false;
-        boolean yCol = false;
-        if ((personNewBounds.x + personNewBounds.width >= zoneObject.x) && (personNewBounds.x <= zoneObject.x + zoneObject.width)) xCol = true;
-        if ((personNewBounds.y + personNewBounds.height >= zoneObject.y) && (personNewBounds.y <= zoneObject.y + zoneObject.height)) yCol = true;
-        return xCol & yCol;
     }
 }

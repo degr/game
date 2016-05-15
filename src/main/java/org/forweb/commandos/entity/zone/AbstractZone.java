@@ -1,10 +1,13 @@
 package org.forweb.commandos.entity.zone;
 
-import java.awt.*;
+import org.forweb.geometry.shapes.Bounds;
+import org.forweb.geometry.shapes.Rectangle;
 
 public abstract class AbstractZone {
 
-    public AbstractZone(String type, Rectangle rectangle) {
+    private Integer id;
+
+    public AbstractZone(String type, Bounds rectangle) {
         this.type = type;
         this.setX((int) rectangle.getX());
         this.setY((int) rectangle.getY());
@@ -83,4 +86,11 @@ public abstract class AbstractZone {
         isStaticSize = staticSize;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 }

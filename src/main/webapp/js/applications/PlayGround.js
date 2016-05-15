@@ -24,6 +24,8 @@ var PlayGround = {
     fireRadius: 7,
 
     init: function () {
+        ZoneActions.init();
+        
         var weapons = PlayGround.buildWeapons();
         var canvas = Dom.el('canvas', {width: 640, height: 480, id: 'playground'});
         PlayGround.container = Dom.el('div', {'class': 'playground'}, [weapons, canvas]);
@@ -128,6 +130,17 @@ var PlayGround = {
             PlayGround.id = packet.owner.id;
             PlayGround.owner = packet.owner;
         }
+        for(var i = 0; i < packet.items.length; i++) {
+            var zones = PlayGround.map.zones;
+            var item = packet.items[i];
+            for(var j = 0; j < zones.length; j++) {
+                var zone = zones[j];
+                if(zone.id === item.id) {
+                    zone.available = item.available;
+                    break;
+                }
+            }
+        }
         for (var i = 0; i < packet.persons.length; i++) {
             var person = packet.persons[i];
             if (!PlayGround.entities[person.id]) {
@@ -147,7 +160,7 @@ var PlayGround = {
         p.y = personDto.y;
         p.angle = personDto.angle;
         if(PlayGround.owner.id == id) {
-            PersonActions.updateMouseDirectionByXy(PersonActions.xMouse, PersonActions.yMouse, p);
+            PersonActions.updateMouseDirectionByXy(PlayGround.xMouse, PlayGround.yMouse, p);
         }
     },
     removePerson: function(id) {

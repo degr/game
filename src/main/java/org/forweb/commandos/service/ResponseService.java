@@ -2,9 +2,12 @@ package org.forweb.commandos.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.forweb.commandos.dto.ItemDto;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.ammo.Projectile;
+import org.forweb.commandos.entity.zone.AbstractItem;
+import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.game.Context;
 import org.forweb.commandos.response.Update;
 import org.forweb.commandos.response.dto.BulletDto;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.websocket.CloseReason;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -59,7 +63,7 @@ public class ResponseService {
             e.printStackTrace();
         }*/
         for (Person person : room.getPersons().values()) {
-            if(!person.isInPool()) {
+            if (!person.isInPool()) {
                 try {
                     update.setOwner(mapOwner(person));
                     String message = prepareJson(update);
@@ -132,6 +136,22 @@ public class ResponseService {
             }
             dto.setType(projectile.getName());
             out.add(dto);
+        }
+        return out;
+    }
+
+    public List<ItemDto> mapItems(List<AbstractZone> zones) {
+        Iterator<AbstractZone> iterator = zones.iterator();
+        List<ItemDto> out = new ArrayList<>();
+        while (iterator.hasNext()) {
+            AbstractZone zone = iterator.next();
+            if (zone instanceof AbstractItem) {
+                AbstractItem item = (AbstractItem) zone;
+                ItemDto dto = new ItemDto();
+                dto.setId(item.getId());
+                dto.setAvailable(item.isAvailable());
+                out.add(dto);
+            }
         }
         return out;
     }
