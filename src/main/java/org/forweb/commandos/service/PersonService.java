@@ -66,7 +66,7 @@ public class PersonService {
     public void handlePersons(Collection<Person> persons, Room room) {
         for (Person person : persons) {
             movementService.onMove(person, room);
-            projectileService.handleFire(person);
+            projectileService.handleFire(person, room);
             turnService.onPersonChangeViewAngle(person);
         }
     }

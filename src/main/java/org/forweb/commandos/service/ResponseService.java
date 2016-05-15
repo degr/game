@@ -90,6 +90,7 @@ public class ResponseService {
                 .collect(Collectors.toList())
         );
         out.setScore(person.getScore());
+        out.setGun(person.getWeapon().getName());
         return out;
     }
 

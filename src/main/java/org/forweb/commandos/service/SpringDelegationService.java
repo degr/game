@@ -121,7 +121,7 @@ public class SpringDelegationService {
         personService.handleDirection(person, part);
     }
 
-    public void doShot(Person person, String status) {
-        projectilesService.doShot(person, status);
+    public void doShot(Person person, String status, Integer roomId) {
+        projectilesService.doShot(person, status, gameContext.getRoom(roomId));
     }
 }

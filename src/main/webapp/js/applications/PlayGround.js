@@ -25,10 +25,10 @@ var PlayGround = {
 
     init: function () {
         ZoneActions.init();
+        Weapons.init();
         
-        var weapons = PlayGround.buildWeapons();
         var canvas = Dom.el('canvas', {width: 640, height: 480, id: 'playground'});
-        PlayGround.container = Dom.el('div', {'class': 'playground'}, [weapons, canvas]);
+        PlayGround.container = Dom.el('div', {'class': 'playground'}, [Weapons.container, canvas]);
         
         PlayGround.nextGameTick = (new Date).getTime();
         PlayGround.skipTicks = 1000 / PlayGround.fps;
@@ -47,9 +47,6 @@ var PlayGround = {
         window.addEventListener('keyup', PersonActions.stopMovement, false);
         window.addEventListener('mousemove', PersonActions.updateMouseDirection);
         PlayGround.canvas = canvas;
-    },
-    buildWeapons: function () {
-        return Dom.el('div');
     },
     createGame: function (name, map) {
         PlayGround.updateCanvas(map);
@@ -130,6 +127,8 @@ var PlayGround = {
             PlayGround.id = packet.owner.id;
             PlayGround.owner = packet.owner;
         }
+        Weapons.update(PlayGround.owner);
+        
         for(var i = 0; i < packet.items.length; i++) {
             var zones = PlayGround.map.zones;
             var item = packet.items[i];

@@ -49,7 +49,7 @@ public class PersonWebSocketEndpoint {
                 springDelegationService.updatePersonViewAngle(getPerson(), Integer.parseInt(parts[1]));
                 break;
             case MESSAGE_SHOT:
-                springDelegationService.doShot(getPerson(), parts[1]);
+                springDelegationService.doShot(getPerson(), parts[1], roomId);
                 break;
             case MESSAGE_DIRECTION:
                 springDelegationService.handleDirection(getPerson(), parts[1]);

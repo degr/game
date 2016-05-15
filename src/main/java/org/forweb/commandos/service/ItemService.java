@@ -79,9 +79,13 @@ public class ItemService {
     private void handleWeaponPick(Person player, AbstractWeapon weapon) {
         for(AbstractWeapon personHaving : player.getWeaponList()) {
             if(personHaving.getClass().equals(weapon.getClass())) {
-                //personHaving.
+                personHaving.setTotalClip(personHaving.getTotalClip() + weapon.getClipSize());
+                if(personHaving.getTotalClip() > personHaving.getMaxClip()) {
+                    personHaving.setTotalClip(weapon.getMaxClip());
+                }
+                return;
             }
         }
-
+        player.getWeaponList().add(weapon);
     }
 }

@@ -4,11 +4,15 @@ import org.forweb.commandos.entity.ammo.Bullet;
 
 public class Pistol extends AbstractWeapon<Bullet> {
     public Pistol() {
-        this.setMaxClip(7);
         this.setShotTimeout(1000);
         this.setReloadTimeout(2000);
         this.setRadius(300);
         this.setSpread(5);
+
+        this.setMaxClip(40);
+        this.setClipSize(9);
+        this.setCurrentClip(9);
+        this.setTotalClip(9);
     }
 
     @Override

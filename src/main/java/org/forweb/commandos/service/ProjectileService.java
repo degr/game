@@ -15,7 +15,6 @@ import org.forweb.geometry.shapes.Bounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.awt.*;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -140,23 +139,26 @@ class ProjectileService {
 
 
 
-    void doShot(Person person, String status) {
+    void doShot(Person person, String status, Room room) {
         boolean isFire = "1".equals(status);
         person.setIsFire(isFire);
-        handleFire(person);
+        handleFire(person, room);
     }
 
-    void handleFire(Person person) {
+    void handleFire(Person person, Room room) {
         if (person.isFire()) {
+            AbstractWeapon weapon = person.getWeapon();
             long now = System.currentTimeMillis();
-            if(person.getWeapon().getCurrentClip() <= 0 && !person.isReload()) {
-                person.setIsReload(true);
-                person.setReloadCooldown(person.getWeapon().getReloadTimeout());
+            if(weapon.getCurrentClip() <= 0) {
+                if(weapon.getTotalClip() >= 0) {
+                    person.setIsReload(true);
+                    person.setReloadCooldown(person.getWeapon().getReloadTimeout());
+                }
             } else if (person.getShotCooldown() < now && person.getReloadCooldown() < now ) {
                 if(person.isReload()) {
                     person.setIsReload(false);
                 }
-                fire(person, gameContext.getRoom(0));
+                fire(person, room);
             }
         }
     }
@@ -164,6 +166,8 @@ class ProjectileService {
     private void fire(Person person, Room room) {
         AbstractWeapon gun = person.getWeapon();
         person.setShotCooldown(System.currentTimeMillis() + gun.getShotTimeout());
+
+        gun.setTotalClip(gun.getTotalClip() - 1);
         gun.setCurrentClip(gun.getCurrentClip() - 1);
 
         for(int i = 0; i < gun.getBulletsPerShot(); i++) {

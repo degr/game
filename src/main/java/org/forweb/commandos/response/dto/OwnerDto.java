@@ -6,6 +6,7 @@ public class OwnerDto {
     private int id;
     private int life;
     private int armor;
+    private String gun;
     private List<String> guns;
     private int score;
 
@@ -47,5 +48,14 @@ public class OwnerDto {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+
+    public String getGun() {
+        return gun;
+    }
+
+    public void setGun(String gun) {
+        this.gun = gun;
     }
 }

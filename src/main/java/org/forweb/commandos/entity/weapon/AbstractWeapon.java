@@ -7,10 +7,23 @@ public abstract class AbstractWeapon<T extends Projectile> {
     private int reloadTimeout;
     private double radius;
 
+    /**
+     * ammo limit for gun
+     */
     private int maxClip;
+    /**
+     * ammo count for payload
+     */
+    private int clipSize;
+    /**
+     * current ammo in gun
+     */
     private int currentClip = 0;
-
+    /**
+     * total ammo count in player backpack
+     */
     private int totalClip = 0;
+
     private int spread;
     private int bulletsPerShot = 1;
 
@@ -81,5 +94,14 @@ public abstract class AbstractWeapon<T extends Projectile> {
 
     public int getBulletsPerShot() {
         return bulletsPerShot;
+    }
+
+
+    public int getClipSize() {
+        return clipSize;
+    }
+
+    public void setClipSize(int clipSize) {
+        this.clipSize = clipSize;
     }
 }
