@@ -187,3 +187,32 @@ body, html {
 .weapon-holder .weapon.active {
     background-color: #c3eaab;
 }
+.life-and-armor {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    font-size: 17px;
+    font-weight: bold;
+    width: 90px;
+}
+.life-and-armor .label {
+    float: left;
+    width: 60px;
+}
+.life-and-armor .life, .life-and-armor .armor{
+    float: left;
+    width: 30px;
+    text-align: center;
+}
+.life-and-armor .life-25 {
+    color: darkred;
+}
+.life-and-armor .life-50 {
+    color: orange;
+}
+.life-and-armor .life-75 {
+    color: forestgreen;
+}
+.life-and-armor .life-100 {
+    color: cornflowerblue;
+}

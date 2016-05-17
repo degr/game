@@ -18,6 +18,6 @@ public class Shot extends Projectile {
 
     @Override
     public int getDamage() {
-        return 10;
+        return 15;
     }
 }

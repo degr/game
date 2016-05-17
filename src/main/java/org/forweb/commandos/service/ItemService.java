@@ -79,7 +79,12 @@ public class ItemService {
     private void handleWeaponPick(Person player, AbstractWeapon weapon) {
         for(AbstractWeapon personHaving : player.getWeaponList()) {
             if(personHaving.getClass().equals(weapon.getClass())) {
-                personHaving.setTotalClip(personHaving.getTotalClip() + weapon.getClipSize());
+                personHaving.setTotalClip(personHaving.getTotalClip() + weapon.getTotalClip());
+                personHaving.setCurrentClip(personHaving.getClipSize());
+                if(player.isReload() && personHaving == player.getWeapon()) {
+                    player.setReload(false);
+                    player.setReloadCooldown(0);
+                }
                 if(personHaving.getTotalClip() > personHaving.getMaxClip()) {
                     personHaving.setTotalClip(weapon.getMaxClip());
                 }

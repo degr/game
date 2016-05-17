@@ -112,7 +112,21 @@ class ProjectileService {
     }
 
     private void onDamage(Person shooter, Projectile projectile, Person person, Room room) {
-        person.setLife(person.getLife() - projectile.getDamage());
+        int life = person.getLife();
+        int armor = person.getArmor();
+        int damage = projectile.getDamage();
+        if(armor > 0) {
+            int armorDamage = damage * 2 / 3;
+            person.setArmor(armor - armorDamage);
+            damage = damage - armorDamage;
+            if(person.getArmor() < 0) {
+                damage -= person.getArmor();
+                person.setArmor(0);
+            }
+
+        }
+        person.setLife(life - damage);
+
         if (person.getLife() <= 0) {
             personService.kill(person, room);
             personService.reward(shooter);
@@ -149,14 +163,22 @@ class ProjectileService {
         if (person.isFire()) {
             AbstractWeapon weapon = person.getWeapon();
             long now = System.currentTimeMillis();
-            if(weapon.getCurrentClip() <= 0) {
+            if(!person.isReload() && weapon.getCurrentClip() <= 0) {
                 if(weapon.getTotalClip() >= 0) {
                     person.setIsReload(true);
-                    person.setReloadCooldown(person.getWeapon().getReloadTimeout());
+                    person.setReloadCooldown(now + person.getWeapon().getReloadTimeout());
                 }
             } else if (person.getShotCooldown() < now && person.getReloadCooldown() < now ) {
                 if(person.isReload()) {
+                    if(weapon.getTotalClip() <= 0) {
+                        return;
+                    }
                     person.setIsReload(false);
+                    int clipToReload = weapon.getClipSize();
+                    if(clipToReload > weapon.getTotalClip()) {
+                        clipToReload = weapon.getTotalClip();
+                    }
+                    weapon.setCurrentClip(clipToReload);
                 }
                 fire(person, room);
             }
@@ -210,7 +232,9 @@ class ProjectileService {
             return new KnifeAmmo(person.getX(), person.getY(), angle);
         } else if(person.getWeapon() instanceof Pistol || person.getWeapon() instanceof AssaultRifle || person.getWeapon() instanceof Minigun) {
             return new Bullet(person.getX(), person.getY(), angle);
-        } else if(person.getWeapon() instanceof SniperRifle) {
+        } else if(person.getWeapon() instanceof Shotgun) {
+            return new Shot(person.getX(), person.getY(), angle);
+        }  else if(person.getWeapon() instanceof SniperRifle) {
             return new SniperBullet(person.getX(), person.getY(), angle);
         } else if(person.getWeapon() instanceof RocketLauncher) {
             return new Rocket(person.getX(), person.getY(), angle);
@@ -229,5 +253,42 @@ class ProjectileService {
     }
 
 
+    public void changeWeapon(Person person, Integer weaponCode) {
+        String weaponTitle = "";
+        switch (weaponCode) {
+            case 1:
+                weaponTitle = "knife";
+                break;
+            case 2:
+                weaponTitle = "pistol";
+                break;
+            case 3:
+                weaponTitle = "shotgun";
+                break;
+            case 4:
+                weaponTitle = "assault";
+                break;
+            case 5:
+                weaponTitle = "sniper";
+                break;
+            case 6:
+                weaponTitle = "flamethrower";
+                break;
+            case 7:
+                weaponTitle = "minigun";
+                break;
+            case 8:
+                weaponTitle = "rocket";
+                break;
+        }
+        if(!"".equals(weaponTitle)) {
+            for(AbstractWeapon weapon : person.getWeaponList()) {
+                if(weapon.getName().equals(weaponTitle)) {
+                    person.setWeapon(weapon);
+                    break;
+                }
+            }
+        }
+    }
 }
 

@@ -24,23 +24,28 @@ PersonActions.startMovement = function(e){
     if(!PlayGround.gameStarted)return;
     e = e || window.event;
     var code = e.keyCode;
-    if (code > 36 && code < 41) {
+    var thisEvent = false;
+    switch (code) {
+        case Controls.left:
+            PersonActions.buttonLeft = true;
+            thisEvent = true;
+            break;
+        case Controls.top:
+            PersonActions.buttonTop = true;
+            thisEvent = true;
+            break;
+        case Controls.right:
+            PersonActions.buttonRight= true;
+            thisEvent = true;
+            break;
+        case Controls.bottom:
+            PersonActions.buttonBottom = true;
+            thisEvent = true;
+            break;
+        default:
+    }
+    if(thisEvent) {
         e.preventDefault();
-        switch (code) {
-            case Controls.left:
-                PersonActions.buttonLeft = true;
-                break;
-            case Controls.top:
-                PersonActions.buttonTop = true;
-                break;
-            case Controls.right:
-                PersonActions.buttonRight= true;
-                break;
-            case Controls.botton:
-                PersonActions.buttonBottom = true;
-                break;
-            default:
-        }
         var direction = PersonActions.handleDirectionAfterButtons();
         PersonActions.setDirection(direction);
     }

@@ -14,7 +14,7 @@ var Dom = {
     addClass: function(el, clazz) {
         if(el.className) {
             if(el.className.indexOf(clazz) === -1 || el.className.split(' ').indexOf(clazz) === -1) {
-                el.className += clazz;
+                el.className += ' ' + clazz;
             }
         } else {
             el.className = clazz;
@@ -47,7 +47,7 @@ var Dom = {
     },
     append: function(o, content) {
         if(content) {
-            if(typeof content === 'string') {
+            if(typeof content === 'string' || typeof content === 'number') {
                 o.appendChild(document.createTextNode(content));
             } else if(content.length) {
                 for(var i = 0;i<content.length;i++) {

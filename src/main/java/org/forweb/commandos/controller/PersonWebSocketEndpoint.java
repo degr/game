@@ -18,6 +18,7 @@ public class PersonWebSocketEndpoint {
     private static final String MESSAGE_SHOT = "fire";
     private static final String MESSAGE_DIRECTION = "direction";
     private static final String MESSAGE_ANGLE = "angle";
+    private static final String MESSAGE_CHANGE_WEAPON = "gun";
 
     public static final int PERSON_RADIUS = 20;
     public static final Integer LIFE_AT_START = 100;
@@ -48,11 +49,14 @@ public class PersonWebSocketEndpoint {
             case MESSAGE_ANGLE:
                 springDelegationService.updatePersonViewAngle(getPerson(), Integer.parseInt(parts[1]));
                 break;
+            case MESSAGE_DIRECTION:
+                springDelegationService.handleDirection(getPerson(), parts[1]);
+                break;
             case MESSAGE_SHOT:
                 springDelegationService.doShot(getPerson(), parts[1], roomId);
                 break;
-            case MESSAGE_DIRECTION:
-                springDelegationService.handleDirection(getPerson(), parts[1]);
+            case MESSAGE_CHANGE_WEAPON:
+                springDelegationService.changeWeapon(getPerson(), Integer.parseInt(parts[1]));
                 break;
             case MESSAGE_CREATE:
                 roomId = springDelegationService.createRoom(Integer.parseInt(parts[1]), parts[2]);

@@ -3,6 +3,7 @@ ProjectilesActions.draw = function(projectile) {
     switch (projectile.type) {
         case 'bullet':
         case 'slug':
+        case 'shot':
             ProjectilesActions.drawBullet(projectile);
             break;
         case 'flame':
@@ -26,24 +27,24 @@ ProjectilesActions.drawBullet = function(projectile){
 };
 
 ProjectilesActions.drawFlame = function(projectile) {
-    context.beginPath();
     var context = PlayGround.context;
+    context.beginPath();
     context.strokeStyle = 'red';
     context.arc(projectile.x1, projectile.x2, PlayGround.fireRadius, 0, 2 * Math.PI, false);
     context.stroke();
 }
 
 ProjectilesActions.drawRocket = function(projectile) {
-    context.beginPath();
     var context = PlayGround.context;
+    context.beginPath();
     context.strokeStyle = 'red';
     context.arc(projectile.x1, projectile.x2, PlayGround.rocketRadius, 0, 2 * Math.PI, false);
     context.stroke();
 }
 
 ProjectilesActions.drawBlade = function(projectile) {
-    context.beginPath();
     var context = PlayGround.context;
+    context.beginPath();
     context.strokeStyle = 'blue';
     context.arc(projectile.x1, projectile.x2, PlayGround.fireRadius, 0, 2 * Math.PI, false);
     context.stroke();

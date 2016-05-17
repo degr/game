@@ -36,11 +36,6 @@ public class Person {
 
     public Person(int id) {
         this.id = id;
-        this.weapon = new Pistol();
-        this.weaponList = new ArrayList<>();
-        this.weaponList.add(new Knife());
-        this.weaponList.add(this.weapon);
-
     }
 
     public int getId() {

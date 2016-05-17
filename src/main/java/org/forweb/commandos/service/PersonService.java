@@ -1,5 +1,8 @@
 package org.forweb.commandos.service;
 
+import org.forweb.commandos.entity.weapon.AbstractWeapon;
+import org.forweb.commandos.entity.weapon.Knife;
+import org.forweb.commandos.entity.weapon.Pistol;
 import org.forweb.commandos.service.person.MovementService;
 import org.forweb.commandos.service.person.TurnService;
 import org.forweb.geometry.shapes.Point;
@@ -12,7 +15,9 @@ import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.game.Context;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Service
 public class PersonService {
@@ -47,6 +52,16 @@ public class PersonService {
         person.setDirection(Direction.NONE);
         person.setLife(PersonWebSocketEndpoint.LIFE_AT_START);
         Point point = locationService.getRespawnCenter(room);
+
+        person.setWeapon(new Pistol());
+        List<AbstractWeapon> weaponList = new ArrayList<>();
+        weaponList.add(new Knife());
+        weaponList.add(person.getWeapon());
+        person.setWeaponList(weaponList);
+
+        person.setReloadCooldown(0);
+        person.setReload(false);
+
         if(point != null) {
             person.setX((int) point.getX());
             person.setY((int) point.getY());

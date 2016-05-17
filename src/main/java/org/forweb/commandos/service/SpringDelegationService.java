@@ -124,4 +124,8 @@ public class SpringDelegationService {
     public void doShot(Person person, String status, Integer roomId) {
         projectilesService.doShot(person, status, gameContext.getRoom(roomId));
     }
+
+    public void changeWeapon(Person person, Integer weaponCode) {
+        projectilesService.changeWeapon(person, weaponCode);
+    }
 }

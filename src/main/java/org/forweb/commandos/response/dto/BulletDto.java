@@ -8,7 +8,7 @@ public class BulletDto {
     private Integer x2;
     private Integer y2;
 
-    public int getY2() {
+    public Integer getY2() {
         return y2;
     }
 
@@ -16,7 +16,7 @@ public class BulletDto {
         this.y2 = y2;
     }
 
-    public int getX2() {
+    public Integer getX2() {
         return x2;
     }
 
