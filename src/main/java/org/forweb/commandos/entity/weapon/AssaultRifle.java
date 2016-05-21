@@ -4,7 +4,6 @@ import org.forweb.commandos.entity.ammo.Bullet;
 
 public class AssaultRifle extends AbstractWeapon<Bullet> {
     public AssaultRifle() {
-        this.setRadius(350);
         this.setShotTimeout(100);
         this.setReloadTimeout(3000);
 

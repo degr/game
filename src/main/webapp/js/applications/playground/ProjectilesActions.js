@@ -28,24 +28,33 @@ ProjectilesActions.drawBullet = function(projectile){
 
 ProjectilesActions.drawFlame = function(projectile) {
     var context = PlayGround.context;
-    context.beginPath();
-    context.strokeStyle = 'red';
-    context.arc(projectile.x1, projectile.x2, PlayGround.fireRadius, 0, 2 * Math.PI, false);
-    context.stroke();
-}
+    context.drawImage(ProjectilesActions.fire, projectile.x1 - 9, projectile.y1 - 9);
+};
 
 ProjectilesActions.drawRocket = function(projectile) {
+
     var context = PlayGround.context;
+    context.save();
+    var x = projectile.x1;
+    var y = projectile.y1;
     context.beginPath();
-    context.strokeStyle = 'red';
-    context.arc(projectile.x1, projectile.x2, PlayGround.rocketRadius, 0, 2 * Math.PI, false);
-    context.stroke();
-}
+    var angle = projectile.angle + 135;
+    context.translate(x,y);
+    context.rotate(angle * Math.PI/180);
+    context.drawImage(ProjectilesActions.rocket, - 9,  - 9);
+    context.restore();
+
+};
 
 ProjectilesActions.drawBlade = function(projectile) {
     var context = PlayGround.context;
     context.beginPath();
     context.strokeStyle = 'blue';
-    context.arc(projectile.x1, projectile.x2, PlayGround.fireRadius, 0, 2 * Math.PI, false);
+    context.arc(projectile.x1, projectile.y1, PlayGround.fireRadius, 0, 2 * Math.PI, false);
     context.stroke();
-}
+};
+ProjectilesActions.fire = new Image();
+ProjectilesActions.fire.src = 'images/map/fire.png';
+
+ProjectilesActions.rocket = new Image();
+ProjectilesActions.rocket.src = 'images/map/rocketBullet.gif';

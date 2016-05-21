@@ -4,6 +4,7 @@ public class Bullet extends Projectile{
     public Bullet(int xStart, int yStart, float angle) {
         super(xStart, yStart, angle);
         this.setLifeTime(150L);
+        this.setRadius(450);
     }
 
     @Override

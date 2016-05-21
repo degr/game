@@ -5,7 +5,6 @@ import org.forweb.commandos.entity.ammo.Shot;
 
 public class Shotgun extends AbstractWeapon<Shot> {
     public Shotgun() {
-        this.setRadius(200);
         this.setShotTimeout(500);
         this.setReloadTimeout(3000);
         setSpread(15);

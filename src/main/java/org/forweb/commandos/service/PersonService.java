@@ -79,8 +79,10 @@ public class PersonService {
     }
 
     public void handlePersons(Collection<Person> persons, Room room) {
+        long now = System.currentTimeMillis();
         for (Person person : persons) {
             movementService.onMove(person, room);
+            projectileService.onReload(person, now);
             projectileService.handleFire(person, room);
             turnService.onPersonChangeViewAngle(person);
         }

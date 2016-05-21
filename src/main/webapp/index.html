@@ -16,6 +16,7 @@
     <script src="js/applications/playground/Weapons.js"></script>
     <script src="js/applications/playground/LifeAndArmor.js"></script>
     <script src="js/applications/playground/Control.js"></script>
+    <script src="js/applications/playground/KeyboardSetup.js"></script>
     <script src="js/applications/playground/ZoneActions.js"></script>
     <script src="js/applications/playground/Person.js"></script>
     <script src="js/applications/playground/Console.js"></script>
@@ -48,7 +49,7 @@
         Accept: "application/json",
         'Content-Type': "application/json"
     };
-    Rest.host = 'http://192.168.1.38:8080/server/';
+    Rest.host = document.location.protocol + '//' + document.location.host + '/server/';
     Dispatcher.init();
 /*
     Rest.doGet("http://localhost:8080/server/map/pingGet");

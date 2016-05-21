@@ -27,12 +27,15 @@ var PlayGround = {
         ZoneActions.init();
         Weapons.init();
         LifeAndArmor.init();
-
+        KeyboardSetup.init();
+        var openKeyboard = Dom.el('a', {'href': "#", 'class': 'icon-keyboard'});
+        openKeyboard.onclick = function(e){e.preventDefault();KeyboardSetup.show()};
+        
         var canvas = Dom.el('canvas', {width: 640, height: 480, id: 'playground'});
         PlayGround.container = Dom.el(
             'div',
             {'class': 'playground'},
-            [Weapons.container,LifeAndArmor.container, canvas]
+            [openKeyboard, Weapons.container,LifeAndArmor.container,KeyboardSetup.container, canvas]
         );
         
         PlayGround.nextGameTick = (new Date).getTime();
@@ -165,6 +168,7 @@ var PlayGround = {
         p.x = personDto.x;
         p.y = personDto.y;
         p.angle = personDto.angle;
+        p.reload = personDto.reload;
         if(PlayGround.owner.id == id) {
             PersonActions.updateMouseDirectionByXy(PlayGround.xMouse, PlayGround.yMouse, p);
         }
@@ -206,7 +210,7 @@ var PlayGround = {
             }
         }
         for (var id in PlayGround.entities) {
-            PlayGround.entities[id].draw();
+            PersonActions.drawPerson(PlayGround.entities[id]);
         }
         if (PlayGround.projectiles != null) {
             for (var i = 0; i < PlayGround.projectiles.length; i++) {

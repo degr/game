@@ -3,10 +3,11 @@ package org.forweb.commandos.response.dto;
 public class BulletDto {
 
     private String type;
-    private Integer x1;
-    private Integer y1;
+    private double x1;
+    private double y1;
     private Integer x2;
     private Integer y2;
+    private float angle;
 
     public Integer getY2() {
         return y2;
@@ -24,19 +25,19 @@ public class BulletDto {
         this.x2 = x2;
     }
 
-    public int getY1() {
+    public double getY1() {
         return y1;
     }
 
-    public void setY1(int y1) {
+    public void setY1(double y1) {
         this.y1 = y1;
     }
 
-    public int getX1() {
+    public double getX1() {
         return x1;
     }
 
-    public void setX1(int x1) {
+    public void setX1(double x1) {
         this.x1 = x1;
     }
 
@@ -48,4 +49,11 @@ public class BulletDto {
         this.type = type;
     }
 
+    public void setAngle(float angle) {
+        this.angle = angle;
+    }
+
+    public float getAngle() {
+        return angle;
+    }
 }

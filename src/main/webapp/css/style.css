@@ -24,7 +24,9 @@ ul.games li p {
     overflow: auto;
     height: 75px;
 }
-
+.hidden {
+    display: none;
+}
 .overlay {
     width: 100%;
     height: 100%;
@@ -215,4 +217,24 @@ body, html {
 }
 .life-and-armor .life-100 {
     color: cornflowerblue;
+}
+.playground .icon-keyboard {
+    position: absolute;
+    right: 100px;
+    bottom: 10px;
+    width: 18px;
+    height: 18px;
+    background: url(../images/gear.png) no-repeat;
+}
+
+
+.keyboard-setup{
+    width: 400px;
+    position: absolute;
+    margin-left: -200px;
+    left: 50%;
+    background: white;
+    border: 1px solid black;
+    padding: 0 10px 10px;
+    top: 30px;
 }

@@ -43,7 +43,8 @@ var Dom = {
         return document.getElementById(id);
     },
     update: function(el, attr) {
-        if(attr)for(var i in attr)el.setAttribute(i, attr[i]);
+        if(typeof attr === 'string'){el.className = attr;
+        }else if(attr)for(var i in attr)el.setAttribute(i, attr[i]);
     },
     append: function(o, content) {
         if(content) {

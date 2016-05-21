@@ -135,6 +135,7 @@ public class ResponseService {
                 dto.setX2(projectile.getxEnd());
                 dto.setY2(projectile.getyEnd());
             }
+            dto.setAngle(projectile.getAngle());
             dto.setType(projectile.getName());
             out.add(dto);
         }

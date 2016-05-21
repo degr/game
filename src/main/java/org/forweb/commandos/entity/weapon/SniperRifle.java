@@ -6,7 +6,6 @@ public class SniperRifle extends AbstractWeapon<SniperBullet> {
     public SniperRifle(){
         this.setReloadTimeout(3000);
         this.setShotTimeout(1500);
-        this.setRadius(500);
         this.setSpread(3);
 
         this.setMaxClip(20);

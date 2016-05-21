@@ -5,15 +5,15 @@ import java.util.Date;
 public abstract class Projectile {
     private Integer id;
     private String type;
-    private Integer xStart;
-    private Integer yStart;
+    private double xStart;
+    private double yStart;
     private Integer xEnd;
     private Integer yEnd;
-    private Integer speed;
     private Long creationTime = new Date().getTime();
     private long now;
     private Long lifeTime;
     private float angle;
+    private double radius;
 
     private boolean piercing = false;
 
@@ -43,19 +43,19 @@ public abstract class Projectile {
         this.xEnd = xEnd;
     }
 
-    public Integer getyStart() {
+    public double getyStart() {
         return yStart;
     }
 
-    public void setyStart(Integer yStart) {
+    public void setyStart(double yStart) {
         this.yStart = yStart;
     }
 
-    public Integer getxStart() {
+    public double getxStart() {
         return xStart;
     }
 
-    public void setxStart(Integer xStart) {
+    public void setxStart(double xStart) {
         this.xStart = xStart;
     }
 
@@ -66,15 +66,14 @@ public abstract class Projectile {
     public void setType(String type) {
         this.type = type;
     }
-    
-    public Integer getSpeed() {
-        return speed;
+
+    public double getRadius() {
+        return radius;
     }
 
-    public void setSpeed(Integer speed) {
-        this.speed = speed;
+    public void setRadius(double radius) {
+        this.radius = radius;
     }
-    
     public Long getCreationTime() {
         return creationTime;
     }

@@ -81,22 +81,27 @@ PersonActions.handleDirectionAfterButtons = function() {
 PersonActions.stopMovement = function(e){
     if(!PlayGround.gameStarted)return;
     var code = e.keyCode;
-    if (code > 36 && code < 41) {
-        e.preventDefault();
-        switch (code) {
-            case 37:
-                PersonActions.buttonLeft = false;
-                break;
-            case 38:
-                PersonActions.buttonTop = false;
-                break;
-            case 39:
-                PersonActions.buttonRight = false;
-                break;
-            case 40:
-                PersonActions.buttonBottom = false;
-                break;
-        }
+    e.preventDefault();
+    var thisEvent = false;
+    switch (code) {
+        case Controls.left:
+            PersonActions.buttonLeft = false;
+            thisEvent = true;
+            break;
+        case Controls.top:
+            PersonActions.buttonTop = false;
+            thisEvent = true;
+            break;
+        case Controls.right:
+            PersonActions.buttonRight = false;
+            thisEvent = true;
+            break;
+        case Controls.bottom:
+            PersonActions.buttonBottom = false;
+            thisEvent = true;
+            break;
+    }
+    if(thisEvent) {
         var direction = PersonActions.handleDirectionAfterButtons();
         PersonActions.setDirection(direction);
     }
@@ -170,3 +175,26 @@ PersonActions.angle = function(cx, cy, ex, ey) {
     //if (theta < 0) theta = 360 + theta; // range [0, 360)
     return theta;
 };
+PersonActions.drawPerson = function(person) {
+    var context = PlayGround.context;
+    context.save();
+    var x = person.x;
+    var y = person.y;
+    context.beginPath();
+    var angle = person.angle + 90;
+    context.strokeStyle = person.hexColor;
+    context.translate(x,y);
+    if(person.reload) {
+        context.drawImage(PersonActions.reload, + PlayGround.radius,  - PlayGround.radius);
+    }
+    context.rotate(angle * Math.PI/180);
+    context.arc(0, 0, PlayGround.radius, 0, 2 * Math.PI, false);
+    context.stroke();
+    context.drawImage(person.image, - PlayGround.radius,  - PlayGround.radius);
+    context.restore();
+    
+    
+};
+
+PersonActions.reload = new Image();
+PersonActions.reload.src = 'images/map/reload.jpg';

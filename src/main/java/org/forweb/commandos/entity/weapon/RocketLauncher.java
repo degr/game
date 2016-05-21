@@ -4,9 +4,8 @@ import org.forweb.commandos.entity.ammo.Rocket;
 
 public class RocketLauncher extends AbstractWeapon<Rocket> {
     public RocketLauncher(){
-        this.setRadius(400);
         this.setReloadTimeout(2000);
-        this.setShotTimeout(2000);
+        this.setShotTimeout(0);
         setSpread(7);
 
         this.setMaxClip(5);

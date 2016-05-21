@@ -6,7 +6,6 @@ public class Flamethrower extends AbstractWeapon<Flame> {
     public Flamethrower(){
         this.setShotTimeout(200);
         this.setReloadTimeout(3000);
-        this.setRadius(80);
         setSpread(15);
 
         this.setMaxClip(120);

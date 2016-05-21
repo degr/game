@@ -5,7 +5,6 @@ import org.forweb.commandos.entity.ammo.Projectile;
 public abstract class AbstractWeapon<T extends Projectile> {
     private int shotTimeout;
     private int reloadTimeout;
-    private double radius;
 
     /**
      * ammo limit for gun
@@ -30,13 +29,6 @@ public abstract class AbstractWeapon<T extends Projectile> {
 
     public abstract String getName();
 
-    public double getRadius() {
-        return radius;
-    }
-
-    public void setRadius(double radius) {
-        this.radius = radius;
-    }
 
     public int getReloadTimeout() {
         return reloadTimeout;

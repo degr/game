@@ -35,16 +35,33 @@ class ProjectileService {
         for (Map.Entry<Integer, Projectile> entry : projectiles.entrySet()) {
             Projectile projectile = entry.getValue();
             projectile.setNow(System.currentTimeMillis());
+            if(!projectile.isInstant()) {
+                updatePosition(projectile);
+                checkForImpacts(projectile);
+            }
             if (projectile.getCreationTime() + projectile.getLifeTime() < now) {
                 projectiles.remove(entry.getKey());
             }
         }
     }
 
+    private void checkForImpacts(Projectile projectile) {
+
+    }
+
+    private void updatePosition(Projectile projectile) {
+        double distance = projectile.getRadius() * Context.TICK_DELAY / projectile.getLifeTime();
+        double angle = projectile.getAngle() * Math.PI / 180;
+        double y = distance * Math.sin(angle);
+        double x = distance * Math.cos(angle);
+        projectile.setxStart(projectile.getxStart() + x);
+        projectile.setyStart(projectile.getyStart() + y);
+    }
+
     private synchronized void calculateInstantImpacts(Person shooter, Projectile projectile, Room room) {
 
-        float xStart = projectile.getxStart();
-        float yStart = projectile.getyStart();
+        double xStart = projectile.getxStart();
+        double yStart = projectile.getyStart();
 
         Person closestPerson = null;
         Point closestPoint = null;
@@ -63,8 +80,8 @@ class ProjectileService {
                     zoneBounds
             );
             Point closest = isMoreClose(
-                    projectile.getxStart(),
-                    projectile.getyStart(),
+                    (int)projectile.getxStart(),
+                    (int)projectile.getyStart(),
                     new Point(projectile.getxEnd(), projectile.getyEnd()),
                     zoneIntersection
             );
@@ -76,18 +93,22 @@ class ProjectileService {
         }
 
         for (Person person : room.getPersons().values()) {
-            if (shooter == person) {
-                continue;
-            }
-
             Point linePointB = new Point((double) projectile.getxEnd(), (double) projectile.getyEnd());
             Point[] intersectionPoints = LineService.lineIntersectCircle(
                     new Line(
-                            new Point((double) xStart, (double) yStart),
+                            new Point(xStart, yStart),
                             linePointB
                     ),
                     new Circle(person.getX(), person.getY(), PersonWebSocketEndpoint.PERSON_RADIUS)
             );
+
+            if (shooter == person) {
+                projectile.setxStart((int)intersectionPoints[0].getX());
+                projectile.setyStart((int)intersectionPoints[0].getY());
+                continue;
+            }
+
+
             if (intersectionPoints != null && intersectionPoints.length > 0) {
                 Point closest = isMoreClose(shooter.getX(), shooter.getY(), closestPoint, intersectionPoints);
                 if(closest != null) {
@@ -168,20 +189,24 @@ class ProjectileService {
                     person.setIsReload(true);
                     person.setReloadCooldown(now + person.getWeapon().getReloadTimeout());
                 }
-            } else if (person.getShotCooldown() < now && person.getReloadCooldown() < now ) {
-                if(person.isReload()) {
-                    if(weapon.getTotalClip() <= 0) {
-                        return;
-                    }
-                    person.setIsReload(false);
-                    int clipToReload = weapon.getClipSize();
-                    if(clipToReload > weapon.getTotalClip()) {
-                        clipToReload = weapon.getTotalClip();
-                    }
-                    weapon.setCurrentClip(clipToReload);
-                }
+            } else if (!person.isReload() && weapon.getCurrentClip() > 0 && person.getShotCooldown() < now) {
                 fire(person, room);
             }
+        }
+    }
+
+    public void onReload(Person person, long now) {
+        if(person.isReload() && person.getShotCooldown() < now && person.getReloadCooldown() < now ) {
+            AbstractWeapon weapon = person.getWeapon();
+            if(weapon.getTotalClip() <= 0) {
+                return;
+            }
+            person.setIsReload(false);
+            int clipToReload = weapon.getClipSize();
+            if(clipToReload > weapon.getTotalClip()) {
+                clipToReload = weapon.getTotalClip();
+            }
+            weapon.setCurrentClip(clipToReload);
         }
     }
 
@@ -200,23 +225,23 @@ class ProjectileService {
             float angle = projectile.getAngle();
             if (angle == 90) {
                 projectile.setxEnd(person.getX());
-                int gunLimit = (int) gun.getRadius() + person.getY();
+                int gunLimit = (int) projectile.getRadius() + person.getY();
                 projectile.setyEnd(gunLimit > room.getMap().getY() ? room.getMap().getY() : gunLimit);
             } else if (angle == 180) {
                 projectile.setyEnd(person.getY());
-                int gunLimit = person.getX() - (int) gun.getRadius();
+                int gunLimit = person.getX() - (int) projectile.getRadius();
                 projectile.setyEnd(gunLimit > 0 ? gunLimit : 0);
             } else if (angle == 270) {
                 projectile.setxEnd(person.getX());
-                int gunLimit = person.getY() - (int) gun.getRadius();
+                int gunLimit = person.getY() - (int) projectile.getRadius();
                 projectile.setyEnd(gunLimit > 0 ? gunLimit : 0);
             } else if (angle == 0) {
                 projectile.setyEnd(person.getY());
-                int gunLimit = person.getX() + (int) gun.getRadius();
+                int gunLimit = person.getX() + (int) projectile.getRadius();
                 projectile.setyEnd(gunLimit > room.getMap().getX() ? room.getMap().getX() : gunLimit);
             } else {
-                double y = gun.getRadius() * Math.sin(angle * Math.PI / 180);
-                double x = gun.getRadius() * Math.cos(angle * Math.PI / 180);
+                double y = projectile.getRadius() * Math.sin(angle * Math.PI / 180);
+                double x = projectile.getRadius() * Math.cos(angle * Math.PI / 180);
                 projectile.setxEnd((int) x + person.getX());
                 projectile.setyEnd((int) y + person.getY());
             }
@@ -228,6 +253,7 @@ class ProjectileService {
 
     private Projectile getCompatibleProjectile(Person person) {
         float angle = getNewProjectileAngle(person);
+
         if(person.getWeapon() instanceof Knife) {
             return new KnifeAmmo(person.getX(), person.getY(), angle);
         } else if(person.getWeapon() instanceof Pistol || person.getWeapon() instanceof AssaultRifle || person.getWeapon() instanceof Minigun) {

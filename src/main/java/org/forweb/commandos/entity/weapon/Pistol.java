@@ -6,7 +6,6 @@ public class Pistol extends AbstractWeapon<Bullet> {
     public Pistol() {
         this.setShotTimeout(1000);
         this.setReloadTimeout(2000);
-        this.setRadius(300);
         this.setSpread(5);
 
         this.setMaxClip(40);

@@ -4,7 +4,6 @@ import org.forweb.commandos.entity.ammo.Bullet;
 
 public class Minigun extends AbstractWeapon<Bullet> {
     public Minigun(){
-        this.setRadius(350);
         this.setShotTimeout(100);
         this.setReloadTimeout(3000);
         this.setSpread(9);

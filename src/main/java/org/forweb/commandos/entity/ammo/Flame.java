@@ -6,6 +6,7 @@ public class Flame extends Projectile {
     public Flame(int xStart, int yStart, float angle) {
         super(xStart, yStart, angle);
         this.setLifeTime(3000L);
+        this.setRadius(80);
     }
 
     @Override
@@ -22,4 +23,5 @@ public class Flame extends Projectile {
     public int getDamage() {
         return 10;
     }
+
 }
