@@ -1,13 +1,17 @@
 package org.forweb.commandos.entity.ammo;
 
-public class Flame extends Projectile {
+public class Flame extends LinkedAmmo {
 
+    private boolean isStoped;
 
-    public Flame(int xStart, int yStart, float angle) {
-        super(xStart, yStart, angle);
+    public Flame(int xStart, int yStart, float angle, int personId) {
+        super(xStart, yStart, angle, personId);
         this.setLifeTime(3000L);
-        this.setRadius(80);
+        this.setRadius(120);
+        setStoped(false);
     }
+
+
 
     @Override
     public boolean isInstant() {
@@ -24,4 +28,11 @@ public class Flame extends Projectile {
         return 10;
     }
 
+    public boolean isStoped() {
+        return isStoped;
+    }
+
+    public void setStoped(boolean stoped) {
+        isStoped = stoped;
+    }
 }

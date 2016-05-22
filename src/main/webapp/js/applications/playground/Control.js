@@ -1,8 +1,8 @@
 var Controls = {
-    left: 37,
-    top: 38,
-    right: 39,
-    bottom: 40,
+    left: 65,
+    top: 87,
+    right: 68,
+    bottom: 83,
     nextWeapon: 0,
     previousWeapon: null,
     knife: 49,
@@ -13,6 +13,6 @@ var Controls = {
     flamethrower: 54,
     minigun: 55,
     rocket: 56,
-    grenage: 9,
-    console: 0
+    //grenage: 9
+    //console: 0
 };

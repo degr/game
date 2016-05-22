@@ -21,13 +21,15 @@ var ZoneActions = {
         ZoneActions.images.sniper.src = 'images/map/sniper.png';
         ZoneActions.images.pistol = new Image();
         ZoneActions.images.pistol.src = 'images/map/pistol.jpg';
+        ZoneActions.images.wall = new Image();
+        ZoneActions.images.wall.src = 'images/map/wall.jpg';
     },
     drawZone: function(zone) {
         var context = PlayGround.context;
         context.beginPath();
         switch (zone.type) {
             case 'respawn':
-                context.fillStyle = '#3dbe2f';
+                context.fillStyle = 'rgba(129, 195, 114, 0.5)';
                 context.fillRect(zone.x, zone.y, zone.width, zone.height);
                 break;
             case "shotgun":
@@ -42,8 +44,7 @@ var ZoneActions = {
                 ZoneActions.drawImage(zone);
                 break;
             case 'wall':
-                context.fillStyle = '#000000';
-                context.fillRect(zone.x, zone.y, zone.width, zone.height);
+                context.drawImage(ZoneActions.images.wall, zone.x, zone.y, zone.width, zone.height);
                 break;
             default:
                 context.strokeStyle = '#000000';

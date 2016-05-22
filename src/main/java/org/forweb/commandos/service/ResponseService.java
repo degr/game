@@ -114,7 +114,7 @@ public class ResponseService {
         for (Person person : persons.values()) {
             PersonDto dto = new PersonDto();
             dto.setColor(person.getHexColor());
-            dto.setReload(person.isReload() ? 1 : null);
+            dto.setReload(person.getWeapon().getCurrentClip() == 0 ? 1 : null);
             dto.setGun(person.getWeapon().getName());
             dto.setX(person.getX());
             dto.setY(person.getY());

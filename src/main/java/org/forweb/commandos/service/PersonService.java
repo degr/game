@@ -43,7 +43,7 @@ public class PersonService {
         //responseService.sendMessage(person, "{\"type\": \"dead\"}");
     }
 
-    public synchronized void reward(Person person) {
+    public synchronized void reward(Person shooter, Person target) {
         //responseService.sendMessage(person, "{\"type\": \"kill\"}");
     }
 

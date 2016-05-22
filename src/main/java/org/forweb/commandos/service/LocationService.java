@@ -85,7 +85,7 @@ public class LocationService {
 
 
         }
-        for(Person person : room.getPersons().values()) {
+        /*for(Person person : room.getPersons().values()) {
             if(person == player) {
                 continue;
             }
@@ -98,7 +98,7 @@ public class LocationService {
             if(p == null || p.length > 0) {
                 return false;
             }
-        }
+        }*/
         return true;
     }
 }

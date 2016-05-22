@@ -65,7 +65,7 @@ public class SpringDelegationService {
     private void tick(Room room) {
         Collection<Person> persons = room.getPersons().values();
         personService.handlePersons(persons, room);
-        projectilesService.onProjectileLifecycle(room.getProjectiles());
+        projectilesService.onProjectileLifecycle(room.getProjectiles(), room);
         mapService.onItemsLifecycle(room.getMap().getZones());
         responseService.broadcast(
                 new Update(

@@ -22,6 +22,7 @@ var PlayGround = {
 
     rocketRadius: 5,
     fireRadius: 7,
+    explosionRadius: 40,//different on 20 with server
 
     init: function () {
         ZoneActions.init();

@@ -21,6 +21,8 @@ public class PersonWebSocketEndpoint {
     private static final String MESSAGE_CHANGE_WEAPON = "gun";
 
     public static final int PERSON_RADIUS = 20;
+    public static final int ROCKET_RADIUS = 8;
+    public static final int FIRE_RADIUS = 8;
     public static final Integer LIFE_AT_START = 100;
 
     @Autowired
