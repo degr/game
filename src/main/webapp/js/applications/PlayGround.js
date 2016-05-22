@@ -29,6 +29,8 @@ var PlayGround = {
         Weapons.init();
         LifeAndArmor.init();
         KeyboardSetup.init();
+        GameStats.init();
+        Score.init();
         var openKeyboard = Dom.el('a', {'href': "#", 'class': 'icon-keyboard'});
         openKeyboard.onclick = function(e){e.preventDefault();KeyboardSetup.show()};
         
@@ -36,7 +38,10 @@ var PlayGround = {
         PlayGround.container = Dom.el(
             'div',
             {'class': 'playground'},
-            [openKeyboard, Weapons.container,LifeAndArmor.container,KeyboardSetup.container, canvas]
+            [
+                openKeyboard, Weapons.container,LifeAndArmor.container,KeyboardSetup.container,
+                Score.container, GameStats.container, canvas
+            ]
         );
         
         PlayGround.nextGameTick = (new Date).getTime();
@@ -120,17 +125,20 @@ var PlayGround = {
                 case 'update':
                     PlayGround.onUpdate(data);
                     break;
-                case 'leave':
+                case 'leave':   
                     PlayGround.removePerson(data.id);
                     break;
-                case 'dead':
-                    Console.log('Info: Your person is dead, bad luck!');
-                    break;
-                case 'kill':
-                    Console.log('Info: Head shot!');
+                case 'stats':
+                    PlayGround.onStats(data);
                     break;
             }
         };
+    },
+    onStats: function (data) {
+        PlayGround.gameStarted = false;
+        GameStats.show();
+        GameStats.update(data.stats);
+        PlayGround.socket.close();
     },
     onUpdate: function(packet) {
         if (packet.owner !== null) {
@@ -139,7 +147,7 @@ var PlayGround = {
         }
         Weapons.update(PlayGround.owner);
         LifeAndArmor.update(PlayGround.owner.life, PlayGround.owner.armor);
-        
+        Score.update(PlayGround.owner, packet.time);
         for(var i = 0; i < packet.items.length; i++) {
             var zones = PlayGround.map.zones;
             var item = packet.items[i];

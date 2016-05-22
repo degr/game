@@ -3,16 +3,19 @@ package org.forweb.commandos.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.forweb.commandos.dto.ItemDto;
+import org.forweb.commandos.entity.GameMap;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.ammo.Projectile;
 import org.forweb.commandos.entity.zone.AbstractItem;
 import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.game.Context;
+import org.forweb.commandos.response.GameStats;
 import org.forweb.commandos.response.Update;
 import org.forweb.commandos.response.dto.BulletDto;
 import org.forweb.commandos.response.dto.OwnerDto;
 import org.forweb.commandos.response.dto.PersonDto;
+import org.forweb.commandos.response.dto.Stats;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -75,6 +78,17 @@ public class ResponseService {
                     // the writes to the clients along with the addPerson() and
                     // removePerson() methods that are already synchronised.
                 }
+            }
+        }
+    }
+    public void sendStats(List<Stats> stats, Room room) {
+        GameStats out = new GameStats();
+        out.setStats(stats);
+        String message = prepareJson(out);
+        for (Person person : room.getPersons().values()) {
+            try {
+                sendMessage(person, message);
+            } catch (IllegalStateException ise) {
             }
         }
     }

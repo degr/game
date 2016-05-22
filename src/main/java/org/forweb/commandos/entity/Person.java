@@ -19,6 +19,8 @@ public class Person {
     private AbstractWeapon weapon;
     private int score;
     private boolean inPool = true;
+    private String name;
+
     public List<AbstractWeapon> getWeaponList() {
         return weaponList;
     }
@@ -170,4 +172,11 @@ public class Person {
         this.inPool = inPool;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

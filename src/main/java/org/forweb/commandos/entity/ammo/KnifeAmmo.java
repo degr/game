@@ -22,6 +22,6 @@ public class KnifeAmmo extends Projectile {
 
     @Override
     public int getDamage() {
-        return 35;
+        return 45;
     }
 }

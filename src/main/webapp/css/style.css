@@ -228,7 +228,7 @@ body, html {
 }
 
 
-.keyboard-setup{
+.keyboard-setup, .game-stats{
     width: 400px;
     position: absolute;
     margin-left: -200px;
@@ -237,4 +237,10 @@ body, html {
     border: 1px solid black;
     padding: 0 10px 10px;
     top: 30px;
+}
+.playground .score {
+    position: absolute;
+    right: 150px;
+    bottom: 0;
+    width: 80px;
 }

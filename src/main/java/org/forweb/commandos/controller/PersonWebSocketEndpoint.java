@@ -62,8 +62,10 @@ public class PersonWebSocketEndpoint {
                 break;
             case MESSAGE_CREATE:
                 roomId = springDelegationService.createRoom(Integer.parseInt(parts[1]), parts[2]);
-                /** Fall throw*/
+                springDelegationService.onJoin(session, id, roomId);
+                break;
             case MESSAGE_JOIN:
+                roomId = Integer.parseInt(parts[1]);
                 springDelegationService.onJoin(session, id, roomId);
                 break;
         }

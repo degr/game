@@ -4,8 +4,10 @@ import org.forweb.commandos.controller.PersonWebSocketEndpoint;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.game.Context;
+import org.forweb.commandos.response.GameStats;
 import org.forweb.commandos.response.Leave;
 import org.forweb.commandos.response.Update;
+import org.forweb.commandos.response.dto.Stats;
 import org.forweb.commandos.service.person.TurnService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import javax.websocket.Session;
 import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 @Service
 public class SpringDelegationService {
@@ -64,17 +67,37 @@ public class SpringDelegationService {
 
     private void tick(Room room) {
         Collection<Person> persons = room.getPersons().values();
-        personService.handlePersons(persons, room);
-        projectilesService.onProjectileLifecycle(room.getProjectiles(), room);
-        mapService.onItemsLifecycle(room.getMap().getZones());
-        responseService.broadcast(
-                new Update(
-                        responseService.mapPersons(room.getPersons()),
-                        responseService.mapProjectiles(room.getProjectiles()),
-                        responseService.mapItems(room.getMap().getZones())
-                ),
-                room
-        );
+        if(room.isShowStats()) {
+            if(persons.size() == 0) {
+                gameContext.getRooms().remove(room.getId());
+            } else {
+                responseService.sendStats(
+                        persons.stream()
+                                .map(v -> {
+                                    Stats stats = new Stats();
+                                    stats.setFrags(v.getScore());
+                                    stats.setPerson(v.getName());
+                                    return stats;
+                                })
+                                .sorted((v1, v2) -> v1.getFrags() - v2.getFrags())
+                                .collect(Collectors.toList()),
+                        room
+                );
+            }
+        } else {
+            personService.handlePersons(persons, room);
+            projectilesService.onProjectileLifecycle(room.getProjectiles(), room);
+            mapService.onItemsLifecycle(room.getMap().getZones());
+            responseService.broadcast(
+                    new Update(
+                            responseService.mapPersons(room.getPersons()),
+                            responseService.mapProjectiles(room.getProjectiles()),
+                            responseService.mapItems(room.getMap().getZones()),
+                            room.getEndTime() - System.currentTimeMillis()
+                    ),
+                    room
+            );
+        }
     }
 
     private void startTimer(Room room) {
@@ -83,8 +106,12 @@ public class SpringDelegationService {
             @Override
             public void run() {
                 try {
+                    if(room.getEndTime() - System.currentTimeMillis() < 0) {
+                        room.setShowStats(true);
+                    }
                     tick(room);
                 } catch (RuntimeException e) {
+                    e.printStackTrace();
                     System.out.println("Caught to prevent timer from shutting down" + e.getMessage());
                 }
             }

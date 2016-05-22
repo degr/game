@@ -56,7 +56,7 @@ var Weapons = {
         ammoholder.appendChild(now);
         now.className = "now";
         var onUpdateCallback = function(weapon) {
-            amount.innerHTML = weapon.max + "/" +weapon.total;
+            amount.innerHTML = weapon.total + "/" + weapon.max;
             var percents = weapon.current * 100 / weapon.clip;
             now.setAttribute('style', 'width:' + percents + '%');
             now.innerHTML = weapon.current;

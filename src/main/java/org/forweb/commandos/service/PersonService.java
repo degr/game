@@ -44,7 +44,11 @@ public class PersonService {
     }
 
     public synchronized void reward(Person shooter, Person target) {
-        //responseService.sendMessage(person, "{\"type\": \"kill\"}");
+        if(shooter == target) {
+            shooter.setScore(shooter.getScore() - 1);
+        } else {
+            shooter.setScore(shooter.getScore() + 1);
+        }
     }
 
 

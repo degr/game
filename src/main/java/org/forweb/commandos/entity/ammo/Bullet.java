@@ -19,6 +19,6 @@ public class Bullet extends Projectile{
 
     @Override
     public int getDamage() {
-        return 20;
+        return 35;
     }
 }

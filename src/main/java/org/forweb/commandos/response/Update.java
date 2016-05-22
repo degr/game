@@ -13,13 +13,15 @@ public class Update {
     private final List<ItemDto> items;
     private OwnerDto owner;
     private final String type = "update";
+    private long time;
     private List<PersonDto> persons;
     private List<BulletDto> projectiles;
 
-    public Update(List<PersonDto> personDto, List<BulletDto> projectiles, List<ItemDto> itemDtos) {
+    public Update(List<PersonDto> personDto, List<BulletDto> projectiles, List<ItemDto> itemDtos, long time) {
         this.persons = personDto;
         this.projectiles = projectiles;
         this.items = itemDtos;
+        this.time = time;
     }
 
     public String getType() {
@@ -46,4 +48,13 @@ public class Update {
     public List<ItemDto> getItems() {
         return items;
     }
+
+    public long getTime() {
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
+    }
+
 }

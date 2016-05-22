@@ -9,10 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/rooms")
@@ -32,19 +30,23 @@ public class RoomsController {
             limit = 0;
         }
         List<RoomForJoinDto> out = new ArrayList<>();
-        LinkedHashMap<Integer, Room> rooms = gameContext.getRooms();
         int start = (page - 1) * limit;
         int i = 0;
-        for (Map.Entry<Integer, Room> entry : rooms.entrySet()) {
+        Collection<Room> rooms = gameContext.getRooms().values().
+                stream().
+                filter(v -> !v.isShowStats()).
+                sorted((v, v1) -> v.getId() - v1.getId()).
+                collect(Collectors.toList());
+
+        for (Room room : rooms) {
             if (i >= start && i < page * limit) {
-                Room room = entry.getValue();
                 GameMap map = room.getMap();
                 RoomForJoinDto item = new RoomForJoinDto();
-                item.setId(entry.getKey());
-                item.setDescription(room.getDescription());
+                item.setId(room.getId());
+                item.setDescription("Room " + room.getName() + "\n Map: " + room.getMap().getName());
                 item.setName(room.getName());
                 item.setPersonsCount(room.getPersons().size());
-                item.setTotalSpace(room.getTotalPlayers());
+                item.setTotalSpace(room.getMap().getMaxPlayers());
                 item.setMap(map);
                 out.add(item);
             }

@@ -8,6 +8,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Room {
 
+    private Integer id;
+
+    public Room(){}
 
     private String name;
     private String description;
@@ -16,6 +19,9 @@ public class Room {
     private int totalPlayers;
 
     private GameMap map;
+    private long endTime;
+
+    private boolean showStats;
 
     public ConcurrentHashMap<Integer, Person> getPersons() {
         return persons;
@@ -24,7 +30,7 @@ public class Room {
     public void setPersons(ConcurrentHashMap<Integer, Person> persons) {
         this.persons = persons;
     }
-    
+
     public ConcurrentHashMap<Integer, Projectile> getProjectiles() {
         return projectiles;
     }
@@ -63,5 +69,29 @@ public class Room {
 
     public GameMap getMap() {
         return map;
+    }
+
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
+    }
+
+    public long getEndTime() {
+        return endTime;
+    }
+
+    public void setShowStats(boolean showStats) {
+        this.showStats = showStats;
+    }
+
+    public boolean isShowStats() {
+        return showStats;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getId() {
+        return id;
     }
 }

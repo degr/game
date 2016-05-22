@@ -15,8 +15,8 @@ public class Knife extends AbstractWeapon<KnifeAmmo>{
         this.setMaxClip(1);
         this.setClipSize(1);
         this.setCurrentClip(1);
-        isInstantiated = true;
         this.setTotalClip(1);
+        isInstantiated = true;
     }
 
     @Override

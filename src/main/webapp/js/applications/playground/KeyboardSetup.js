@@ -10,6 +10,15 @@ var KeyboardSetup = {
         Dom.addClass(KeyboardSetup.container, 'hidden');
     },
     init: function() {
+        var oldConfig = localStorage.getItem('keyboard');
+        if(oldConfig) {
+            var obj = JSON.parse(oldConfig);
+            if(obj) {
+                for (var k in obj) {
+                    Controls[k] = obj[k];
+                }
+            }
+        }
         var title = Dom.el('h3', null, 'Keyboard settings');
         var buttons = KeyboardSetup.buildButtons();
         window.addEventListener('keyup', KeyboardSetup.onEscapeButton, false);
@@ -42,6 +51,7 @@ var KeyboardSetup = {
             if(value) {
                 this.value = value;
                 Controls[key] = e.keyCode;
+                localStorage.setItem('keyboard', JSON.stringify(Controls));
             } else {
                 this.value = Controls[key];
             }

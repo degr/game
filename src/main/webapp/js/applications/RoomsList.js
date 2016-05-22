@@ -55,8 +55,8 @@ var RoomsList = {
 
         var titleLink = Dom.el('a', {'href':'#'});
         titleLink.onclick = clb;
-        titleLink.innerText = room.id + " " + (room.name ? room.name : 'unnamed room') + " (" + room.totalSpace+ "/" +
-            room.personsCount+ ")";
+        titleLink.innerText = room.id + " " + (room.name ? room.name : 'unnamed room') + " (" + room.personsCount+ "/" +
+            room.totalSpace+ ")";
         var description = Dom.el('p', null, descriptionLink);
         var name = Dom.el('h3', null, titleLink);
         
