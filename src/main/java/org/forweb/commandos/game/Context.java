@@ -18,7 +18,6 @@ public class Context {
 
     private LinkedHashMap<Integer, Room> rooms;
 
-    private Timer gameTimer = null;
     public static final long TICK_DELAY = 10;
     private final AtomicInteger personIds = new AtomicInteger(0);
     private final AtomicInteger projectilesIds = new AtomicInteger(0);
@@ -41,13 +40,6 @@ public class Context {
         return personIds;
     }
 
-    public void setGameTimer(Timer timer) {
-        this.gameTimer = timer;
-    }
-
-    public Timer getGameTimer() {
-        return gameTimer;
-    }
     
     public ConcurrentHashMap<Integer, Session> getSessionStorage() {
         return sessionStorage;

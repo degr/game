@@ -1,13 +1,25 @@
 package org.forweb.commandos.entity.ammo;
 
+import java.util.Random;
+
 public class Flame extends LinkedAmmo {
 
     private boolean isStoped;
 
+    private static final Random r = new Random();
+
     public Flame(int xStart, int yStart, float angle, int personId) {
         super(xStart, yStart, angle, personId);
-        this.setLifeTime(3000L);
-        this.setRadius(120);
+        int speed = r.nextInt(3);
+        if(speed == 0) {
+            this.setLifeTime((long)new Random().nextInt(500) + 250L );
+        } else if (speed == 1) {
+            this.setLifeTime((long)new Random().nextInt(1000) + 1000L );
+        } else {
+            this.setLifeTime((long)new Random().nextInt(3000) + 2000L );
+        }
+
+        this.setRadius(250);
         setStoped(false);
     }
 

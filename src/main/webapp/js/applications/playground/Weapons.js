@@ -27,6 +27,7 @@ var Weapons = {
         }
     },
     mapResponse: function (guns, active) {
+        if(!guns)return;
         var out = {};
         for(var i = 0; i < guns.length; i++) {
             var proto = guns[i].split(':');
@@ -67,7 +68,7 @@ var Weapons = {
         Weapons.container.appendChild(out);
     },
     changeWeapon: function(e) {
-        if(!PlayGround.gameStarted)return;
+        if(!PlayGround.gameStarted || Chat.active)return;
         e = e || window.event;
         var code = e.keyCode;
         var thisEvent = false;

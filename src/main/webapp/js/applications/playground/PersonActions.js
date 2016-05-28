@@ -11,17 +11,26 @@ PersonActions.setDirection  = function(direction) {
     PlayGround.socket.send("direction:" + direction);
 };
 PersonActions.startFire = function(e){
-    e = e || window.event;
-    e.preventDefault();
-    PlayGround.socket.send("fire:1");
+    if(e) {
+        e = e || window.event;
+        e.preventDefault();
+    }
+    if(Chat.active) {
+        Chat.active = false;
+        document.activeElement.blur();
+    } else {
+        PlayGround.socket.send("fire:1");
+    }
 };
 PersonActions.stopFire = function(e){
-    e = e || window.event;
-    e.preventDefault();
+    if(e) {
+        e = e || window.event;
+        e.preventDefault();
+    }
     PlayGround.socket.send("fire:0");
 };
 PersonActions.startMovement = function(e){
-    if(!PlayGround.gameStarted)return;
+    if(!PlayGround.gameStarted || Chat.active)return;
     e = e || window.event;
     var code = e.keyCode;
     var thisEvent = false;
@@ -80,26 +89,34 @@ PersonActions.handleDirectionAfterButtons = function() {
 };
 PersonActions.stopMovement = function(e){
     if(!PlayGround.gameStarted)return;
-    var code = e.keyCode;
-    e.preventDefault();
     var thisEvent = false;
-    switch (code) {
-        case Controls.left:
-            PersonActions.buttonLeft = false;
-            thisEvent = true;
-            break;
-        case Controls.top:
-            PersonActions.buttonTop = false;
-            thisEvent = true;
-            break;
-        case Controls.right:
-            PersonActions.buttonRight = false;
-            thisEvent = true;
-            break;
-        case Controls.bottom:
-            PersonActions.buttonBottom = false;
-            thisEvent = true;
-            break;
+    if(Chat.active) {
+        PersonActions.buttonLeft = false;
+        PersonActions.buttonTop = false;
+        PersonActions.buttonRight = false;
+        PersonActions.buttonBottom = false;
+    } else {
+        var code = e.keyCode;
+        e.preventDefault();
+        
+        switch (code) {
+            case Controls.left:
+                PersonActions.buttonLeft = false;
+                thisEvent = true;
+                break;
+            case Controls.top:
+                PersonActions.buttonTop = false;
+                thisEvent = true;
+                break;
+            case Controls.right:
+                PersonActions.buttonRight = false;
+                thisEvent = true;
+                break;
+            case Controls.bottom:
+                PersonActions.buttonBottom = false;
+                thisEvent = true;
+                break;
+        }
     }
     if(thisEvent) {
         var direction = PersonActions.handleDirectionAfterButtons();
@@ -170,9 +187,8 @@ PersonActions.updateMouseDirection = function(e){
 PersonActions.angle = function(cx, cy, ex, ey) {
     var dy = ey - cy;
     var dx = ex - cx;
-    var theta = Math.atan2(dy, dx); // range (-PI, PI]
-    theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
-    //if (theta < 0) theta = 360 + theta; // range [0, 360)
+    var theta = Math.atan2(dy, dx);
+    theta *= 180 / Math.PI;
     return theta;
 };
 PersonActions.drawPerson = function(person) {
@@ -192,8 +208,10 @@ PersonActions.drawPerson = function(person) {
     context.stroke();
     context.drawImage(person.image, - PlayGround.radius,  - PlayGround.radius);
     context.restore();
-    
-    
+    if(PlayGround.showNames) {
+        context.strokeText(person.name, x - 10, y + 27);
+    }
+
 };
 
 PersonActions.reload = new Image();

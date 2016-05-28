@@ -1,6 +1,9 @@
 var KeyboardSetup = {
     container: null,
     isActive: false,
+    showNames: null,
+    hideChatMessage: 'Hide Chat',
+    showChatMessage: 'Show Chat',
     show: function() {
         KeyboardSetup.isActive = true;
         Dom.removeClass(KeyboardSetup.container, 'hidden');
@@ -21,11 +24,32 @@ var KeyboardSetup = {
         }
         var title = Dom.el('h3', null, 'Keyboard settings');
         var buttons = KeyboardSetup.buildButtons();
+        KeyboardSetup.chatToggler = Dom.el('input', {'class': 'toggler', type: 'button', value: Chat.hideChatMessage});
+        KeyboardSetup.chatToggler.onclick = function() {
+            if(Chat.isHidden) {
+                Chat.show();
+                KeyboardSetup.chatToggler.value = KeyboardSetup.hideChatMessage;
+            } else {
+                Chat.hide();
+                KeyboardSetup.chatToggler.value = KeyboardSetup.showChatMessage;
+            }
+        };
+        var esc = Dom.el('input', {type: 'button', value: 'Close'});
+        esc.onclick = KeyboardSetup.hide;
+        
+        KeyboardSetup.showNames = Dom.el('input', {type: 'button', value: PlayGround.showNames ? 'hide names' : 'show names'});
+        KeyboardSetup.showNames.onclick = function() {
+            PlayGround.showNames = !PlayGround.showNames;
+            KeyboardSetup.showNames.value = PlayGround.showNames ? 'hide names' : 'show names';
+        };
         window.addEventListener('keyup', KeyboardSetup.onEscapeButton, false);
-        KeyboardSetup.container = Dom.el('div', {class: 'keyboard-setup hidden'}, [title, buttons]);
+        KeyboardSetup.container = Dom.el(
+            'div',
+            {class: 'keyboard-setup hidden'},
+            [title, buttons, KeyboardSetup.showNames, KeyboardSetup.chatToggler, esc]
+        );
     },
     onEscapeButton: function(e) {
-        console.log("button pressed: " + e.keyCode + " " + String.fromCharCode(e.keyCode));
         if(KeyboardSetup.isActive && e.keyCode === 27) {
             KeyboardSetup.hide();
         }
@@ -35,9 +59,6 @@ var KeyboardSetup = {
         for(var key in Controls) {
             buttons.push(KeyboardSetup.createInput(key));
         }
-        var esc = Dom.el('input', {type: 'button', value: 'Close'});
-        esc.onclick = KeyboardSetup.hide;
-        buttons.push(esc);
         return Dom.el('div', 'controls', buttons);
     },
     createInput: function(key) {

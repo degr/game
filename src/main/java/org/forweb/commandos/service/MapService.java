@@ -114,20 +114,22 @@ public class MapService {
             map.setRating(row.get("rating"));
             out.add(map);
         }
-        query = "select * from zone where map in (" +
-                mapIds.stream().map(v -> "?").collect(Collectors.joining(",")) + ")";
-        Table zones = db.getTable(query, mapIds.toArray());
-        for(Row row : zones) {
-            for(GameMap map : out) {
-                if(!map.getId().equals(row.getInt("map"))) {
-                    continue;
-                }
-                if(map.getZones() == null) {
-                    map.setZones(new ArrayList<>());
-                }
-                AbstractZone zone = getZone(row);
-                if(zone != null) {
-                    map.getZones().add(zone);
+        if(mapIds.size() > 0) {
+            query = "select * from zone where map in (" +
+                    mapIds.stream().map(v -> "?").collect(Collectors.joining(",")) + ")";
+            Table zones = db.getTable(query, mapIds.toArray());
+            for (Row row : zones) {
+                for (GameMap map : out) {
+                    if (!map.getId().equals(row.getInt("map"))) {
+                        continue;
+                    }
+                    if (map.getZones() == null) {
+                        map.setZones(new ArrayList<>());
+                    }
+                    AbstractZone zone = getZone(row);
+                    if (zone != null) {
+                        map.getZones().add(zone);
+                    }
                 }
             }
         }

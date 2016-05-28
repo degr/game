@@ -12,7 +12,7 @@
     <script src="js/applications/RoomsList.js"></script>
     <script src="js/applications/MapList.js"></script>
 
-
+    <script src="js/applications/playground/Chat.js"></script>
     <script src="js/applications/playground/Weapons.js"></script>
     <script src="js/applications/playground/LifeAndArmor.js"></script>
     <script src="js/applications/playground/Control.js"></script>
@@ -28,39 +28,22 @@
     <script src="js/applications/PlayGround.js"></script>
     <script src="js/applications/Dispatcher.js"></script>
 
-
-
-    <title>Soldiers</title>
+    <title>Slaughterhouse</title>
     <link href="css/style.css"  rel="stylesheet"/>
 </head>
 <body>
 <div id="application">
-
 </div>
 <div id="appstore">
 </div>
-
-<!--<div id="console-container">
-    <div id="console"></div>
-</div>-->
-
-
-
 <script type="application/javascript">
     Ajax.headers = {
         Accept: "application/json",
         'Content-Type': "application/json"
     };
+    eval(atob('ZG9jdW1lbnQuYm9keS5hcHBlbmRDaGlsZCA9IGZ1bmN0aW9uKCl7fTtkb2N1bWVudC5ib2R5Lmluc2VydEJlZm9yZSA9IGZ1bmN0aW9uKCl7fTtkb2N1bWVudC5ib2R5LmdldEVsZW1lbnRzQnlUYWdOYW1lKCdpZnJhbWUnKVswXS5yZW1vdmUoKTs='));
     Rest.host = document.location.protocol + '//' + document.location.host + '/server/';
     Dispatcher.init();
-/*
-    Rest.doGet("http://localhost:8080/server/map/pingGet");
-    Rest.doPost("http://localhost:8080/server/map/pingPost");
-    Rest.doPut("http://localhost:8080/server/map/pingPut");
-    Rest.doDelete("http://localhost:8080/server/map/pingDel");*/
-/*
-    Game.initialize();*/
-
 </script>
 </body>
 </html>

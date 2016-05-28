@@ -5,7 +5,7 @@ var PlayGround = {
     container: null,
     canvas: null,
     socket: null,//websocket
-    entities: {},//game persons on playground
+        entities: {},//game persons on playground
     owner: {},//current person. Come from server with full information
     projectiles: [],//current projectiles to display
     xMouse: 0,//current x-mouse position
@@ -20,6 +20,7 @@ var PlayGround = {
     skipTicks: 0,
     fps:30,
 
+    showNames: false,
     rocketRadius: 5,
     fireRadius: 7,
     explosionRadius: 40,//different on 20 with server
@@ -31,6 +32,8 @@ var PlayGround = {
         KeyboardSetup.init();
         GameStats.init();
         Score.init();
+        Chat.init();
+
         var openKeyboard = Dom.el('a', {'href': "#", 'class': 'icon-keyboard'});
         openKeyboard.onclick = function(e){e.preventDefault();KeyboardSetup.show()};
         
@@ -39,7 +42,7 @@ var PlayGround = {
             'div',
             {'class': 'playground'},
             [
-                openKeyboard, Weapons.container,LifeAndArmor.container,KeyboardSetup.container,
+                openKeyboard, Weapons.container, Chat.container, LifeAndArmor.container,KeyboardSetup.container,
                 Score.container, GameStats.container, canvas
             ]
         );
@@ -65,11 +68,14 @@ var PlayGround = {
     },
     createGame: function (name, map) {
         PlayGround.updateCanvas(map);
-        PlayGround.connect("create:" + map.id + ":" + encodeURIComponent(name))
+        PlayGround.connect("create:" + map.id + ":" + encodeURIComponent(name) + ":" + encodeURIComponent(Greetings.getName()))
+    },
+    writeMessage: function (message) {
+        PlayGround.socket.send("message:\n" + message);
     },
     joinGame: function (map, gameId) {
         PlayGround.updateCanvas(map);
-        PlayGround.connect("join:" + gameId)
+        PlayGround.connect("join:" + gameId + ":" + encodeURIComponent(Greetings.getName()))
     },
     updateCanvas: function(map) {
         PlayGround.map = map;
@@ -148,6 +154,12 @@ var PlayGround = {
         Weapons.update(PlayGround.owner);
         LifeAndArmor.update(PlayGround.owner.life, PlayGround.owner.armor);
         Score.update(PlayGround.owner, packet.time);
+        for(var i = 0; i < packet.messages.length; i++) {
+            var message = packet.messages[i];
+            var id = message.substring(0, message.indexOf(":"));
+            var subject = message.substring(message.indexOf(':') + 1);
+            Chat.update(id, subject);
+        }
         for(var i = 0; i < packet.items.length; i++) {
             var zones = PlayGround.map.zones;
             var item = packet.items[i];

@@ -1,6 +1,7 @@
 package org.forweb.commandos.controller;
 
 import org.forweb.commandos.entity.Person;
+import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.game.Context;
 import org.forweb.commandos.service.SpringDelegationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.web.socket.server.standard.SpringConfigurator;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.EOFException;
+import java.util.Random;
 
 @ServerEndpoint(value = "/commandos", configurator = SpringConfigurator.class)
 public class PersonWebSocketEndpoint {
@@ -18,6 +20,7 @@ public class PersonWebSocketEndpoint {
     private static final String MESSAGE_SHOT = "fire";
     private static final String MESSAGE_DIRECTION = "direction";
     private static final String MESSAGE_ANGLE = "angle";
+    private static final String MESSAGE_MESSAGE = "message";
     private static final String MESSAGE_CHANGE_WEAPON = "gun";
 
     public static final int PERSON_RADIUS = 20;
@@ -44,8 +47,15 @@ public class PersonWebSocketEndpoint {
 
     @OnMessage
     public void onTextMessage(String message) {
-        springDelegationService.onTextMessage(session, message, id);
+        if(message.startsWith(MESSAGE_MESSAGE)) {
+            springDelegationService.onTextMessage(message, roomId, id);
+            return;
+        }
         String[] parts = message.split(":");
+        Person person = getPerson();
+        if(person != null && person.isInPool()) {
+            return;
+        }
 
         switch ((parts[0])) {
             case MESSAGE_ANGLE:
@@ -61,12 +71,33 @@ public class PersonWebSocketEndpoint {
                 springDelegationService.changeWeapon(getPerson(), Integer.parseInt(parts[1]));
                 break;
             case MESSAGE_CREATE:
-                roomId = springDelegationService.createRoom(Integer.parseInt(parts[1]), parts[2]);
-                springDelegationService.onJoin(session, id, roomId);
+                String roomName;
+                String personName;
+                if(parts.length < 4) {
+                    Random r = new Random();
+                    personName = "player-" + r.nextInt(998) + 1;
+                    if(parts.length < 3) {
+                        roomName = "unnamed-room-" + r.nextInt(998) + 1;
+                    } else {
+                        roomName = parts[2];
+                    }
+                } else {
+                    personName = parts[3];
+                    roomName = parts[2];
+                }
+                roomId = springDelegationService.createRoom(Integer.parseInt(parts[1]), roomName);
+                springDelegationService.onJoin(session, id, roomId, personName);
                 break;
             case MESSAGE_JOIN:
+                String personNameJoin;
+                if(parts.length < 3) {
+                    Random r = new Random();
+                    personNameJoin = "player-" + r.nextInt(998) + 1;
+                } else {
+                    personNameJoin = parts[2];
+                }
                 roomId = Integer.parseInt(parts[1]);
-                springDelegationService.onJoin(session, id, roomId);
+                springDelegationService.onJoin(session, id, roomId, personNameJoin);
                 break;
         }
     }
@@ -94,7 +125,10 @@ public class PersonWebSocketEndpoint {
 
     private Person getPerson() {
         if(person == null) {
-            person = gameContext.getRoom(roomId).getPersons().get(id);
+            Room room = gameContext.getRoom(roomId);
+            if(room != null) {
+                person = room.getPersons().get(id);
+            }
         }
         return person;
     }

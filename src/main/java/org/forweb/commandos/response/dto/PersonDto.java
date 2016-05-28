@@ -2,11 +2,11 @@ package org.forweb.commandos.response.dto;
 
 public class PersonDto {
 
-
     private int id;
     private String color;
     private float angle;
     private Integer reload;
+    private String name;
     private String gun;
     private int x;
     private int y;
@@ -66,5 +66,14 @@ public class PersonDto {
     public void setId(int id) {
         this.id = id;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
 }
 

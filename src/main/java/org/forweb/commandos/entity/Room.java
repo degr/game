@@ -3,7 +3,9 @@ package org.forweb.commandos.entity;
 import org.forweb.commandos.entity.ammo.Projectile;
 import org.forweb.commandos.entity.zone.AbstractZone;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Room {
@@ -22,9 +24,18 @@ public class Room {
     private long endTime;
 
     private boolean showStats;
-
+    private List<String> messages = new ArrayList<>();
     public ConcurrentHashMap<Integer, Person> getPersons() {
         return persons;
+    }
+
+    private Timer gameTimer = null;
+    public void setGameTimer(Timer timer) {
+        this.gameTimer = timer;
+    }
+
+    public Timer getGameTimer() {
+        return gameTimer;
     }
 
     public void setPersons(ConcurrentHashMap<Integer, Person> persons) {
@@ -93,5 +104,16 @@ public class Room {
 
     public Integer getId() {
         return id;
+    }
+
+    public void addMessage(String message) {
+        messages.add(message);
+    }
+
+    public List<String> getMessages() {
+        return messages;
+    }
+    public void setMessages(ArrayList<String> messages) {
+        this.messages = messages;
     }
 }

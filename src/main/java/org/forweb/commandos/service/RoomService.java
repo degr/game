@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Base64;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -21,7 +20,7 @@ public class RoomService {
     @Autowired
     private Context gameContext;
 
-    public Integer createRoom(Integer mapId, String roomName) {
+    public Room createRoom(Integer mapId, String roomName) {
         Room room = new Room();
         room.setEndTime(System.currentTimeMillis() + ROOM_LIFETIME);
         try {
@@ -37,6 +36,6 @@ public class RoomService {
         room.setTotalPlayers(0);
         Integer roomId = gameContext.addRoom(room);
         room.setId(roomId);
-        return roomId;
+        return room;
     }
 }

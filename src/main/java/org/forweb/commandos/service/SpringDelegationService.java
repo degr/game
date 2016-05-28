@@ -4,7 +4,6 @@ import org.forweb.commandos.controller.PersonWebSocketEndpoint;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.game.Context;
-import org.forweb.commandos.response.GameStats;
 import org.forweb.commandos.response.Leave;
 import org.forweb.commandos.response.Update;
 import org.forweb.commandos.response.dto.Stats;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.websocket.Session;
 import java.util.Collection;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
@@ -39,37 +39,55 @@ public class SpringDelegationService {
     private RoomService roomService;
 
 
-    public void onJoin(Session session, Integer personId, Integer roomId) {
-        gameContext.getSessionStorage().put(personId, session);
+    public void onJoin(Session session, Integer personId, Integer roomId, String name) {
+        Room room = gameContext.getRoom(roomId);
         Person person = new Person(personId);
+        if(room.getPersons().size() >= room.getMap().getMaxPlayers()) {
+            person.setInPool(true);
+        } else {
+            person.setInPool(false);
+        }
+        gameContext.getSessionStorage().put(personId, session);
+        person.setName(name);
         person.setHexColor(locationService.getRandomHexColor());
-        person.setInPool(false);//@todo add observers logic
         personService.resetState(person, gameContext.getRoom(roomId));
-        addPerson(person, roomId);
+        room.getPersons().put(person.getId(), person);
     }
 
     public int addAndIncrementPersonId() {
         return gameContext.getPersonIds().getAndIncrement();
     }
 
-    public void onTextMessage(Session session, String message, Integer personId) {
-
+    public void onTextMessage(String message, int roomId, Integer personId) {
+        Room room = gameContext.getRoom(roomId);
+        Person person = room.getPersons().get(personId);
+        if(!person.isInPool()) {
+            room.addMessage(personId + ":" + message.substring(message.indexOf(":") + 1));
+        }
     }
 
     public Integer createRoom(Integer mapId, String roomName) {
-        return roomService.createRoom(mapId, roomName);
+        Room room = roomService.createRoom(mapId, roomName);
+        startTimer(room);
+        return room.getId();
     }
 
     public void onClose(Integer personId, Integer roomId) {
         removePerson(personId, roomId);
-        responseService.flushToAll(new Leave(personId), gameContext.getRoom(0));
+        responseService.flushToAll(new Leave(personId), gameContext.getRoom(roomId));
     }
 
     private void tick(Room room) {
+
+        if (room.getEndTime() - System.currentTimeMillis() < 0) {
+            room.setShowStats(true);
+        }
+
         Collection<Person> persons = room.getPersons().values();
-        if(room.isShowStats()) {
-            if(persons.size() == 0) {
+        if (room.isShowStats()) {
+            if (persons.size() == 0) {
                 gameContext.getRooms().remove(room.getId());
+                room.getGameTimer().cancel();
             } else {
                 responseService.sendStats(
                         persons.stream()
@@ -93,6 +111,7 @@ public class SpringDelegationService {
                             responseService.mapPersons(room.getPersons()),
                             responseService.mapProjectiles(room.getProjectiles()),
                             responseService.mapItems(room.getMap().getZones()),
+                            room.getMessages(),
                             room.getEndTime() - System.currentTimeMillis()
                     ),
                     room
@@ -100,15 +119,13 @@ public class SpringDelegationService {
         }
     }
 
-    private void startTimer(Room room) {
-        gameContext.setGameTimer(new Timer(PersonWebSocketEndpoint.class.getSimpleName() + " Timer"));
-        gameContext.getGameTimer().scheduleAtFixedRate(new TimerTask() {
+    public void startTimer(Room room) {
+        room.setGameTimer(new Timer(PersonWebSocketEndpoint.class.getSimpleName() + " Timer " + new Random().nextDouble()));
+
+        room.getGameTimer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 try {
-                    if(room.getEndTime() - System.currentTimeMillis() < 0) {
-                        room.setShowStats(true);
-                    }
                     tick(room);
                 } catch (RuntimeException e) {
                     e.printStackTrace();
@@ -119,26 +136,19 @@ public class SpringDelegationService {
     }
 
 
-    private synchronized void addPerson(Person person, Integer roomId) {
-        Room room = gameContext.getRoom(roomId);
-        if (room.getPersons().size() == 0) {
-            startTimer(room);
-        }
-        room.getPersons().put(person.getId(), person);
-    }
 
     private synchronized void removePerson(Integer personId, Integer roomId) {
-        gameContext.getRoom(roomId).getPersons().remove(personId);
-        if (gameContext.getRoom(roomId).getPersons().size() == 0) {
-            stopTimer();
+        Room room = gameContext.getRoom(roomId);
+        if(room != null) {
+            room.getPersons().remove(personId);
         }
     }
 
-    private void stopTimer() {
-        if (gameContext.getGameTimer() != null) {
-            gameContext.getGameTimer().cancel();
+    /*private void stopTimer(Room room) {
+        if (room.getGameTimer() != null) {
+            room.getGameTimer().cancel();
         }
-    }
+    }*/
 
     public void updatePersonViewAngle(Person person, int direction) {
         turnService.updatePersonViewAngle(person, direction);

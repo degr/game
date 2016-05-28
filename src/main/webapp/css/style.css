@@ -239,8 +239,44 @@ body, html {
     top: 30px;
 }
 .playground .score {
-    position: absolute;
+    position: fixed;
     right: 150px;
     bottom: 0;
     width: 80px;
+}
+.playground .chat {
+    position: fixed;
+    right: 0;
+    bottom: 40px;
+    min-width: 229px;
+    background: rgba(0,0,0,0.3);
+}
+.playground .chat .message {
+    color: rgb(53, 42, 191);
+    text-shadow: white 1px 1px, white -1px -1px, white 1px -1px, white -1px 1px;
+    font-weight: bold;
+}
+.playground .chat .writer {
+    color: #0aff00;
+    text-shadow: black 1px 1px, black -1px -1px, black 1px -1px, black -1px 1px;
+    font-weight: bold;
+}
+
+.playground .chat.expanded{
+     width: 468px;
+}
+.playground .chat .console{
+    height: 74px;
+    overflow: auto;
+}
+.playground .chat textarea{
+    width: 100%;
+    padding: 2px;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+
+#application {
+    margin-top: -85px;
 }

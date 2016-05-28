@@ -78,7 +78,7 @@
         <dependency>
             <groupId>com.github.degr</groupId>
             <artifactId>geometry</artifactId>
-            <version>695be641a5</version>
+            <version>0d2316dbfa</version>
         </dependency>
 
     </dependencies>

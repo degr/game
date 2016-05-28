@@ -11,7 +11,7 @@ public class Pistol extends AbstractWeapon<Bullet> {
         this.setMaxClip(40);
         this.setClipSize(9);
         this.setCurrentClip(9);
-        this.setTotalClip(9);
+        this.setTotalClip(18);
     }
 
     @Override

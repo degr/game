@@ -17,6 +17,24 @@ public class SpringConfiguration {
 
     @PostConstruct
     public void postConstruct() {
-        Db.init("127.0.0.1:3306", "root", "", "commandos");
+        Db.init(
+                "mysql35608-env-2464409.mycloud.by",
+                "root",
+                "QASsyb01289",
+                "commandos"
+        );
+        //Db.init("127.0.0.1:3306", "root", "", "commandos");
+        (new Thread(){
+            public void run() {
+                while(true) {
+                    try {
+                        sleep(1000 * 60 * 60);
+                        new Db().query("select 1;");
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
     }
 }

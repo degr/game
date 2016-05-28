@@ -3,7 +3,6 @@ package org.forweb.commandos.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.forweb.commandos.dto.ItemDto;
-import org.forweb.commandos.entity.GameMap;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.ammo.Projectile;
@@ -66,20 +65,19 @@ public class ResponseService {
             e.printStackTrace();
         }*/
         for (Person person : room.getPersons().values()) {
-            if (!person.isInPool()) {
-                try {
-                    update.setOwner(mapOwner(person));
-                    String message = prepareJson(update);
-                    sendMessage(person, message);
-                } catch (IllegalStateException ise) {
-                    // An ISE can occur if an attempt is made to write to a
-                    // WebSocket connection after it has been closed. The
-                    // alternative to catching this exception is to synchronise
-                    // the writes to the clients along with the addPerson() and
-                    // removePerson() methods that are already synchronised.
-                }
+            try {
+                update.setOwner(mapOwner(person));
+                String message = prepareJson(update);
+                sendMessage(person, message);
+            } catch (IllegalStateException ise) {
+                // An ISE can occur if an attempt is made to write to a
+                // WebSocket connection after it has been closed. The
+                // alternative to catching this exception is to synchronise
+                // the writes to the clients along with the addPerson() and
+                // removePerson() methods that are already synchronised.
             }
         }
+        room.setMessages(new ArrayList<>());
     }
     public void sendStats(List<Stats> stats, Room room) {
         GameStats out = new GameStats();
@@ -95,6 +93,9 @@ public class ResponseService {
 
 
     private OwnerDto mapOwner(Person person) {
+        if(person.isInPool()) {
+            return null;
+        }
         OwnerDto out = new OwnerDto();
         out.setId(person.getId());
         out.setArmor(person.getArmor());
@@ -126,7 +127,11 @@ public class ResponseService {
     public List<PersonDto> mapPersons(ConcurrentHashMap<Integer, Person> persons) {
         List<PersonDto> out = new ArrayList<>(persons.size());
         for (Person person : persons.values()) {
+            if(person.isInPool()) {
+                continue;
+            }
             PersonDto dto = new PersonDto();
+            dto.setName(person.getName());
             dto.setColor(person.getHexColor());
             dto.setReload(person.getWeapon().getCurrentClip() == 0 ? 1 : null);
             dto.setGun(person.getWeapon().getName());

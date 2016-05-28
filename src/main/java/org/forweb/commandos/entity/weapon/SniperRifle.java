@@ -11,7 +11,7 @@ public class SniperRifle extends AbstractWeapon<SniperBullet> {
         this.setMaxClip(20);
         this.setClipSize(5);
         this.setCurrentClip(5);
-        this.setTotalClip(5);
+        this.setTotalClip(10);
     }
 
     @Override

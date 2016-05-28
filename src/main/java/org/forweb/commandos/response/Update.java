@@ -6,6 +6,7 @@ import org.forweb.commandos.response.dto.BulletDto;
 import org.forweb.commandos.response.dto.OwnerDto;
 import org.forweb.commandos.response.dto.PersonDto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Update {
@@ -16,11 +17,13 @@ public class Update {
     private long time;
     private List<PersonDto> persons;
     private List<BulletDto> projectiles;
+    private List<String> messages;
 
-    public Update(List<PersonDto> personDto, List<BulletDto> projectiles, List<ItemDto> itemDtos, long time) {
+    public Update(List<PersonDto> personDto, List<BulletDto> projectiles, List<ItemDto> itemDtos, List<String> messages, long time) {
         this.persons = personDto;
         this.projectiles = projectiles;
         this.items = itemDtos;
+        this.messages = messages;
         this.time = time;
     }
 
@@ -55,6 +58,10 @@ public class Update {
 
     public void setTime(long time) {
         this.time = time;
+    }
+
+    public List<String> getMessages() {
+        return messages;
     }
 
 }

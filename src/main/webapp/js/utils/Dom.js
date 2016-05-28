@@ -13,7 +13,9 @@ var Dom = {
     },
     addClass: function(el, clazz) {
         if(el.className) {
-            if(el.className.indexOf(clazz) === -1 || el.className.split(' ').indexOf(clazz) === -1) {
+            if(el.className.indexOf(clazz) === -1) {
+                el.className += ' ' + clazz;
+            } else if(el.className.split(' ').indexOf(clazz) === -1) {
                 el.className += ' ' + clazz;
             }
         } else {

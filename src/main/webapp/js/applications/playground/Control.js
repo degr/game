@@ -12,7 +12,7 @@ var Controls = {
     sniper: 53,
     flamethrower: 54,
     minigun: 55,
-    rocket: 56
+    rocket: 56,
     //grenage: 9
-    //console: 0
+    chat: 13
 };
