@@ -7,6 +7,7 @@ import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.entity.zone.AbstractItem;
 import org.forweb.commandos.entity.zone.interactive.Respawn;
 import org.forweb.geometry.services.CircleService;
+import org.forweb.geometry.services.PointService;
 import org.forweb.geometry.shapes.Circle;
 import org.forweb.geometry.shapes.Point;
 import org.forweb.geometry.shapes.Bounds;
@@ -50,40 +51,55 @@ public class LocationService {
                 (color.getRGB() & 0xffffff) | 0x1000000).substring(1);
     }
 
-    public boolean canGoEast(Person player, Room room) {
-        return player.getX() < room.getMap().getX() - PersonWebSocketEndpoint.PERSON_RADIUS && calculateCollistions(player, room, 1, 0);
-
+    public Point[] canGoEast(Person player, Room room) {
+        if(player.getX() >= room.getMap().getX() - PersonWebSocketEndpoint.PERSON_RADIUS) {
+            return null;
+        } else {
+            return calculateCollistions(player, room, 1, 0);
+        }
     }
-    public boolean canGoWest(Person player, Room room) {
-        return player.getX() > PersonWebSocketEndpoint.PERSON_RADIUS && calculateCollistions(player, room, -1, 0);
+    public Point[] canGoWest(Person player, Room room) {
+        if(player.getX() <= PersonWebSocketEndpoint.PERSON_RADIUS) {
+            return null;
+        } else {
+            return calculateCollistions(player, room, -1, 0);
+        }
     }
 
-    public boolean canGoNorth(Person player, Room room) {
-        return player.getY() > PersonWebSocketEndpoint.PERSON_RADIUS && calculateCollistions(player, room, 0, -1);
+    public Point[] canGoNorth(Person player, Room room) {
+        if(player.getY() <= PersonWebSocketEndpoint.PERSON_RADIUS) {
+            return null;
+        } else {
+            return calculateCollistions(player, room, 0, -1);
+        }
     }
 
-    public boolean canGoSouth(Person player, Room room) {
-        return player.getY() < room.getMap().getY() - PersonWebSocketEndpoint.PERSON_RADIUS && calculateCollistions(player, room, 0, 1);
+    public Point[] canGoSouth(Person player, Room room) {
+        if(player.getY() + PersonWebSocketEndpoint.PERSON_RADIUS >= room.getMap().getY()) {
+            return null;
+        } else {
+            return calculateCollistions(player, room, 0, 1);
+        }
     }
 
-    private boolean calculateCollistions(Person player, Room room, int xShift, int yShift){
+    private Point[] calculateCollistions(Person player, Room room, int xShift, int yShift){
         Circle playerCircle = new Circle(
                 player.getX() + xShift,
                 player.getY() + yShift,
                 PersonWebSocketEndpoint.PERSON_RADIUS
         );
         for(AbstractZone zone : room.getMap().getZones()) {
-            if (CircleService.circleBoundsIntersection(playerCircle, GeometryService.getRectangle(zone)).length > 0) {
+            Point[] point = CircleService.circleBoundsIntersection(playerCircle, GeometryService.getRectangle(zone));
+            if (point.length > 0) {
                 if(zone.isPassable()) {
                     if(zone instanceof AbstractItem) {
                         itemService.onGetItem((AbstractItem)zone, player);
                     }
+                    return PointService.EMPTY;
                 } else {
-                    return false;
+                    return point;
                 }
             }
-
-
         }
         /*for(Person person : room.getPersons().values()) {
             if(person == player) {
@@ -99,6 +115,6 @@ public class LocationService {
                 return false;
             }
         }*/
-        return true;
+        return PointService.EMPTY;
     }
 }

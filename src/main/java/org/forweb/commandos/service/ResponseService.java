@@ -133,10 +133,10 @@ public class ResponseService {
             PersonDto dto = new PersonDto();
             dto.setName(person.getName());
             dto.setColor(person.getHexColor());
-            dto.setReload(person.getWeapon().getCurrentClip() == 0 ? 1 : null);
+            dto.setReload(person.getWeapon().getCurrentClip() == 0 || person.isReload() ? 1 : null);
             dto.setGun(person.getWeapon().getName());
-            dto.setX(person.getX());
-            dto.setY(person.getY());
+            dto.setX((int)person.getX());
+            dto.setY((int)person.getY());
             dto.setAngle(person.getAngle());
             dto.setId(person.getId());
             out.add(dto);
