@@ -144,9 +144,10 @@ var Weapons = {
                     if(weaponId == gun) {
                         currentIndex = idx;
                     }
+                    idx ++;
+                    break;
                 }
             }
-            idx ++;
         }
         var index = isNext ? currentIndex + 1 : currentIndex - 1;
         if(index < 0) {

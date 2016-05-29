@@ -1,24 +1,44 @@
 var ProjectilesActions = {};
-ProjectilesActions.draw = function(projectile) {
-    switch (projectile.type) {
-        case 'bullet':
-        case 'slug':
-        case 'shot':
-            ProjectilesActions.drawBullet(projectile);
-            break;
-        case 'flame':
-            ProjectilesActions.drawFlame(projectile);
-            break;
-        case 'rocket':
-            ProjectilesActions.drawRocket(projectile);
-            break;
-        case 'blade':
-            ProjectilesActions.drawBlade(projectile);
-            break;
-        case 'explosion':
-            ProjectilesActions.drawExplosion(projectile);
-    }
 
+ProjectilesActions.draw = function(projectileBatch) {
+    for(var i = 0; i < projectileBatch.length; i++) {
+        var projectile = projectileBatch[i];
+        switch (projectile.type) {
+            case 'bullet':
+                ProjectilesActions.drawBullet(projectile);
+                if(!projectileBatch.soundPlayed) {
+                    projectileBatch.soundPlayed = true;
+                    (new Audio('sound/minigun.mp3')).play();
+                }
+                break;
+            case 'slug':
+                ProjectilesActions.drawBullet(projectile);
+                if(!projectileBatch.soundPlayed) {
+                    projectileBatch.soundPlayed = true;
+                    (new Audio('sound/sniper.mp3')).play();
+                }
+                break;
+            case 'shot':
+                
+                ProjectilesActions.drawBullet(projectile);
+                if(!projectileBatch.soundPlayed) {
+                    projectileBatch.soundPlayed = true;
+                    (new Audio('sound/shotgun.mp3')).play();
+                }
+                break;
+            case 'flame':
+                ProjectilesActions.drawFlame(projectile);
+                break;
+            case 'rocket':
+                ProjectilesActions.drawRocket(projectile);
+                break;
+            case 'blade':
+                ProjectilesActions.drawBlade(projectile);
+                break;
+            case 'explosion':
+                ProjectilesActions.drawExplosion(projectile);
+        }
+    }
 };
 ProjectilesActions.drawBullet = function(projectile){
     var context = PlayGround.context;

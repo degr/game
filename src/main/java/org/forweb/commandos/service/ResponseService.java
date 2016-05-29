@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.forweb.commandos.dto.ItemDto;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
+import org.forweb.commandos.entity.ammo.Bullet;
 import org.forweb.commandos.entity.ammo.Projectile;
 import org.forweb.commandos.entity.zone.AbstractItem;
 import org.forweb.commandos.entity.zone.AbstractZone;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -75,6 +77,13 @@ public class ResponseService {
                 // alternative to catching this exception is to synchronise
                 // the writes to the clients along with the addPerson() and
                 // removePerson() methods that are already synchronised.
+            }
+        }
+        for(Map.Entry<Integer, Projectile[]> entry : room.getProjectiles().entrySet()) {
+            for(Projectile projectile : entry.getValue()) {
+                if(projectile.isInstant()) {
+                    room.getProjectiles().remove(entry.getKey());
+                }
             }
         }
         room.setMessages(new ArrayList<>());
@@ -144,19 +153,25 @@ public class ResponseService {
         return out;
     }
 
-    public List<BulletDto> mapProjectiles(ConcurrentHashMap<Integer, Projectile> projectiles) {
-        List<BulletDto> out = new ArrayList<>(projectiles.size());
-        for (Projectile projectile : projectiles.values()) {
-            BulletDto dto = new BulletDto();
-            dto.setX1(projectile.getxStart());
-            dto.setY1(projectile.getyStart());
-            if (projectile.isInstant()) {
-                dto.setX2(projectile.getxEnd());
-                dto.setY2(projectile.getyEnd());
+    public List<BulletDto[]> mapProjectiles(ConcurrentHashMap<Integer, Projectile[]> projectiles) {
+        List<BulletDto[]> out = new ArrayList<>(projectiles.size());
+        for (Projectile projectilesBatch[] : projectiles.values()) {
+            BulletDto[] batch = new BulletDto[projectilesBatch.length];
+            for(int i = 0; i < projectilesBatch.length; i++) {
+                Projectile projectile = projectilesBatch[i];
+                BulletDto dto = new BulletDto();
+                dto.setId(projectile.getId());
+                dto.setX1(projectile.getxStart());
+                dto.setY1(projectile.getyStart());
+                if (projectile.isInstant()) {
+                    dto.setX2(projectile.getxEnd());
+                    dto.setY2(projectile.getyEnd());
+                }
+                dto.setAngle(projectile.getAngle());
+                dto.setType(projectile.getName());
+                batch[i] = dto;
             }
-            dto.setAngle(projectile.getAngle());
-            dto.setType(projectile.getName());
-            out.add(dto);
+            out.add(batch);
         }
         return out;
     }

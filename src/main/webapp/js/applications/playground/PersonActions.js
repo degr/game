@@ -125,9 +125,14 @@ PersonActions.stopMovement = function(e){
     }
 };
 
-PersonActions.updateMouseDirectionByXy = function(x, y, person) {
+PersonActions.updateMouseDirectionByXy = function(x, y, person, offset) {
     if(!PlayGround.gameStarted)return;
-    var angle = Math.floor(PersonActions.angle(person.x, person.y, x, y));
+    var angle = Math.floor(PersonActions.angle(
+        person.x,
+        person.y,
+        x - offset.left + window.scrollX,
+        y - offset.top + window.scrollY
+    ));
     var pa = person.angle;
     if(pa > 180) {
         pa = pa - 360;
@@ -190,7 +195,12 @@ PersonActions.updateMouseDirection = function(e){
     PlayGround.yMouse = e.clientY;
     var person = PlayGround.getPerson();
     if(person) {
-        PersonActions.updateMouseDirectionByXy(e.clientX, e.clientY, person);
+        PersonActions.updateMouseDirectionByXy(
+            e.clientX,
+            e.clientY,
+            person,
+            PlayGround.canvasOffset
+        );
     }
 };
 PersonActions.angle = function(cx, cy, ex, ey) {

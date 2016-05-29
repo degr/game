@@ -18,7 +18,7 @@ public class SpringConfiguration {
     @PostConstruct
     public void postConstruct() {
 
-        Db.init("mysql35608-env-2464409.mycloud.by", "root", "QASsyb01289", "commandos");
+        //Db.init("mysql35608-env-2464409.mycloud.by", "root", "QASsyb01289", "commandos");
         try{
             new Db().getTable("select 1;");
         } catch (Exception e) {

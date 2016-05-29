@@ -16,10 +16,10 @@ public class Update {
     private final String type = "update";
     private long time;
     private List<PersonDto> persons;
-    private List<BulletDto> projectiles;
+    private List<BulletDto[]> projectiles;
     private List<String> messages;
 
-    public Update(List<PersonDto> personDto, List<BulletDto> projectiles, List<ItemDto> itemDtos, List<String> messages, long time) {
+    public Update(List<PersonDto> personDto, List<BulletDto[]> projectiles, List<ItemDto> itemDtos, List<String> messages, long time) {
         this.persons = personDto;
         this.projectiles = projectiles;
         this.items = itemDtos;
@@ -32,7 +32,7 @@ public class Update {
     }
 
 
-    public List<BulletDto> getProjectiles() {
+    public List<BulletDto[]> getProjectiles() {
         return projectiles;
     }
 

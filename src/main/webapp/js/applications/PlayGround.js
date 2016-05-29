@@ -13,6 +13,7 @@ var PlayGround = {
     viewAngleDirection: 0,//current y-mouse position,
     angle: 0,
     map: {},
+    canvasOffset: {top: 0, left: 0},
     
     nextFrame: null,
     interval: null,
@@ -24,7 +25,8 @@ var PlayGround = {
     rocketRadius: 5,
     fireRadius: 7,
     explosionRadius: 40,//different on 20 with server
-
+    instantBullets: {},
+    
     init: function () {
         ZoneActions.init();
         Weapons.init();
@@ -34,6 +36,18 @@ var PlayGround = {
         Score.init();
         Chat.init();
 
+        setInterval(function(){
+            if(PlayGround.gameStarted) {
+                var now = (new Date()).getTime() - 100;
+                for (var key in PlayGround.instantBullets) {
+                    var bullet = PlayGround.instantBullets[key];
+                    if(bullet.created < now) {
+                        delete (PlayGround.instantBullets[key]);
+                    }
+                }
+            }
+        }, 50);
+        
         var openKeyboard = Dom.el('a', {'href': "#", 'class': 'icon-keyboard'});
         openKeyboard.onclick = function(e){e.preventDefault();KeyboardSetup.show()};
         
@@ -52,7 +66,7 @@ var PlayGround = {
 
         PlayGround.entities = {};
         if (!canvas.getContext) {
-            Console.log('Error: 2d canvas not supported by this browser.');
+            alert('Error: 2d canvas not supported by this browser.');
             return;
         }
 
@@ -64,6 +78,7 @@ var PlayGround = {
         window.addEventListener('keydown', Weapons.changeWeapon, false);
         window.addEventListener('keyup', PersonActions.stopMovement, false);
         window.addEventListener('mousemove', PersonActions.updateMouseDirection);
+        window.addEventListener('resize', function(){PlayGround.updateCanvas(PlayGround.map)});
         PlayGround.canvas = canvas;
     },
     createGame: function (name, map) {
@@ -77,12 +92,27 @@ var PlayGround = {
         PlayGround.updateCanvas(map);
         PlayGround.connect("join:" + gameId + ":" + encodeURIComponent(Greetings.getName()))
     },
-    updateCanvas: function(map) {
+    updateCanvas: function(map) {        
         PlayGround.map = map;
-        PlayGround.canvas.style.width  = map.x + 'px';
-        PlayGround.canvas.style.height = map.y + 'px';
-        PlayGround.canvas.width = map.x;
-        PlayGround.canvas.height = map.y;
+        var canvas = PlayGround.canvas;
+        canvas.style.width  = map.x + 'px';
+        canvas.style.height = map.y + 'px';
+        canvas.width = map.x;
+        canvas.height = map.y;
+        var win = ScreenUtils.window();
+        if(map.x < win.width) {
+            canvas.style.marginLeft = 'auto';
+            canvas.style.marginRight = 'auto';
+        } else {
+            canvas.style.marginLeft = null;
+            canvas.style.marginRight = null;
+        }
+        if(map.y < win.height) {
+            canvas.style.marginTop = (win.height - map.y) / 2 + 'px';
+        } else {
+            canvas.style.marginTop = null;
+        }
+        PlayGround.canvasOffset = Dom.calculateOffset(canvas);
     },
     connect: function (onConnectMessage) {
         PlayGround.gameStarted = true;
@@ -97,19 +127,16 @@ var PlayGround = {
         } else if ('MozWebSocket' in window) {
             PlayGround.socket = new MozWebSocket(host);
         } else {
-            Console.log('Error: WebSocket is not supported by this browser.');
+            alert('Error: WebSocket is not supported by this browser.');
             return;
         }
 
         PlayGround.socket.onerror = function() {
-            console.log("Error!");
-            console.log(arguments);
+            alert("Error! Please describe how it happen to developer." + JSON.stringify(arguments));
             PlayGround.gameStarted = false;
         };
         
         PlayGround.socket.onopen = function () {
-            // Socket open.. start the game loop.
-            Console.log('Info: WebSocket connection opened.');
             PlayGround.socket.send(onConnectMessage);
             PlayGround.startGameLoop();
             PlayGround.gameStarted = true;
@@ -178,7 +205,17 @@ var PlayGround = {
             }
             PlayGround.updatePerson(person);
         }
-        PlayGround.projectiles = packet.projectiles;
+        var now = (new Date()).getTime();
+        PlayGround.projectiles = [];
+        for(var i = 0; i < packet.projectiles.length; i++) {
+            var p = packet.projectiles[i];
+            if(p[0].x2 || p[0].x2 === 0) {
+                PlayGround.instantBullets[i] = p;
+                p.created = now;
+            } else {
+                PlayGround.projectiles.push(packet.projectiles[i]);
+            }
+        }
     },
     addPerson: function(person) {
         PlayGround.entities[person.id] = new Person(person)
@@ -191,7 +228,12 @@ var PlayGround = {
         p.angle = personDto.angle;
         p.reload = personDto.reload;
         if(PlayGround.owner.id == id) {
-            PersonActions.updateMouseDirectionByXy(PlayGround.xMouse, PlayGround.yMouse, p);
+            PersonActions.updateMouseDirectionByXy(
+                PlayGround.xMouse,
+                PlayGround.yMouse,
+                p,
+                PlayGround.canvasOffset
+            );
         }
     },
     removePerson: function(id) {
@@ -237,6 +279,10 @@ var PlayGround = {
             for (var i = 0; i < PlayGround.projectiles.length; i++) {
                 ProjectilesActions.draw(PlayGround.projectiles[i]);
             }
+        }
+        console.log(PlayGround.instantBullets);
+        for(var iKey in PlayGround.instantBullets) {
+            ProjectilesActions.draw(PlayGround.instantBullets[iKey]);
         }
     },
     stopGameLoop: function () {

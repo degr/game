@@ -32,31 +32,32 @@ class ProjectileService {
 
     private Random random = new Random();
 
-    synchronized void onProjectileLifecycle(ConcurrentHashMap<Integer, Projectile> projectiles, Room room) {
+    synchronized void onProjectileLifecycle(ConcurrentHashMap<Integer, Projectile[]> projectiles, Room room) {
         Long now = System.currentTimeMillis();
-        for (Map.Entry<Integer, Projectile> entry : projectiles.entrySet()) {
-            Projectile projectile = entry.getValue();
-            projectile.setNow(System.currentTimeMillis());
-            if (projectile.getCreationTime() + projectile.getLifeTime() < now) {
-                projectiles.remove(entry.getKey());
-                continue;
-            }
-            if(!projectile.isInstant()) {
-                checkForImpacts(room, projectile);
+        for (Map.Entry<Integer, Projectile[]> entry : projectiles.entrySet()) {
+            for(Projectile projectile : entry.getValue()) {
+                projectile.setNow(System.currentTimeMillis());
+                if (projectile.getCreationTime() + projectile.getLifeTime() < now) {
+                    projectiles.remove(entry.getKey());
+                    continue;
+                }
+                if (!projectile.isInstant()) {
+                    checkForImpacts(room, projectile, entry.getKey());
+                }
             }
         }
     }
 
-    private void checkForImpacts(Room room, Projectile projectile) {
+    private void checkForImpacts(Room room, Projectile projectile, Integer batchId) {
         if(projectile instanceof Flame) {
-            onFlameLifecycle(room, (Flame)projectile);
+            onFlameLifecycle(room, (Flame)projectile, batchId);
         } else if (projectile instanceof Rocket) {
-            onRocketLifecycle(room, (Rocket) projectile);
+            onRocketLifecycle(room, (Rocket) projectile, batchId);
         }
 
     }
 
-    private void onFlameLifecycle(Room room, Flame flame) {
+    private void onFlameLifecycle(Room room, Flame flame, Integer flameBathcId) {
         if(!flame.isStoped()) {
             updatePosition(flame);
         }
@@ -95,7 +96,7 @@ class ProjectileService {
                 );
                 if(point.length > 0) {
                     onDamage(room.getPersons().get(flame.getPersonId()), flame.getDamage(), person, room);
-                    room.getProjectiles().remove(flame.getId());
+                    room.getProjectiles().remove(flameBathcId);
                 }
             }
 
@@ -103,7 +104,7 @@ class ProjectileService {
 
     }
 
-    private void onRocketLifecycle(Room room, Rocket rocket) {
+    private void onRocketLifecycle(Room room, Rocket rocket, Integer rocketBatchId) {
         updatePosition(rocket);
 
         Circle rocketCircle = new Circle(
@@ -155,7 +156,7 @@ class ProjectileService {
             explosion.setxEnd((int)explosion.getxStart());
             explosion.setyEnd((int)explosion.getyStart());
             int id = gameContext.getProjectilesIds().getAndIncrement();
-            room.getProjectiles().put(id, explosion);
+            room.getProjectiles().put(id, new Projectile[]{explosion});
 
             Circle explosionCircle = new Circle(
                     explosion.getxStart(),
@@ -174,7 +175,7 @@ class ProjectileService {
                     onDamage(shooter, (int)damage, person, room);
                 }
             }
-            room.getProjectiles().remove(rocket.getId());
+            room.getProjectiles().remove(rocketBatchId);
         }
     }
 
@@ -345,11 +346,12 @@ class ProjectileService {
         gun.setTotalClip(gun.getTotalClip() - 1);
         gun.setCurrentClip(gun.getCurrentClip() - 1);
 
-        for(int i = 0; i < gun.getBulletsPerShot(); i++) {
+        Integer id = gameContext.getProjectilesIds().getAndIncrement();
+        Projectile[] projectilesBatch = new Projectile[gun.getBulletsPerShot()];
+        for(int i = 0; i < projectilesBatch.length; i++) {
             Projectile projectile = getCompatibleProjectile(person);
-            Integer id = gameContext.getProjectilesIds().getAndIncrement();
-            projectile.setId(id);
-            room.getProjectiles().put(id, projectile);
+            projectile.setId(i);
+            projectilesBatch[i] = projectile;
 
             float angle = projectile.getAngle();
             if (angle == 90) {
@@ -378,6 +380,8 @@ class ProjectileService {
                 calculateInstantImpacts(person, projectile, room);
             }
         }
+
+        room.getProjectiles().put(id, projectilesBatch);
     }
 
     private Projectile getCompatibleProjectile(Person person) {

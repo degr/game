@@ -8,6 +8,7 @@ public class BulletDto {
     private Integer x2;
     private Integer y2;
     private float angle;
+    private Integer id;
 
     public Integer getY2() {
         return y2;
@@ -55,5 +56,13 @@ public class BulletDto {
 
     public float getAngle() {
         return angle;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getId() {
+        return id;
     }
 }

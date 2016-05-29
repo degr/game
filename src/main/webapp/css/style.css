@@ -2,6 +2,7 @@
     width: 640px;
     height: 480px;
     background: url(../images/map/sand.png);
+    display: block;
 }
 
 #appstore {
@@ -280,4 +281,3 @@ body, html {
     margin: 0;
     box-sizing: border-box;
 }
-
