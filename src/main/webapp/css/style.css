@@ -67,7 +67,11 @@ body, html {
 #map_editor_table {
     border-collapse: collapse;
 }
-
+.map-list .maps li{
+    float: left;
+    list-style: none;
+    margin: 10px 20px;
+}
 .editor td {
     width: 10px;
     height: 10px;
@@ -278,5 +282,5 @@ body, html {
 
 
 #application {
-    /*margin-top: -85px;*/
+    margin-top: -85px;
 }

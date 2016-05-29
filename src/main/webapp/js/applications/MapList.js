@@ -13,7 +13,7 @@ var MapList = {
     },
     init: function() {
         var controlPanel = new Pagination(MapList.openPage, MapList.pageNumber);
-        MapList.content = Dom.el('div');
+        MapList.content = Dom.el('div', 'maps');
         var joinGame = Dom.el('input', {type:'button', value: 'Join to existing room'});
         joinGame.onclick = function(){Dispatcher.placeApplication('RoomsList')};
         var createMap = Dom.el('input', {type:'button', value: 'Create new map'});

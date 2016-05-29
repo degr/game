@@ -70,6 +70,8 @@ var MapEditor = {
             Rest.doPost('map/name-empty', name).then(function (response) {
                 if (response !== true) {
                     mapNameEror.innerHTML = "Map with this name already exist";
+                } else {
+                    mapNameEror.innerHTML = '';
                 }
             })
         }

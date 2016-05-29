@@ -24,7 +24,7 @@ var KeyboardSetup = {
         }
         var title = Dom.el('h3', null, 'Keyboard settings');
         var buttons = KeyboardSetup.buildButtons();
-        KeyboardSetup.chatToggler = Dom.el('input', {'class': 'toggler', type: 'button', value: Chat.hideChatMessage});
+        KeyboardSetup.chatToggler = Dom.el('input', {'class': 'toggler', type: 'button', value: KeyboardSetup.hideChatMessage});
         KeyboardSetup.chatToggler.onclick = function() {
             if(Chat.isHidden) {
                 Chat.show();
@@ -37,10 +37,10 @@ var KeyboardSetup = {
         var esc = Dom.el('input', {type: 'button', value: 'Close'});
         esc.onclick = KeyboardSetup.hide;
         
-        KeyboardSetup.showNames = Dom.el('input', {type: 'button', value: PlayGround.showNames ? 'hide names' : 'show names'});
+        KeyboardSetup.showNames = Dom.el('input', {type: 'button', value: PlayGround.showNames ? 'Hide names' : 'Show names'});
         KeyboardSetup.showNames.onclick = function() {
             PlayGround.showNames = !PlayGround.showNames;
-            KeyboardSetup.showNames.value = PlayGround.showNames ? 'hide names' : 'show names';
+            KeyboardSetup.showNames.value = PlayGround.showNames ? 'Hide names' : 'Show names';
         };
         window.addEventListener('keyup', KeyboardSetup.onEscapeButton, false);
         KeyboardSetup.container = Dom.el(

@@ -51,38 +51,38 @@ public class LocationService {
                 (color.getRGB() & 0xffffff) | 0x1000000).substring(1);
     }
 
-    public Point[] canGoEast(Person player, Room room) {
+    public Point[] canGoEast(Person player, Room room, double distance) {
         if(player.getX() >= room.getMap().getX() - PersonWebSocketEndpoint.PERSON_RADIUS) {
             return null;
         } else {
-            return calculateCollistions(player, room, 1, 0);
+            return calculateCollistions(player, room, distance, 0);
         }
     }
-    public Point[] canGoWest(Person player, Room room) {
+    public Point[] canGoWest(Person player, Room room, double distance) {
         if(player.getX() <= PersonWebSocketEndpoint.PERSON_RADIUS) {
             return null;
         } else {
-            return calculateCollistions(player, room, -1, 0);
+            return calculateCollistions(player, room, -1 * distance, 0);
         }
     }
 
-    public Point[] canGoNorth(Person player, Room room) {
+    public Point[] canGoNorth(Person player, Room room, double distance) {
         if(player.getY() <= PersonWebSocketEndpoint.PERSON_RADIUS) {
             return null;
         } else {
-            return calculateCollistions(player, room, 0, -1);
+            return calculateCollistions(player, room, 0, -1 * distance);
         }
     }
 
-    public Point[] canGoSouth(Person player, Room room) {
+    public Point[] canGoSouth(Person player, Room room, double distance) {
         if(player.getY() + PersonWebSocketEndpoint.PERSON_RADIUS >= room.getMap().getY()) {
             return null;
         } else {
-            return calculateCollistions(player, room, 0, 1);
+            return calculateCollistions(player, room, 0, distance);
         }
     }
 
-    private Point[] calculateCollistions(Person player, Room room, int xShift, int yShift){
+    private Point[] calculateCollistions(Person player, Room room, double xShift, double yShift){
         Circle playerCircle = new Circle(
                 player.getX() + xShift,
                 player.getY() + yShift,

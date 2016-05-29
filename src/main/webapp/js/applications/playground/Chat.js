@@ -21,11 +21,11 @@ var Chat = {
     },
     show: function() {
         Chat.isHidden = false;
-        Dom.addClass(Chat.container, 'hidden');
+        Dom.removeClass(Chat.container, 'hidden');
     },
     hide: function() {
         Chat.isHidden = true;
-        Dom.removeClass(Chat.container, 'hidden');
+        Dom.addClass(Chat.container, 'hidden');
     },
     update: function(personId, message) {
         if(PlayGround.entities[personId]) {
