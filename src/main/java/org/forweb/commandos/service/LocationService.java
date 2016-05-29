@@ -88,33 +88,27 @@ public class LocationService {
                 player.getY() + yShift,
                 PersonWebSocketEndpoint.PERSON_RADIUS
         );
+        List<AbstractItem> itemsToPick = null;
         for(AbstractZone zone : room.getMap().getZones()) {
             Point[] point = CircleService.circleBoundsIntersection(playerCircle, GeometryService.getRectangle(zone));
             if (point.length > 0) {
                 if(zone.isPassable()) {
                     if(zone instanceof AbstractItem) {
-                        itemService.onGetItem((AbstractItem)zone, player);
+                        if(itemsToPick == null) {
+                            itemsToPick = new ArrayList<>();
+                        }
+                        itemsToPick.add((AbstractItem)zone);
                     }
-                    return PointService.EMPTY;
                 } else {
                     return point;
                 }
             }
         }
-        /*for(Person person : room.getPersons().values()) {
-            if(person == player) {
-                continue;
+        if(itemsToPick != null) {
+            for (AbstractItem item : itemsToPick) {
+                itemService.onGetItem(item, player);
             }
-            Circle circle = new Circle(
-                    person.getX(),
-                    person.getY(),
-                    PersonWebSocketEndpoint.PERSON_RADIUS
-            );
-            Point[] p = CircleService.circleCircleIntersection(circle, playerCircle);
-            if(p == null || p.length > 0) {
-                return false;
-            }
-        }*/
+        }
         return PointService.EMPTY;
     }
 }

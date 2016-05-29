@@ -20,8 +20,6 @@ public class MovementService {
     public void onMove(Person person, Room room){
 
         Direction direction = person.getDirection();
-        double x = person.getX();
-        double y = person.getY();
         double factor = 1;
         if(person.getWeapon() instanceof Minigun) {
             factor *= 0.6;
@@ -38,39 +36,39 @@ public class MovementService {
             int onOx;
             switch (direction) {
                 case EAST:
-                    onGoEast(person, room, x, y, factor);
+                    onGoEast(person, room, factor, true);
                     break;
                 case WEST:
-                    onGoWest(person, room, x, y, factor);
+                    onGoWest(person, room, factor, true);
                     break;
                 case NORTH:
-                    onGoNorth(person, room, x, y, factor, 0);
+                    onGoNorth(person, room, factor, 0);
                     break;
                 case SOUTH:
-                    onGoSouth(person, room, x, y, factor, 0);
+                    onGoSouth(person, room, factor, 0);
                     break;
                 case SOUTH_WEST:
-                    onOx = onGoSouth(person, room, x, y, factor, -1);
+                    onOx = onGoSouth(person, room, factor, -1);
                     if(onOx == 0) {
-                        onGoWest(person, room, x, y, factor);
+                        onGoWest(person, room, factor, false);
                     }
                     break;
                 case SOUTH_EAST:
-                    onOx = onGoSouth(person, room, x, y, factor, 1);
+                    onOx = onGoSouth(person, room, factor, 1);
                     if(onOx == 0) {
-                        onGoEast(person, room, x, y, factor);
+                        onGoEast(person, room, factor, false);
                     }
                     break;
                 case NORTH_WEST:
-                    onOx = onGoNorth(person, room, x, y, factor, -1);
+                    onOx = onGoNorth(person, room, factor, -1);
                     if(onOx == 0) {
-                        onGoWest(person, room, x, y, factor);
+                        onGoWest(person, room, factor, false);
                     }
                     break;
                 case NORTH_EAST:
-                    onOx = onGoNorth(person, room, x, y, factor, 1);
+                    onOx = onGoNorth(person, room, factor, 1);
                     if(onOx == 0) {
-                        onGoEast(person, room, x, y, factor);
+                        onGoEast(person, room, factor, false);
                     }
                     break;
                 default:
@@ -79,54 +77,55 @@ public class MovementService {
         }
     }
 
-    private void onGoEast(Person person, Room room, double x, double y, double distance) {
+    private void onGoEast(Person person, Room room, double distance, boolean allowFloat) {
         Point[] point = locationService.canGoEast(person, room, distance);
         if (point != null) {
             if(point.length == 0) {
-                person.setX(x + distance);
-            } else {
-                onFloatOx(point, y, person, room, distance, true);
+                person.setX(person.getX() + distance);
+            } else if(allowFloat){
+                onFloatOx(point, person, room, distance, true);
             }
         }
     }
-    private void onGoWest(Person person, Room room, double x, double y, double distance) {
+    private void onGoWest(Person person, Room room, double distance, boolean allowFloat) {
         Point[] point = locationService.canGoWest(person, room, distance);
         if (point != null) {
             if(point.length == 0) {
-                person.setX(x - distance);
-            } else {
-               onFloatOx(point, y, person, room, distance, false);
+                person.setX(person.getX() - distance);
+            } else  if(allowFloat){
+               onFloatOx(point, person, room, distance, false);
             }
         }
     }
-    private int onGoSouth(Person person, Room room, double x, double y, double distance, int oxShift) {
+    private int onGoSouth(Person person, Room room, double distance, int oxShift) {
         Point[] point = locationService.canGoSouth(person, room, distance);
         if (point != null) {
             if(point.length == 0) {
-                person.setY(y + distance);
+                person.setY(person.getY() + distance);
                 return 0;
             } else {
-                return onFloatOy(point, x, person, room, distance, true, oxShift);
+                return onFloatOy(point, person, room, distance, true, oxShift);
             }
         } else {
             return 0;
         }
     }
-    private int onGoNorth(Person person, Room room, double x, double y, double distance, int oxShift) {
+    private int onGoNorth(Person person, Room room, double distance, int oxShift) {
         Point[] point = locationService.canGoNorth(person, room, distance);
         if (point != null) {
             if(point.length == 0) {
-                person.setY(y - distance);
+                person.setY(person.getY() - distance);
                 return 0;
             } else {
-                return onFloatOy(point, x, person, room, distance, false, oxShift);
+                return onFloatOy(point, person, room, distance, false, oxShift);
             }
         } else {
             return 0;
         }
     }
 
-    private void onFloatOx(Point[] point, double y, Person person, Room room, double distance, boolean onGoEast) {
+    private void onFloatOx(Point[] point, Person person, Room room, double distance, boolean onGoEast) {
+        double y = person.getY();
         Point floatPoint;
         if(point.length == 1) {
             floatPoint = point[0];
@@ -148,7 +147,8 @@ public class MovementService {
         }
     }
 
-    private int onFloatOy(Point[] point, double x, Person person, Room room, double distance, boolean onGoSouth, int oxShift) {
+    private int onFloatOy(Point[] point, Person person, Room room, double distance, boolean onGoSouth, int oxShift) {
+        double x = person.getX();
         Point floatPoint;
         if(point.length == 1) {
             floatPoint = point[0];
@@ -157,7 +157,7 @@ public class MovementService {
         }
         if(Math.abs(floatPoint.getX() - person.getX()) > 0.5) {
             if (floatPoint.getX() > x) {
-                if(oxShift != -1) {
+                if(oxShift != 1) {
                     Point[] westPoint = locationService.canGoWest(person, room, distance);
                     if (westPoint != null && westPoint.length == 0) {
                         person.setX(x - distance);
@@ -165,7 +165,7 @@ public class MovementService {
                     return 1;
                 }
             } else if (floatPoint.getX() < x) {
-                if(oxShift != 1) {
+                if(oxShift != -1) {
                     Point[] eastPoint = locationService.canGoEast(person, room, distance);
                     if (eastPoint != null && eastPoint.length == 0) {
                         person.setX(x + distance);

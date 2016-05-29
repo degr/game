@@ -59,7 +59,21 @@ var KeyboardSetup = {
         for(var key in Controls) {
             buttons.push(KeyboardSetup.createInput(key));
         }
+        buttons.push(KeyboardSetup.buildAngleMistake());
         return Dom.el('div', 'controls', buttons);
+    },
+    buildAngleMistake: function() {
+        var input = Dom.el('input', {type: 'text', value: PersonActions.angleMistake, id: 'angle_mistake'});
+        var label = Dom.el('label', {'for': 'angle_mistake'}, 'Angle Mistake (for slow internet)');
+        input.onkeyup = function() {
+            var value = parseFloat(input.value);
+            if(value >= 0) {
+                PersonActions.angleMistake = value;
+            } else {
+                input.value = PersonActions.angleMistake;
+            }
+        };
+        return Dom.el('div', null, [label, input])
     },
     createInput: function(key) {
         var id = "control_" + key;

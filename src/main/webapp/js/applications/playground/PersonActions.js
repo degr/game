@@ -4,7 +4,8 @@ var PersonActions = {
     buttonLeft: false,
     buttonRight: false,
     directionX: null,
-    directionY: null
+    directionY: null,
+    angleMistake: 0
 };
 
 PersonActions.setDirection  = function(direction) {
@@ -30,7 +31,7 @@ PersonActions.stopFire = function(e){
     PlayGround.socket.send("fire:0");
 };
 PersonActions.startMovement = function(e){
-    if(!PlayGround.gameStarted || Chat.active)return;
+    if(!PlayGround.gameStarted || Chat.active || KeyboardSetup.isActive)return;
     e = e || window.event;
     var code = e.keyCode;
     var thisEvent = false;
@@ -163,10 +164,18 @@ PersonActions.updateMouseDirectionByXy = function(x, y, person) {
     } else {
         antiClockAngle = 360 - clockAngle;
     }
-    if(clockAngle < antiClockAngle) {
-        PlayGround.updatePersonViewAngle(clockAngle > 5 ? 2 : 1);
+    if(clockAngle < antiClockAngle ) {
+        if(clockAngle <= PersonActions.angleMistake ) {
+            PlayGround.updatePersonViewAngle(0);
+        } else {
+            PlayGround.updatePersonViewAngle(clockAngle > 5 ? 2 : 1);
+        }
     } else if(clockAngle > antiClockAngle) {
-        PlayGround.updatePersonViewAngle(antiClockAngle > 5 ? -2 : -1);
+        if(antiClockAngle <= PersonActions.angleMistake ) {
+            PlayGround.updatePersonViewAngle(0);
+        } else {
+            PlayGround.updatePersonViewAngle(antiClockAngle > 5 ? -2 : -1);
+        }
     } else {
         PlayGround.updatePersonViewAngle(0);
     }

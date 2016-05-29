@@ -68,7 +68,7 @@ var Weapons = {
         Weapons.container.appendChild(out);
     },
     changeWeapon: function(e) {
-        if(!PlayGround.gameStarted || Chat.active)return;
+        if(!PlayGround.gameStarted || Chat.active || KeyboardSetup.isActive)return;
         e = e || window.event;
         var code = e.keyCode;
         var thisEvent = false;
@@ -130,20 +130,31 @@ var Weapons = {
         }
     },
     findWeapon: function(isNext) {
-        var gun = PlayGround.owner.gun + ":";
+        var sorted = [];
         var guns = PlayGround.owner.guns;
-        var gunIndex = -1;
-        for(var i = 0; i < guns.length; i++) {
-            if(guns[i].indexOf(gun) === 0) {
-                gunIndex = i;
+        var gun = PlayGround.owner.gun;
+        var currentIndex = -1;
+        var idx = 0;
+        for(var weaponId in Weapons.weapons) {
+            var weapon = Weapons.weapons[weaponId];
+            for(var i = 0; i < guns.length; i++) {
+                var iGun = guns[i];
+                if(iGun.indexOf(weapon.type + ':') === 0) {
+                    sorted.push(weaponId);
+                    if(weaponId == gun) {
+                        currentIndex = idx;
+                    }
+                }
             }
+            idx ++;
         }
-        if(isNext) {
-            gunIndex = gunIndex == guns.length -1 ? 0 : gunIndex + 1;
-        } else {
-            gunIndex = gunIndex == 0 ? guns.length - 1 : gunIndex - 1;
+        var index = isNext ? currentIndex + 1 : currentIndex - 1;
+        if(index < 0) {
+            index = sorted.length - 1;
+        } else if(index >= sorted.length) {
+            index = 0;
         }
-        return PlayGround.owner.guns[gunIndex].split(':')[0];
+        return sorted[index];
     },
     setWeapon: function(gun) {
         PlayGround.socket.send("gun:" + gun);
