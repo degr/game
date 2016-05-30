@@ -28,6 +28,7 @@ var PlayGround = {
     instantBullets: {},
     
     init: function () {
+        PersonTracker.init();
         ZoneActions.init();
         Weapons.init();
         LifeAndArmor.init();
@@ -103,14 +104,23 @@ var PlayGround = {
         if(map.x < win.width) {
             canvas.style.marginLeft = 'auto';
             canvas.style.marginRight = 'auto';
+            PersonTracker.trackX = false;
         } else {
             canvas.style.marginLeft = null;
             canvas.style.marginRight = null;
+            PersonTracker.trackX = true;
         }
         if(map.y < win.height) {
             canvas.style.marginTop = (win.height - map.y) / 2 + 'px';
+            PersonTracker.trackY = false;
         } else {
             canvas.style.marginTop = null;
+            PersonTracker.trackY = true;
+        }
+        if(PersonTracker.trackX || PersonTracker.trackY) {
+            PersonTracker.start();
+        } else {
+            PersonTracker.stop();
         }
         PlayGround.canvasOffset = Dom.calculateOffset(canvas);
     },
@@ -280,7 +290,6 @@ var PlayGround = {
                 ProjectilesActions.draw(PlayGround.projectiles[i]);
             }
         }
-        console.log(PlayGround.instantBullets);
         for(var iKey in PlayGround.instantBullets) {
             ProjectilesActions.draw(PlayGround.instantBullets[iKey]);
         }

@@ -225,7 +225,7 @@ body, html {
     color: cornflowerblue;
 }
 .playground .icon-keyboard {
-    position: absolute;
+    position: fixed;
     right: 100px;
     bottom: 10px;
     width: 18px;
