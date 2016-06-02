@@ -1,8 +1,12 @@
 package org.forweb.commandos.entity.weapon;
 
+import org.forweb.commandos.entity.Person;
+import org.forweb.commandos.entity.WebSocketResponse;
 import org.forweb.commandos.entity.ammo.Projectile;
 
-public abstract class AbstractWeapon<T extends Projectile> {
+import java.util.Random;
+
+public abstract class AbstractWeapon<T extends Projectile> implements WebSocketResponse {
     private int shotTimeout;
     private int reloadTimeout;
 
@@ -28,7 +32,7 @@ public abstract class AbstractWeapon<T extends Projectile> {
 
 
     public abstract String getName();
-
+    public abstract Projectile getProjectile(Person person, float changedAngle);
 
     public int getReloadTimeout() {
         return reloadTimeout;
@@ -62,7 +66,7 @@ public abstract class AbstractWeapon<T extends Projectile> {
         this.currentClip = currentClip;
     }
 
-    public int getSpread() {
+    public float getSpread() {
         return spread;
     }
 
@@ -96,4 +100,11 @@ public abstract class AbstractWeapon<T extends Projectile> {
     public void setClipSize(int clipSize) {
         this.clipSize = clipSize;
     }
+
+
+    @Override
+    public String doResponse() {
+        return getName() + ":" + getTotalClip() + ":" + getCurrentClip();
+    }
+
 }

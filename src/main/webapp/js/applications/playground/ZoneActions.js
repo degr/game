@@ -48,7 +48,7 @@ var ZoneActions = {
                 break;
             default:
                 context.strokeStyle = '#000000';
-                context.rect(zone.x + 4, zone.y + 4, zone.width, zone.height);
+                context.rect(zone.x, zone.y, zone.width, zone.height);
                 context.stroke();
                 context.strokeText(zone.type, zone.x + 3, zone.y + 20, zone.width - 6);
         }
@@ -56,7 +56,9 @@ var ZoneActions = {
     },
     drawImage: function(zone) {
         if(zone.available) {
-            PlayGround.context.drawImage(ZoneActions.images[zone.type], zone.x - 4, zone.y - 4, 48, 48);
+            var size = 48;
+            var shift = (size - 40) / 2;
+            PlayGround.context.drawImage(ZoneActions.images[zone.type], zone.x - shift, zone.y - shift, size, size);
         }
     }
 };

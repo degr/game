@@ -1,6 +1,7 @@
 package org.forweb.commandos;
 
 
+import org.forweb.database.HibernateSupport;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.request.RequestContextListener;
@@ -19,6 +20,7 @@ public class AppInitializer implements WebApplicationInitializer {
     @Override
     public void onStartup(ServletContext container) {
         System.out.println("on startup");
+        HibernateSupport.init("127.0.0.1:3306", "root", "", "commandos", BASE_PACKAGE + ".entity");
 
         AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
         rootContext.register(SpringConfiguration.class);

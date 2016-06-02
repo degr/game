@@ -11,7 +11,6 @@
     <properties>
         <jackson>2.7.3</jackson>
         <spring>4.2.5.RELEASE</spring>
-        <hibernate>5.1.0.Final</hibernate>
     </properties>
 
     <repositories>
@@ -81,6 +80,11 @@
             <version>0d2316dbfa</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.degr</groupId>
+            <artifactId>HibernateSupport</artifactId>
+            <version>d6b5208bc6</version>
+        </dependency>
     </dependencies>
 
     <build>

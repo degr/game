@@ -20,7 +20,20 @@ PersonActions.startFire = function(e){
         Chat.active = false;
         document.activeElement.blur();
     } else {
-        PlayGround.socket.send("fire:1");
+        var gun = '';
+        var guns = PlayGround.owner.guns;
+        for(var i = 0; i < guns.length; i++) {
+            if(guns[i].indexOf(PlayGround.owner.gun + ":") === 0) {
+                gun =guns[i];
+                break;
+            }
+        }
+        var data = gun.split(":");
+        if(data[2] > 0) {
+            PlayGround.socket.send("fire:1");
+        } else {
+            SoundUtils.play('sound/no-ammo.mp3');
+        }
     }
 };
 PersonActions.stopFire = function(e){
@@ -220,12 +233,12 @@ PersonActions.drawPerson = function(person) {
     context.strokeStyle = person.hexColor;
     context.translate(x,y);
     if(person.reload) {
-        context.drawImage(PersonActions.reload, + PlayGround.radius,  - PlayGround.radius);
+        context.drawImage(PersonActions.reload, + PlayGround.radius + 4,  - PlayGround.radius);
     }
     context.rotate(angle * Math.PI/180);
-    context.arc(0, 0, PlayGround.radius, 0, 2 * Math.PI, false);
+    //context.arc(0, 0, PlayGround.radius, 0, 2 * Math.PI, false);
     context.stroke();
-    context.drawImage(person.image, - PlayGround.radius,  - PlayGround.radius);
+    context.drawImage(person.image, - PlayGround.radius - 4,  - PlayGround.radius);
     context.restore();
     if(PlayGround.showNames) {
         context.strokeText(person.name, x - 10, y + 27);

@@ -66,3 +66,4 @@ CREATE TABLE `zone` (
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2016-05-22 22:52:51
+alter table map add COLUMN map_hash VARCHAR (255);

@@ -1,6 +1,5 @@
 package org.forweb.commandos.controller;
 
-import org.forweb.commandos.database.Table;
 import org.forweb.commandos.entity.GameMap;
 import org.forweb.commandos.service.MapService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,7 @@ public class MapController {
     @Autowired
     private MapService mapService;
 
-    @RequestMapping("/save")
+    @RequestMapping(value="/save", produces = "text/plain")
     public String saveMap(@RequestBody GameMap map) throws NoSuchAlgorithmException {
         return mapService.saveMap(map);
     }
@@ -25,7 +24,6 @@ public class MapController {
     @RequestMapping("/list/{page}/{size}")
     public List<GameMap> loadMaps(@RequestParam(required = false) String mapName, @PathVariable Integer page, @PathVariable Integer size) {
         return mapService.loadMaps(mapName, page, size);
-
     }
 
     @RequestMapping("/name-empty")

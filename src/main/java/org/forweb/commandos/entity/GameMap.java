@@ -16,6 +16,8 @@ public class GameMap {
     private String gameType;
     private String rating;
 
+    private String mapHash;
+
     public Integer getX() {
         return x;
     }
@@ -87,5 +89,13 @@ public class GameMap {
 
     public String getRating() {
         return rating;
+    }
+
+    public String getMapHash() {
+        return mapHash;
+    }
+
+    public void setMapHash(String mapHash) {
+        this.mapHash = mapHash;
     }
 }

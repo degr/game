@@ -126,67 +126,60 @@ var PlayGround = {
     },
     connect: function (onConnectMessage) {
         PlayGround.gameStarted = true;
-        var host;
-        if (window.location.protocol == 'http:') {
-            host = 'ws://' + window.location.host + '/commandos';
-        } else {
-            host = 'wss://' + window.location.host + '/commandos';
-        }
-        if ('WebSocket' in window) {
-            PlayGround.socket = new WebSocket(host);
-        } else if ('MozWebSocket' in window) {
-            PlayGround.socket = new MozWebSocket(host);
-        } else {
-            alert('Error: WebSocket is not supported by this browser.');
-            return;
-        }
-
-        PlayGround.socket.onerror = function() {
-            alert("Error! Please describe how it happen to developer." + JSON.stringify(arguments));
-            PlayGround.gameStarted = false;
-        };
-        
-        PlayGround.socket.onopen = function () {
-            PlayGround.socket.send(onConnectMessage);
-            PlayGround.startGameLoop();
-            PlayGround.gameStarted = true;
-            setInterval(function () {
-                // Prevent server read timeout.
-                PlayGround.socket.send('ping');
-            }, 5000);
-        };
-
-        PlayGround.socket.onclose = function () {
-            PlayGround.stopGameLoop();
-            PlayGround.gameStarted = false;
-        };
-
-        PlayGround.socket.onmessage = function (message) {
-            // _Potential_ security hole, consider using json lib to parse data in production.
-            var data = eval('(' + message.data + ')');
-            switch (data.type) {
-                case 'update':
-                    PlayGround.onUpdate(data);
-                    break;
-                case 'leave':   
-                    PlayGround.removePerson(data.id);
-                    break;
-                case 'stats':
-                    PlayGround.onStats(data);
-                    break;
+        PlayGround.socket = WebSocketUtils.getSocket(
+            '/commandos',
+            function onOpen() {
+                PlayGround.socket.send(onConnectMessage);
+                PlayGround.startGameLoop();
+                PlayGround.gameStarted = true;
+            },
+            function onMessage(message) {
+                // _Potential_ security hole, consider using json lib to parse data in production.
+                var data = eval('(' + message.data + ')');
+                switch (data.type) {
+                    case 'update':
+                        PlayGround.onUpdate(data);
+                        break;
+                    case 'leave':
+                        PlayGround.removePerson(data.id);
+                        break;
+                    case 'stats':
+                        PlayGround.onStats(data);
+                        break;
+                }
+            },
+            function onStop() {
+                PlayGround.stopGameLoop();
+                PlayGround.gameStarted = false;
+            },
+            function onError() {
+                alert("Error! Please describe how it happen to developer." + JSON.stringify(arguments));
+                PlayGround.gameStarted = false;
             }
-        };
+        )
     },
     onStats: function (data) {
         PlayGround.gameStarted = false;
+        PersonTracker.stop();
         GameStats.show();
         GameStats.update(data.stats);
         PlayGround.socket.close();
     },
+    decryptOwner: function(owner) {
+        var data = owner.owner.split(":");
+        return {
+            id: data[0],
+            life: data[1],
+            armor: data[2],
+            score: data[3],
+            gun: data[4],
+            guns: owner.guns
+        };
+    },
     onUpdate: function(packet) {
         if (packet.owner !== null) {
             PlayGround.id = packet.owner.id;
-            PlayGround.owner = packet.owner;
+            PlayGround.owner = PlayGround.decryptOwner(packet.owner);
         }
         Weapons.update(PlayGround.owner);
         LifeAndArmor.update(PlayGround.owner.life, PlayGround.owner.armor);
@@ -218,12 +211,12 @@ var PlayGround = {
         var now = (new Date()).getTime();
         PlayGround.projectiles = [];
         for(var i = 0; i < packet.projectiles.length; i++) {
-            var p = packet.projectiles[i];
-            if(p[0].x2 || p[0].x2 === 0) {
+            var p = ProjectilesActions.decode(packet.projectiles[i]);
+            if(p.x2 || p.x2 === 0) {
                 PlayGround.instantBullets[i] = p;
                 p.created = now;
             } else {
-                PlayGround.projectiles.push(packet.projectiles[i]);
+                PlayGround.projectiles.push(p);
             }
         }
     },

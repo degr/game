@@ -1,8 +1,10 @@
 package org.forweb.commandos.entity.ammo;
 
+import org.forweb.commandos.entity.WebSocketResponse;
+
 import java.util.Date;
 
-public abstract class Projectile {
+public abstract class Projectile implements WebSocketResponse {
     private Integer id;
     private String type;
     private double xStart;
@@ -18,15 +20,17 @@ public abstract class Projectile {
     private boolean piercing = false;
 
     public abstract boolean isInstant();
+
     public abstract String getName();
+
     public abstract int getDamage();
-    
+
     public Projectile(int xStart, int yStart, float angle) {
         this.setxStart(xStart);
         this.setyStart(yStart);
         this.setAngle(angle);
     }
-    
+
     public Integer getyEnd() {
         return yEnd;
     }
@@ -74,6 +78,7 @@ public abstract class Projectile {
     public void setRadius(double radius) {
         this.radius = radius;
     }
+
     public Long getCreationTime() {
         return creationTime;
     }
@@ -81,7 +86,7 @@ public abstract class Projectile {
     public Long getLifeTime() {
         return lifeTime;
     }
-    
+
     public void setLifeTime(Long lifeTime) {
         this.lifeTime = lifeTime;
     }
@@ -97,6 +102,7 @@ public abstract class Projectile {
     public Integer getId() {
         return id;
     }
+
     public void setId(Integer id) {
         this.id = id;
     }
@@ -112,8 +118,18 @@ public abstract class Projectile {
     public boolean isPiercing() {
         return piercing;
     }
+
     public void setPiercing(boolean piercing) {
         this.piercing = piercing;
     }
 
+    public String doResponse() {
+        return getId() + ":" +
+                getName() + ":" +
+                (int)getxStart() + ":" +
+                (int)getyStart() + ":" +
+                getxEnd() + ":" +
+                getyEnd() + ":" +
+                (int)getAngle();
+    }
 }

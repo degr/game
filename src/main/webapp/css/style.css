@@ -127,7 +127,11 @@ body, html {
 
 .editor .mounted {
     float: right;
-    max-width: 200px;
+    max-width: 20%;
+}
+.editor .map-editor-wrapper {
+    max-width: 78%;
+    margin-right: 2%;
 }
 
 .editor canvas {

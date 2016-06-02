@@ -1,6 +1,8 @@
 package org.forweb.commandos.entity.weapon;
 
+import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.ammo.Bullet;
+import org.forweb.commandos.entity.ammo.Projectile;
 
 public class AssaultRifle extends AbstractWeapon<Bullet> {
     public AssaultRifle() {
@@ -18,5 +20,10 @@ public class AssaultRifle extends AbstractWeapon<Bullet> {
     @Override
     public String getName() {
         return "assault";
+    }
+
+    @Override
+    public Projectile getProjectile(Person person, float changedAngle) {
+        return new Bullet((int)person.getX(), (int)person.getY(), changedAngle);
     }
 }

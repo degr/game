@@ -3,20 +3,9 @@ package org.forweb.commandos.response.dto;
 import java.util.List;
 
 public class OwnerDto {
-    private int id;
-    private int life;
-    private int armor;
-    private String gun;
     private List<String> guns;
-    private int score;
 
-    public int getScore() {
-        return score;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
-    }
+    private String owner;
 
     public List<String> getGuns() {
         return guns;
@@ -26,36 +15,11 @@ public class OwnerDto {
         this.guns = guns;
     }
 
-    public int getArmor() {
-        return armor;
+    public String getOwner() {
+        return owner;
     }
 
-    public void setArmor(int armor) {
-        this.armor = armor;
-    }
-
-    public int getLife() {
-        return life;
-    }
-
-    public void setLife(int life) {
-        this.life = life;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-
-    public String getGun() {
-        return gun;
-    }
-
-    public void setGun(String gun) {
-        this.gun = gun;
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 }

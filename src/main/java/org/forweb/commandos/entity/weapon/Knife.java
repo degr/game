@@ -1,7 +1,9 @@
 package org.forweb.commandos.entity.weapon;
 
 import org.forweb.commandos.controller.PersonWebSocketEndpoint;
+import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.ammo.KnifeAmmo;
+import org.forweb.commandos.entity.ammo.Projectile;
 
 public class Knife extends AbstractWeapon<KnifeAmmo>{
 
@@ -22,6 +24,11 @@ public class Knife extends AbstractWeapon<KnifeAmmo>{
     @Override
     public String getName() {
         return "knife";
+    }
+
+    @Override
+    public Projectile getProjectile(Person person, float angle) {
+        return new KnifeAmmo((int)person.getX(), (int)person.getY(), angle);
     }
 
     @Override

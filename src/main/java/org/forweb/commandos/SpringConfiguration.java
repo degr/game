@@ -3,6 +3,7 @@ package org.forweb.commandos;
 import org.forweb.commandos.database.Db;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.annotation.PostConstruct;
@@ -10,8 +11,10 @@ import javax.annotation.PostConstruct;
 @Configuration
 @ComponentScan(basePackages = {
         AppInitializer.BASE_PACKAGE,
-        AppInitializer.BASE_PACKAGE + ".controller"
+        AppInitializer.BASE_PACKAGE + ".controller",
+        "org.forweb.database"
 })
+@EnableJpaRepositories(AppInitializer.BASE_PACKAGE + ".dao")
 @EnableWebMvc
 public class SpringConfiguration {
 
@@ -19,11 +22,8 @@ public class SpringConfiguration {
     public void postConstruct() {
 
         //Db.init("mysql35608-env-2464409.mycloud.by", "root", "QASsyb01289", "commandos");
-        try{
-            new Db().getTable("select 1;");
-        } catch (Exception e) {
-            Db.init("127.0.0.1:3306", "root", "", "commandos");
-        }
+
+        Db.init("127.0.0.1:3306", "root", "", "commandos");
         (new Thread(){
             public void run() {
                 while(true) {

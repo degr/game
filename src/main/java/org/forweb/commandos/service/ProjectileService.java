@@ -22,7 +22,7 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-class ProjectileService {
+public class ProjectileService {
 
     @Autowired
     Context gameContext;
@@ -30,20 +30,19 @@ class ProjectileService {
     @Autowired
     private PersonService personService;
 
-    private Random random = new Random();
+    private static final Random random = new Random();
 
-    synchronized void onProjectileLifecycle(ConcurrentHashMap<Integer, Projectile[]> projectiles, Room room) {
+    synchronized void onProjectileLifecycle(ConcurrentHashMap<Integer, Projectile> projectiles, Room room) {
         Long now = System.currentTimeMillis();
-        for (Map.Entry<Integer, Projectile[]> entry : projectiles.entrySet()) {
-            for(Projectile projectile : entry.getValue()) {
-                projectile.setNow(System.currentTimeMillis());
-                if (projectile.getCreationTime() + projectile.getLifeTime() < now) {
-                    projectiles.remove(entry.getKey());
-                    continue;
-                }
-                if (!projectile.isInstant()) {
-                    checkForImpacts(room, projectile, entry.getKey());
-                }
+        for (Map.Entry<Integer, Projectile> entry : projectiles.entrySet()) {
+            Projectile projectile = entry.getValue();
+            projectile.setNow(System.currentTimeMillis());
+            if (projectile.getCreationTime() + projectile.getLifeTime() < now) {
+                projectiles.remove(entry.getKey());
+                continue;
+            }
+            if (!projectile.isInstant()) {
+                checkForImpacts(room, projectile, entry.getKey());
             }
         }
     }
@@ -156,7 +155,7 @@ class ProjectileService {
             explosion.setxEnd((int)explosion.getxStart());
             explosion.setyEnd((int)explosion.getyStart());
             int id = gameContext.getProjectilesIds().getAndIncrement();
-            room.getProjectiles().put(id, new Projectile[]{explosion});
+            room.getProjectiles().put(id, explosion);
 
             Circle explosionCircle = new Circle(
                     explosion.getxStart(),
@@ -346,70 +345,61 @@ class ProjectileService {
         gun.setTotalClip(gun.getTotalClip() - 1);
         gun.setCurrentClip(gun.getCurrentClip() - 1);
 
+        Projectile projectile = getCompatibleProjectile(person);
         Integer id = gameContext.getProjectilesIds().getAndIncrement();
-        Projectile[] projectilesBatch = new Projectile[gun.getBulletsPerShot()];
-        for(int i = 0; i < projectilesBatch.length; i++) {
-            Projectile projectile = getCompatibleProjectile(person);
-            projectile.setId(i);
-            projectilesBatch[i] = projectile;
-
-            float angle = projectile.getAngle();
-            if (angle == 90) {
-                projectile.setxEnd((int)person.getX());
-                int gunLimit = (int) (projectile.getRadius() + person.getY());
-                projectile.setyEnd(gunLimit > room.getMap().getY() ? room.getMap().getY() : gunLimit);
-            } else if (angle == 180) {
-                projectile.setyEnd((int)person.getY());
-                int gunLimit = (int)person.getX() - (int) projectile.getRadius();
-                projectile.setyEnd(gunLimit > 0 ? gunLimit : 0);
-            } else if (angle == 270) {
-                projectile.setxEnd((int)person.getX());
-                int gunLimit = (int)person.getY() - (int) projectile.getRadius();
-                projectile.setyEnd(gunLimit > 0 ? gunLimit : 0);
-            } else if (angle == 0) {
-                projectile.setyEnd((int)person.getY());
-                int gunLimit = (int)person.getX() + (int) projectile.getRadius();
-                projectile.setyEnd(gunLimit > room.getMap().getX() ? room.getMap().getX() : gunLimit);
-            } else {
-                double y = projectile.getRadius() * Math.sin(angle * Math.PI / 180);
-                double x = projectile.getRadius() * Math.cos(angle * Math.PI / 180);
-                projectile.setxEnd((int) x + (int)person.getX());
-                projectile.setyEnd((int) y + (int)person.getY());
+        projectile.setId(id);
+        if(projectile instanceof Shot) {
+            Shot shotProjectile = (Shot) projectile;
+            for(SubShot subShot : shotProjectile.getSubShots()) {
+                Integer subId = gameContext.getProjectilesIds().getAndIncrement();
+                subShot.setId(subId);
+                onProjectileInstantiation(person, subShot, room);
             }
-            if (projectile.isInstant()) {
-                calculateInstantImpacts(person, projectile, room);
-            }
+        } else {
+            onProjectileInstantiation(person, projectile, room);
         }
+        room.getProjectiles().put(id, projectile);
+    }
 
-        room.getProjectiles().put(id, projectilesBatch);
+    private void onProjectileInstantiation(Person person, Projectile projectile, Room room) {
+        float angle = projectile.getAngle();
+        if (angle == 90) {
+            projectile.setxEnd((int)person.getX());
+            int gunLimit = (int) (projectile.getRadius() + person.getY());
+            projectile.setyEnd(gunLimit > room.getMap().getY() ? room.getMap().getY() : gunLimit);
+        } else if (angle == 180) {
+            projectile.setyEnd((int)person.getY());
+            int gunLimit = (int)person.getX() - (int) projectile.getRadius();
+            projectile.setyEnd(gunLimit > 0 ? gunLimit : 0);
+        } else if (angle == 270) {
+            projectile.setxEnd((int)person.getX());
+            int gunLimit = (int)person.getY() - (int) projectile.getRadius();
+            projectile.setyEnd(gunLimit > 0 ? gunLimit : 0);
+        } else if (angle == 0) {
+            projectile.setyEnd((int)person.getY());
+            int gunLimit = (int)person.getX() + (int) projectile.getRadius();
+            projectile.setyEnd(gunLimit > room.getMap().getX() ? room.getMap().getX() : gunLimit);
+        } else {
+            double y = projectile.getRadius() * Math.sin(angle * Math.PI / 180);
+            double x = projectile.getRadius() * Math.cos(angle * Math.PI / 180);
+            projectile.setxEnd((int) x + (int)person.getX());
+            projectile.setyEnd((int) y + (int)person.getY());
+        }
+        if (projectile.isInstant()) {
+            calculateInstantImpacts(person, projectile, room);
+        }
+    }
+
+    public static float changeProjectileAngle(Person person) {
+        float spread = person.getWeapon().getSpread();
+        return person.getAngle() + random.nextFloat() * (spread * 2) - spread;
     }
 
     private Projectile getCompatibleProjectile(Person person) {
-        float angle = getNewProjectileAngle(person);
-
-        if(person.getWeapon() instanceof Knife) {
-            return new KnifeAmmo((int)person.getX(), (int)person.getY(), angle);
-        } else if(person.getWeapon() instanceof Pistol || person.getWeapon() instanceof AssaultRifle || person.getWeapon() instanceof Minigun) {
-            return new Bullet((int)person.getX(), (int)person.getY(), angle);
-        } else if(person.getWeapon() instanceof Shotgun) {
-            return new Shot((int)person.getX(), (int)person.getY(), angle);
-        }  else if(person.getWeapon() instanceof SniperRifle) {
-            return new SniperBullet((int)person.getX(), (int)person.getY(), angle);
-        } else if(person.getWeapon() instanceof RocketLauncher) {
-            return new Rocket((int)person.getX(), (int)person.getY(), angle, person.getId());
-        }else if(person.getWeapon() instanceof Flamethrower) {
-            return new Flame((int)person.getX(),(int) person.getY(), angle, person.getId());
-        } else {
-            throw new RuntimeException("Person have no weapon!");
-        }
-
+        return person.getWeapon().getProjectile(person, changeProjectileAngle(person));
     }
 
 
-    private float getNewProjectileAngle(Person person) {
-        float spread = (float) person.getWeapon().getSpread();
-        return person.getAngle() + random.nextFloat() * (spread * 2) - spread;
-    }
 
 
     public void changeWeapon(Person person, Integer weaponCode) {

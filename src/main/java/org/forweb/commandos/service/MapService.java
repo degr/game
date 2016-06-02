@@ -1,17 +1,22 @@
 package org.forweb.commandos.service;
 
+import org.forweb.commandos.dao.MapDao;
 import org.forweb.commandos.database.Db;
 import org.forweb.commandos.database.Row;
 import org.forweb.commandos.database.Table;
 import org.forweb.commandos.entity.GameMap;
+import org.forweb.commandos.entity.Map;
 import org.forweb.commandos.entity.zone.AbstractItem;
 import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.entity.zone.ZoneDto;
 import org.forweb.commandos.entity.zone.interactive.Respawn;
 import org.forweb.commandos.entity.zone.items.*;
 import org.forweb.commandos.entity.zone.walls.Wall;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -22,6 +27,14 @@ import java.util.stream.Collectors;
 @Service
 public class MapService {
 
+    @Autowired
+    MapDao mapDao;
+
+    @PostConstruct
+    public void postConstruct() {
+        List<Map> maps = mapDao.findAll();
+        System.out.println(maps);
+    }
 
     public String saveMap(GameMap map) throws NoSuchAlgorithmException {
         if (map.getName() == null || "".equals(map.getName())) {
@@ -36,14 +49,50 @@ public class MapService {
         if (maxPlayers < 2) {
             return "-1";
         }
-        Integer mapId = saveMapGeneral(map, maxPlayers);
-        saveMapZones(map.getZonesDto(), mapId);
-        return Arrays.toString(
-                MessageDigest.getInstance("MD5").
-                        digest(String.valueOf(mapId + System.currentTimeMillis()).getBytes())
-        );
-    }
 
+        Integer mapId = null;
+        if(map.getMapHash() != null) {
+            mapId = findMapIdByHash(map.getMapHash());
+        }
+        if(mapId == null) {
+            mapId = saveMapGeneral(map, maxPlayers);
+        }
+        saveMapZones(map.getZonesDto(), mapId);
+        String mapHash = md5Custom(String.valueOf(mapId + "_" + System.currentTimeMillis()));
+        String query = "update map set map_hash = ? where id = ?";
+        Db db = new Db();
+        db.query(query, mapHash, mapId);
+        return mapHash;
+    }
+    public static String md5Custom(String st) {
+        MessageDigest messageDigest = null;
+        byte[] digest = new byte[0];
+
+        try {
+            messageDigest = MessageDigest.getInstance("MD5");
+            messageDigest.reset();
+            messageDigest.update(st.getBytes());
+            digest = messageDigest.digest();
+        } catch (NoSuchAlgorithmException e) {
+            // тут можно обработать ошибку
+            // возникает она если в передаваемый алгоритм в getInstance(,,,) не существует
+            e.printStackTrace();
+        }
+
+        BigInteger bigInt = new BigInteger(1, digest);
+        String md5Hex = bigInt.toString(16);
+
+        while( md5Hex.length() < 32 ){
+            md5Hex = "0" + md5Hex;
+        }
+
+        return md5Hex;
+    }
+    private Integer findMapIdByHash(String hash) {
+        Db db = new Db();
+        String query = "Select id from map where hash = ?";
+        return db.getCellInt(query, hash);
+    }
 
     private void saveMapZones(List<ZoneDto> zones, Integer mapId) {
         Db db = new Db();

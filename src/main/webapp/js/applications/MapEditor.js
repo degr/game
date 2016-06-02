@@ -1,18 +1,25 @@
 var MapEditor = {
     container: null,
+    gridSize: 1,
     init: function () {
         MapEditor.console = Dom.el('p', {id: 'editor_console'});
         var labelX = Dom.el('label', {'for': 'x'}, 'Map X');
         var inputX = Dom.el('input', {type: 'text', name: 'x', value: MapEditor.x});
         inputX.onkeyup = function () {
             MapEditor.updateDimension(this, true);
-            MapEditor.changeMapSize()
+            MapEditor.changeMapSize();
         };
         var labelY = Dom.el('label', {'for': 'y'}, 'Map Y');
         var inputY = Dom.el('input', {type: 'text', name: 'y', value: MapEditor.y});
         inputY.onkeyup = function () {
             MapEditor.updateDimension(this, false);
             MapEditor.changeMapSize()
+        };
+        var labelGridSize = Dom.el('label', {'for': 'grid_size'}, 'Grid cell size');
+        var inputGridSize = Dom.el('input', {type: 'grid_size', name: 'grid_size', value: MapEditor.gridSize});
+        inputGridSize.onkeyup = function () {
+            MapEditor.updateGridSize(this, false);
+            MapEditor.render()
         };
         var mapName = Dom.el('input', {name: 'map_name', placeholder: 'Map name'});
         var mapNameEror = Dom.el('span', {'style': 'color: red'});
@@ -27,7 +34,7 @@ var MapEditor = {
             }
         };
         var mapControl = Dom.el('form', null, [
-            labelX, inputX, mapName, mapNameEror,
+            labelX, inputX, mapName, mapNameEror,labelGridSize, inputGridSize,
             Dom.el('br'),
             labelY, inputY, Dom.el('input', {type: 'submit', value: 'Save map'}), goBack
         ]);
@@ -39,7 +46,7 @@ var MapEditor = {
         MapEditor.zoneTypeHolder = Dom.el('div', {'class': 'mounted'});
         MapEditor.map = Dom.el('canvas', {width: MapEditor.x, height: MapEditor.y});
         MapEditor.container = Dom.el('div', {'class': 'editor'}, [
-            MapEditor.console, mapControl, MapEditor.zonesButtons, MapEditor.zoneTypeHolder, MapEditor.map
+            MapEditor.console, mapControl, MapEditor.zonesButtons, MapEditor.zoneTypeHolder, Dom.el('div', 'map-editor-wrapper', MapEditor.map)
         ]);
         MapEditor.map.onclick = function (e) {
             MapEditor.onClick(e)
@@ -98,9 +105,13 @@ var MapEditor = {
             y: MapEditor.y,
             zonesDto: zones
         };
+        if(document.location.hash) {
+            map.mapHash = document.location.hash
+        }
         Rest.doPost('map/save', map).then(function (response) {
             if (response != -1) {
-                alert('Map was saved');
+                alert('Map was saved. Map hash for edit: ' + response);
+                document.location.hash = response;
             } else {
                 alert("Can't save map due unknown reasons. May be name is not unique, or there is no respawn points.")
             }
@@ -110,6 +121,15 @@ var MapEditor = {
         var type = MapEditor.mounting.type;
         if (type) {
             var point = {x: e.offsetX, y: e.offsetY};
+            if(MapEditor.gridSize > 1) {
+                if (!MapEditor.mounting.pointA) {
+                    point.x = Math.floor(point.x / MapEditor.gridSize) * MapEditor.gridSize;
+                    point.y = Math.floor(point.y / MapEditor.gridSize) * MapEditor.gridSize;
+                } else {
+                    point.x = Math.ceil(point.x / MapEditor.gridSize) * MapEditor.gridSize;
+                    point.y = Math.ceil(point.y / MapEditor.gridSize) * MapEditor.gridSize;
+                }
+            }
             var zone = MapEditor.zones[type];
             var finishMount = function () {
                 MapEditor.mountedObjects.push(MapEditor.mounting);
@@ -126,8 +146,10 @@ var MapEditor = {
             if (!MapEditor.mounting.pointA) {
 
                 if (zone.staticSize) {
-                    point.x = point.x - zone.width / 2;
-                    point.y = point.y - zone.height / 2;
+                    if(MapEditor.gridSize <= 1) {
+                        point.x = point.x - zone.width / 2;
+                        point.y = point.y - zone.height / 2;
+                    }
                     MapEditor.mounting.pointA = point;
                     MapEditor.mounting.pointB = {x: point.x + zone.width, y: point.y + zone.height};
                     finishMount();
@@ -145,7 +167,6 @@ var MapEditor = {
         var context = MapEditor.context;
         context.clearRect(0, 0, MapEditor.x, MapEditor.y);
 
-
         for (var i = 0; i < MapEditor.mountedObjects.length; i++) {
             context.beginPath();
             var zone = MapEditor.mountedObjects[i];
@@ -162,6 +183,22 @@ var MapEditor = {
                 context.rect(rect.x, rect.y, rect.width, rect.height);
             } else {
                 context.fillRect(rect.x, rect.y, rect.width, rect.height)
+            }
+            context.stroke();
+        }
+
+        context.beginPath();
+        context.strokeStyle = "#60BB60";
+        if(MapEditor.gridSize && MapEditor.gridSize > 1) {
+            context.beginPath();
+            //context.setLineDash([5, 15]);
+            for(var i = 0; i< MapEditor.x; i+=MapEditor.gridSize) {
+                context.moveTo(i,0);
+                context.lineTo(i, MapEditor.y);
+            }
+            for(var i = 0; i< MapEditor.y; i+=MapEditor.gridSize) {
+                context.moveTo(0,i);
+                context.lineTo(MapEditor.x, i);
             }
             context.stroke();
         }
@@ -216,10 +253,23 @@ var MapEditor = {
         Dom.update(element, {width: MapEditor.x, height: MapEditor.y});
         MapEditor.render()
     },
+    updateGridSize: function(input) {
+        var newValue = input.value;
+        var newNumberValue = !newValue ? 0 : parseInt(newValue);
+        if (newValue == newNumberValue || !newValue) {
+            MapEditor.gridSize = newNumberValue;
+            MapEditor.write("Grid size was changed. Now all static-sized objects will be placed" +
+                (newNumberValue > 1 ?
+                    ' based on <span style="color:red">left-top corner</span>. ' :
+                    ' based on <span style="color:red">it center</span>.') + ' Also you can change positions after placement manually.')
+        } else {
+            input.value = MapEditor.gridSize;
+        }
+    },
     updateDimension: function (input, isX) {
         var newValue = input.value;
-        var newNumberValue = parseInt(newValue);
-        if (newValue == newNumberValue) {
+        var newNumberValue = !newValue ? 0 : parseInt(newValue);
+        if (!newValue || newValue == newNumberValue) {
             if (isX) {
                 MapEditor.x = newNumberValue;
             } else {
@@ -244,7 +294,7 @@ var MapEditor = {
         MapEditor.write("Select left - top corner for " + type);
     },
     write: function (text) {
-        MapEditor.getConsole().innerText = text;
+        MapEditor.getConsole().innerHTML = text;
     },
     getConsole: function () {
         return MapEditor.console;

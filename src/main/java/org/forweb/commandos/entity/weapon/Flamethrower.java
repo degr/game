@@ -1,6 +1,8 @@
 package org.forweb.commandos.entity.weapon;
 
+import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.ammo.Flame;
+import org.forweb.commandos.entity.ammo.Projectile;
 
 public class Flamethrower extends AbstractWeapon<Flame> {
     public Flamethrower(){
@@ -17,5 +19,10 @@ public class Flamethrower extends AbstractWeapon<Flame> {
     @Override
     public String getName() {
         return "flamethrower";
+    }
+
+    @Override
+    public Projectile getProjectile(Person person, float changedAngle) {
+        return new Flame((int)person.getX(),(int) person.getY(), changedAngle, person.getId());
     }
 }

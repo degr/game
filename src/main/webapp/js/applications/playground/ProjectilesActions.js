@@ -1,43 +1,40 @@
 var ProjectilesActions = {};
 
-ProjectilesActions.draw = function(projectileBatch) {
-    for(var i = 0; i < projectileBatch.length; i++) {
-        var projectile = projectileBatch[i];
-        switch (projectile.type) {
-            case 'bullet':
-                ProjectilesActions.drawBullet(projectile);
-                if(!projectileBatch.soundPlayed) {
-                    projectileBatch.soundPlayed = true;
-                    (new Audio('sound/minigun.mp3')).play();
-                }
-                break;
-            case 'slug':
-                ProjectilesActions.drawBullet(projectile);
-                if(!projectileBatch.soundPlayed) {
-                    projectileBatch.soundPlayed = true;
-                    (new Audio('sound/sniper.mp3')).play();
-                }
-                break;
-            case 'shot':
-                
-                ProjectilesActions.drawBullet(projectile);
-                if(!projectileBatch.soundPlayed) {
-                    projectileBatch.soundPlayed = true;
-                    (new Audio('sound/shotgun.mp3')).play();
-                }
-                break;
-            case 'flame':
-                ProjectilesActions.drawFlame(projectile);
-                break;
-            case 'rocket':
-                ProjectilesActions.drawRocket(projectile);
-                break;
-            case 'blade':
-                ProjectilesActions.drawBlade(projectile);
-                break;
-            case 'explosion':
-                ProjectilesActions.drawExplosion(projectile);
-        }
+ProjectilesActions.draw = function(projectile) {
+    switch (projectile.type) {
+        case 'bullet':
+            ProjectilesActions.drawBullet(projectile);
+            if(!projectile.soundPlayed) {
+                projectile.soundPlayed = true;
+                SoundUtils.play('sound/minigun.mp3');
+            }
+            break;
+        case 'slug':
+            ProjectilesActions.drawBullet(projectile);
+            if(!projectile.soundPlayed) {
+                projectile.soundPlayed = true;
+                SoundUtils.play('sound/sniper.mp3');
+            }
+            break;
+        case 'shot':
+
+            ProjectilesActions.drawBullet(projectile);
+            if(!projectile.soundPlayed) {
+                projectile.soundPlayed = true;
+                SoundUtils.play('sound/shotgun.mp3');
+            }
+            break;
+        case 'flame':
+            ProjectilesActions.drawFlame(projectile);
+            break;
+        case 'rocket':
+            ProjectilesActions.drawRocket(projectile);
+            break;
+        case 'blade':
+            ProjectilesActions.drawBlade(projectile);
+            break;
+        case 'explosion':
+            ProjectilesActions.drawExplosion(projectile);
     }
 };
 ProjectilesActions.drawBullet = function(projectile){
@@ -82,6 +79,18 @@ ProjectilesActions.drawBlade = function(projectile) {
     context.lineTo(projectile.x2, projectile.y2);
     context.stroke();
     context.restore();
+};
+ProjectilesActions.decode = function(str) {
+    var data = str.split(':');
+    return {
+        id: data[0],
+        type: data[1],
+        x1: parseInt(data[2]),
+        y1: parseInt(data[3]),
+        x2: parseInt(data[4]),
+        y2: parseInt(data[5]),
+        angle: parseInt(data[6])
+    }
 };
 ProjectilesActions.fire = new Image();
 ProjectilesActions.fire.src = 'images/map/fire.png';

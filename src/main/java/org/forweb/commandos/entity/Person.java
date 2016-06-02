@@ -6,7 +6,7 @@ import org.forweb.commandos.entity.weapon.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Person {
+public class Person implements WebSocketResponse {
 
     private int id;
     private Direction direction;
@@ -178,5 +178,9 @@ public class Person {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String doResponse() {
+        return getId() + ":" + getLife() + ":" + getArmor() + ":" + getScore() + ":" + getWeapon().getName();
     }
 }

@@ -17,7 +17,7 @@ public class Room {
     private String name;
     private String description;
     private ConcurrentHashMap<Integer, Person> persons;
-    private ConcurrentHashMap<Integer, Projectile[]> projectiles;
+    private ConcurrentHashMap<Integer, Projectile> projectiles;
     private int totalPlayers;
 
     private GameMap map;
@@ -42,11 +42,11 @@ public class Room {
         this.persons = persons;
     }
 
-    public ConcurrentHashMap<Integer, Projectile[]> getProjectiles() {
+    public ConcurrentHashMap<Integer, Projectile> getProjectiles() {
         return projectiles;
     }
 
-    public void setProjectiles(ConcurrentHashMap<Integer, Projectile[]> projectiles) {
+    public void setProjectiles(ConcurrentHashMap<Integer, Projectile> projectiles) {
         this.projectiles = projectiles;
     }
 
