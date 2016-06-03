@@ -72,10 +72,12 @@ var MapList = {
         context.fillStyle = MapList.mapBackground;
         context.fillRect(0, 0, x, y);
         context.fillStyle = MapList.mapForeground;
-        for(var i = 0; i < zones.length; i++) {
-            var zone = zones[i];
-            if(!zone.passable) {
-                context.fillRect(zone.x, zone.y, zone.width, zone.height);
+        if(zones) {
+            for (var i = 0; i < zones.length; i++) {
+                var zone = zones[i];
+                if (!zone.passable) {
+                    context.fillRect(zone.x, zone.y, zone.width, zone.height);
+                }
             }
         }
         out.setAttribute('style', 'border: 1px solid '+MapList.mapForeground+

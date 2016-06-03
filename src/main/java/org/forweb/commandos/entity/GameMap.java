@@ -1,7 +1,7 @@
 package org.forweb.commandos.entity;
 
 import org.forweb.commandos.entity.zone.AbstractZone;
-import org.forweb.commandos.entity.zone.ZoneDto;
+import org.forweb.commandos.entity.zone.Zone;
 
 import java.util.List;
 
@@ -10,12 +10,11 @@ public class GameMap {
     private Integer x;
     private Integer y;
     private String name;
-    private List<ZoneDto> zonesDto;
+    private List<Zone> zonesDto;
     private List<AbstractZone> zones;
     private Integer maxPlayers;
     private String gameType;
-    private String rating;
-
+    private Integer rating;
     private String mapHash;
 
     public Integer getX() {
@@ -75,19 +74,19 @@ public class GameMap {
         this.zones = zones;
     }
 
-    public List<ZoneDto> getZonesDto() {
+    public List<Zone> getZonesDto() {
         return zonesDto;
     }
 
-    public void setZonesDto(List<ZoneDto> zonesDto) {
+    public void setZonesDto(List<Zone> zonesDto) {
         this.zonesDto = zonesDto;
     }
 
-    public void setRating(String rating) {
+    public void setRating(Integer rating) {
         this.rating = rating;
     }
 
-    public String getRating() {
+    public Integer getRating() {
         return rating;
     }
 

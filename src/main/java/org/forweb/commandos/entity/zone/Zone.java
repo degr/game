@@ -1,14 +1,26 @@
 package org.forweb.commandos.entity.zone;
 
+import org.forweb.database.AbstractEntity;
 
-public class ZoneDto {
+import javax.persistence.Entity;
 
-    private int id;
+@Entity
+public class Zone extends AbstractEntity {
+
     private int x;
     private int y;
     private int width;
     private int height;
     private String type;
+    private Integer map;
+
+    public Integer getMap() {
+        return map;
+    }
+
+    public void setMap(Integer map) {
+        this.map = map;
+    }
 
     public int getX() {
         return x;
@@ -48,12 +60,5 @@ public class ZoneDto {
 
     public void setType(String type) {
         this.type = type;
-    }
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 }

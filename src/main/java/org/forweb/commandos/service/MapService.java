@@ -1,18 +1,19 @@
 package org.forweb.commandos.service;
 
 import org.forweb.commandos.dao.MapDao;
-import org.forweb.commandos.database.Db;
-import org.forweb.commandos.database.Row;
-import org.forweb.commandos.database.Table;
+import org.forweb.commandos.dao.ZoneDao;
 import org.forweb.commandos.entity.GameMap;
 import org.forweb.commandos.entity.Map;
 import org.forweb.commandos.entity.zone.AbstractItem;
 import org.forweb.commandos.entity.zone.AbstractZone;
-import org.forweb.commandos.entity.zone.ZoneDto;
+import org.forweb.commandos.entity.zone.Zone;
 import org.forweb.commandos.entity.zone.interactive.Respawn;
 import org.forweb.commandos.entity.zone.items.*;
 import org.forweb.commandos.entity.zone.walls.Wall;
+import org.forweb.database.AbstractService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -20,28 +21,27 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class MapService {
+public class MapService extends AbstractService<Map, MapDao> {
 
     @Autowired
-    MapDao mapDao;
+    private ZoneDao zoneDao;
 
     @PostConstruct
     public void postConstruct() {
-        List<Map> maps = mapDao.findAll();
+        List<Map> maps = findAll();
         System.out.println(maps);
     }
 
-    public String saveMap(GameMap map) throws NoSuchAlgorithmException {
-        if (map.getName() == null || "".equals(map.getName())) {
+    public String saveMap(GameMap dto) throws NoSuchAlgorithmException {
+        if (dto.getName() == null || "".equals(dto.getName())) {
             return "-1";
         }
         int maxPlayers = 0;
-        for (ZoneDto zone : map.getZonesDto()) {
+        for (Zone zone : dto.getZonesDto()) {
             if (Respawn.TITLE.equals(zone.getType())) {
                 maxPlayers++;
             }
@@ -50,18 +50,17 @@ public class MapService {
             return "-1";
         }
 
-        Integer mapId = null;
-        if(map.getMapHash() != null) {
-            mapId = findMapIdByHash(map.getMapHash());
+        Map map;
+        if(dto.getMapHash() != null) {
+            map = findMapByHash(dto.getMapHash());
+        } else {
+            map = new Map();
         }
-        if(mapId == null) {
-            mapId = saveMapGeneral(map, maxPlayers);
-        }
-        saveMapZones(map.getZonesDto(), mapId);
-        String mapHash = md5Custom(String.valueOf(mapId + "_" + System.currentTimeMillis()));
-        String query = "update map set map_hash = ? where id = ?";
-        Db db = new Db();
-        db.query(query, mapHash, mapId);
+        map = saveMapGeneral(map, dto, maxPlayers);
+        saveMapZones(map, dto.getZonesDto());
+
+        String mapHash = md5Custom(String.valueOf(map.getId() + "_" + System.currentTimeMillis()));
+        save(map);
         return mapHash;
     }
     public static String md5Custom(String st) {
@@ -88,28 +87,26 @@ public class MapService {
 
         return md5Hex;
     }
-    private Integer findMapIdByHash(String hash) {
-        Db db = new Db();
-        String query = "Select id from map where hash = ?";
-        return db.getCellInt(query, hash);
+    private Map findMapByHash(String hash) {
+        return dao.findMapByMapHash(hash);
     }
 
-    private void saveMapZones(List<ZoneDto> zones, Integer mapId) {
-        Db db = new Db();
-        String deleteQuery = "delete from zone where map = ?";
-        db.query(deleteQuery, mapId);
-
-        String query = "insert into zone (type, x, y, width, height, map) values (?, ?, ?, ?, ?, ?)";
-        for (ZoneDto zone : zones) {
-            db.query(query, zone.getType(), zone.getX(), zone.getY(), zone.getWidth(), zone.getHeight(), mapId);
+    private void saveMapZones(Map map, List<Zone> zones) {
+        zoneDao.deleteAllForMap(map.getId());
+        for (Zone zone : zones) {
+            zone.setMap(map.getId());
         }
+        zoneDao.save(zones);
     }
 
-    private Integer saveMapGeneral(GameMap map, Integer maxPlayers) {
-        Db db = new Db();
-        String query = "insert into map (title, x, y, max_players) values (?, ?, ?, ?)";
-        db.query(query, map.getName(), map.getX(), map.getY(), maxPlayers);
-        return db.getCellInt("select max(id) from map");
+    private Map saveMapGeneral(Map map, GameMap dto, Integer maxPlayers) {
+        map.setTitle(dto.getName());
+        map.setX(dto.getX());
+        map.setY(dto.getY());
+        map.setGameType(dto.getGameType() != null ? Map.GameType.valueOf(dto.getGameType()) : null);
+        map.setMaxPlayers(maxPlayers);
+        map.setRating(0);
+        return save(map);
     }
 
     public GameMap loadMap(Integer mapId) {
@@ -125,51 +122,40 @@ public class MapService {
     }
 
     public List<GameMap> loadMaps(String mapName, Integer page, Integer size, Integer mapId) {
-        String query = "select * from map ";
-        Object [] params;
+
+        List<Map> maps;
         if(mapId == null) {
             page = (page - 1) * size;
             if (mapName != null && !"".equals(mapName)) {
-                query += "where title like ? ";
-                params = new Object[3];
-                params[0] = mapName + "%";
-                params[1] = page;
-                params[2] = size;
+                maps = dao.findMapsForPage(mapName + "%", page, size);
             } else {
-                params = new Object[2];
-                params[0] = page;
-                params[1] = size;
+                maps = dao.findMapsForPage(page, size);
             }
-            query += "limit ?, ?";
         } else {
-            query += "where id = ?";
-            params = new Object[1];
-            params[0] = mapId;
+            maps = new ArrayList<>(1);
+            maps.add(findOne(mapId));
         }
-        Db db = new Db();
-        Table table = db.getTable(query, params);
-        List<GameMap> out = new ArrayList<>(table.size());
+
+        List<GameMap> out = new ArrayList<>(maps.size());
         List<Integer> mapIds = new ArrayList<>();
-        for(Row row : table) {
-            Integer id = row.getInt("id");
+        for(Map row : maps) {
+            Integer id = row.getId();
             mapIds.add(id);
             GameMap map = new GameMap();
             map.setId(id);
-            map.setX(row.getInt("x"));
-            map.setY(row.getInt("y"));
-            map.setMaxPlayers(row.getInt("max_players"));
-            map.setGameType(row.get("game_type"));
-            map.setName(row.get("title"));
-            map.setRating(row.get("rating"));
+            map.setX(row.getX());
+            map.setY(row.getY());
+            map.setMaxPlayers(row.getMaxPlayers());
+            map.setGameType(row.getGameType() != null ? row.getGameType().toString() : null);
+            map.setName(row.getTitle());
+            map.setRating(row.getRating());
             out.add(map);
         }
         if(mapIds.size() > 0) {
-            query = "select * from zone where map in (" +
-                    mapIds.stream().map(v -> "?").collect(Collectors.joining(",")) + ")";
-            Table zones = db.getTable(query, mapIds.toArray());
-            for (Row row : zones) {
+            List<Zone> zones = zoneDao.findAllZonesForMaps(mapIds);
+            for (Zone row : zones) {
                 for (GameMap map : out) {
-                    if (!map.getId().equals(row.getInt("map"))) {
+                    if (!map.getId().equals(row.getMap())) {
                         continue;
                     }
                     if (map.getZones() == null) {
@@ -185,10 +171,10 @@ public class MapService {
         return out;
     }
 
-    private AbstractZone getZone(Row row) {
+    private AbstractZone getZone(Zone row) {
         AbstractZone zone;
-        Integer x = row.getInt("x"), y = row.getInt("y"), id = row.getInt("id");
-        switch (row.get("type")) {
+        Integer x = row.getX(), y = row.getY(), id = row.getId();
+        switch (row.getType()) {
             case "shotgun":
                 zone = new ShotgunZone(x, y, id);
                 break;
@@ -220,10 +206,10 @@ public class MapService {
                 zone = new Respawn(x, y);
                 break;
             case "wall":
-                zone = new Wall(x, y, row.getInt("width"), row.getInt("height"));
+                zone = new Wall(x, y, row.getWidth(), row.getHeight());
                 break;
             default:
-                System.out.println("Unknown zone type: " + row.get("type"));
+                System.out.println("Unknown zone type: " + row.getType());
                 zone = null;
         }
         return zone;
@@ -231,8 +217,7 @@ public class MapService {
 
 
     public Boolean nameEmpty(String name) {
-        Db db = new Db();
-        Integer out = db.getCellInt("select id from map where title = ?", name);
+        Map out = dao.findMapByTitle(name);
         return out == null;
     }
 

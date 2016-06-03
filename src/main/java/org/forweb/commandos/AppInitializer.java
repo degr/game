@@ -21,7 +21,7 @@ public class AppInitializer implements WebApplicationInitializer {
     public void onStartup(ServletContext container) {
         System.out.println("on startup");
         HibernateSupport.init("127.0.0.1:3306", "root", "", "commandos", BASE_PACKAGE + ".entity");
-
+        HibernateSupport.setDebug(false);
         AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
         rootContext.register(SpringConfiguration.class);
         addServlet(new DispatcherServlet(rootContext), "dispatcher", "/server/*", container);

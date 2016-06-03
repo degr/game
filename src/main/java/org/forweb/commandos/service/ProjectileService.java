@@ -232,8 +232,10 @@ public class ProjectileService {
             );
 
             if (shooter == person) {
-                projectile.setxStart((int) intersectionPoints[0].getX());
-                projectile.setyStart((int) intersectionPoints[0].getY());
+                if(intersectionPoints.length > 0) {
+                    projectile.setxStart((int) intersectionPoints[0].getX());
+                    projectile.setyStart((int) intersectionPoints[0].getY());
+                }
                 continue;
             }
 
