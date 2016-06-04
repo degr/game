@@ -35,4 +35,8 @@ public class MapController {
         return mapService.nameEmpty(name);
     }
 
+    @RequestMapping("/load-map-by-hash")
+    public GameMap loadMapByHash(@RequestParam("hash") String mapHash) {
+        return mapService.loadMapByHash(mapHash);
+    }
 }

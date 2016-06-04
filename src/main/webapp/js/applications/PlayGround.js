@@ -47,7 +47,7 @@ var PlayGround = {
                     }
                 }
             }
-        }, 50);
+        }, 20);
         
         var openKeyboard = Dom.el('a', {'href': "#", 'class': 'icon-keyboard'});
         openKeyboard.onclick = function(e){e.preventDefault();KeyboardSetup.show()};
@@ -101,7 +101,7 @@ var PlayGround = {
         canvas.width = map.x;
         canvas.height = map.y;
         var win = ScreenUtils.window();
-        if(map.x < win.width) {
+        if (map.x < win.width) {
             canvas.style.marginLeft = 'auto';
             canvas.style.marginRight = 'auto';
             PersonTracker.trackX = false;
@@ -110,17 +110,24 @@ var PlayGround = {
             canvas.style.marginRight = null;
             PersonTracker.trackX = true;
         }
-        if(map.y < win.height) {
+        if (map.y < win.height) {
             canvas.style.marginTop = (win.height - map.y) / 2 + 'px';
             PersonTracker.trackY = false;
         } else {
             canvas.style.marginTop = null;
             PersonTracker.trackY = true;
         }
-        if(PersonTracker.trackX || PersonTracker.trackY) {
-            PersonTracker.start();
+
+        if(PlayGround.owner.id) {
+            if (PersonTracker.trackX || PersonTracker.trackY) {
+                Dom.addClass(document.body, 'no-overflow');
+                PersonTracker.start();
+            } else {
+                Dom.removeClass(document.body, 'no-overflow');
+                PersonTracker.stop();
+            }
         } else {
-            PersonTracker.stop();
+            Dom.removeClass(document.body, 'no-overflow');
         }
         PlayGround.canvasOffset = Dom.calculateOffset(canvas);
     },
@@ -289,6 +296,7 @@ var PlayGround = {
     },
     stopGameLoop: function () {
         PlayGround.nextFrame = null;
+        Dom.removeClass(document.body, 'no-overflow');
         if (PlayGround.interval != null) {
             clearInterval(PlayGround.interval);
         }

@@ -1,7 +1,11 @@
 var MapEditor = {
     container: null,
     gridSize: 1,
+    inputX: null,
+    inputY: null,
+    inputName: null,
     init: function () {
+        CustomTiles.init();
         MapEditor.console = Dom.el('p', {id: 'editor_console'});
         var labelX = Dom.el('label', {'for': 'x'}, 'Map X');
         var inputX = Dom.el('input', {type: 'text', name: 'x', value: MapEditor.x});
@@ -9,12 +13,14 @@ var MapEditor = {
             MapEditor.updateDimension(this, true);
             MapEditor.changeMapSize();
         };
+        MapEditor.inputX = inputX;
         var labelY = Dom.el('label', {'for': 'y'}, 'Map Y');
         var inputY = Dom.el('input', {type: 'text', name: 'y', value: MapEditor.y});
         inputY.onkeyup = function () {
             MapEditor.updateDimension(this, false);
             MapEditor.changeMapSize()
         };
+        MapEditor.inputY = inputY;
         var labelGridSize = Dom.el('label', {'for': 'grid_size'}, 'Grid cell size');
         var inputGridSize = Dom.el('input', {type: 'grid_size', name: 'grid_size', value: MapEditor.gridSize});
         inputGridSize.onkeyup = function () {
@@ -26,6 +32,7 @@ var MapEditor = {
         mapName.onkeyup = function (e) {
             MapEditor.checkMapName(this.value, mapNameEror);
         };
+        MapEditor.inputName = mapName;
         var goBack = Dom.el('input', {type: 'button', value: 'Create Game'});
         goBack.onclick = function () {
             var c = confirm("Are you sure to leave this page?");
@@ -33,20 +40,29 @@ var MapEditor = {
                 Dispatcher.placeApplication('MapList');
             }
         };
-        var mapControl = Dom.el('form', null, [
+        var createTile = Dom.el('input', {type: 'button', value: 'Create Tile'});
+        createTile.onclick = function () {
+            CustomTiles.show();
+        };
+        var mapControl = Dom.el('form', {'class': 'panel main-control'}, [
             labelX, inputX, mapName, mapNameEror,labelGridSize, inputGridSize,
             Dom.el('br'),
-            labelY, inputY, Dom.el('input', {type: 'submit', value: 'Save map'}), goBack
+            labelY, inputY, Dom.el('input', {type: 'submit', value: 'Save map'}), createTile, goBack,
+            MapEditor.console
         ]);
         mapControl.onsubmit = function (e) {
             MapEditor.onSubmit(e);
         };
 
-        MapEditor.zonesButtons = Dom.el('div', {'class': 'zones'});
-        MapEditor.zoneTypeHolder = Dom.el('div', {'class': 'mounted'});
+        DomComponents.doModal(mapControl);
+        MapEditor.zonesButtons = Dom.el('div', {'class': 'zones panel'});
+        DomComponents.doModal(MapEditor.zonesButtons);
+        MapEditor.zoneTypeHolder = Dom.el('div', {'class': 'mounted panel'});
+        DomComponents.doModal(MapEditor.zoneTypeHolder);
         MapEditor.map = Dom.el('canvas', {width: MapEditor.x, height: MapEditor.y});
         MapEditor.container = Dom.el('div', {'class': 'editor'}, [
-            MapEditor.console, mapControl, MapEditor.zonesButtons, MapEditor.zoneTypeHolder, Dom.el('div', 'map-editor-wrapper', MapEditor.map)
+            CustomTiles.container,
+            mapControl, MapEditor.zonesButtons, MapEditor.zoneTypeHolder, Dom.el('div', 'map-editor-wrapper', MapEditor.map)
         ]);
         MapEditor.map.onclick = function (e) {
             MapEditor.onClick(e)
@@ -55,6 +71,7 @@ var MapEditor = {
     },
     x: 640,
     y: 480,
+    gameType: 'dm',
     map: null,
     mapName: '',
     console: null,
@@ -63,7 +80,8 @@ var MapEditor = {
         type: null,
         pointA: null,
         pointB: null,
-        highlight: false
+        highlight: false,
+        customSprite: null
     },
     context: null,
     mounted: null,
@@ -85,10 +103,46 @@ var MapEditor = {
     },
     beforeOpen: function () {
         MapEditor.changeMapSize();
+        var loadMap = function() {
+            var hash = document.location.hash;
+            if(hash) hash = hash.replace('#', '').trim();
+            if(hash) {
+                try {
+                    Rest.doGet('map/load-map-by-hash?hash=' + hash).then(function (r) {
+                        MapEditor.x = r.x;
+                        MapEditor.y = r.y;
+                        MapEditor.gameType = r.gameType;
+                        MapEditor.mapName = r.name;
+                        MapEditor.mountedObjects = [];
+                        if(r.zones) {
+                            for(var i = 0; i < r.zones.length; i++) {
+                                var zone = r.zones[i];
+                                var mounting = {
+                                    type: zone.type,
+                                    pointA: {x: zone.x, y: zone.y},
+                                    pointB: {x: zone.x + zone.width, y: zone.y + zone.height},
+                                    highlight: false,
+                                    customSprite: zone.customSprite,
+                                    tileId: zone.tileId
+                                };
+                                MapEditor.doMount(mounting);
+                            }
+                        }
+                        MapEditor.render();
+                        MapEditor.changeMapSize()
+                    })
+                } catch (e){}
+            }
+        };
         if (!MapEditor.objectsLoaded) {
             MapEditor.objectsLoaded = true;
-            MapEditor.loadObjects();
+            MapEditor.loadObjects().then(function() {
+                loadMap();
+            });
+        } else {
+            loadMap();
         }
+        
     },
     onSubmit: function (e) {
         e.preventDefault();
@@ -97,6 +151,7 @@ var MapEditor = {
             var zone = MapEditor.mountedObjects[i];
             var rect = MapEditor.doRectangle(zone);
             rect.type = zone.type;
+            rect.tile = zone.tileId;
             zones.push(rect);
         }
         var map = {
@@ -106,9 +161,9 @@ var MapEditor = {
             zonesDto: zones
         };
         if(document.location.hash) {
-            map.mapHash = document.location.hash
+            map.mapHash = document.location.hash.replace("#", '').trim();
         }
-        Rest.doPost('map/save', map).then(function (response) {
+        Rest.doPost('map/save', map, 'text').then(function (response) {
             if (response != -1) {
                 alert('Map was saved. Map hash for edit: ' + response);
                 document.location.hash = response;
@@ -116,6 +171,20 @@ var MapEditor = {
                 alert("Can't save map due unknown reasons. May be name is not unique, or there is no respawn points.")
             }
         })
+    },
+    doMount: function(mounting) {
+        MapEditor.mountedObjects.push(mounting);
+        MapEditor.appendControlButton(mounting);
+        MapEditor.mounting = {
+            type: null,
+            pointA: null,
+            pointB: null,
+            highlight: false,
+            customSprite: null,
+            tileId: 0
+        };
+        MapEditor.render();
+        MapEditor.write("Object " + mounting.type + " was mounted.");
     },
     onClick: function (e) {
         var type = MapEditor.mounting.type;
@@ -130,21 +199,8 @@ var MapEditor = {
                     point.y = Math.ceil(point.y / MapEditor.gridSize) * MapEditor.gridSize;
                 }
             }
-            var zone = MapEditor.zones[type];
-            var finishMount = function () {
-                MapEditor.mountedObjects.push(MapEditor.mounting);
-                MapEditor.appendControlButton(MapEditor.mounting);
-                MapEditor.mounting = {
-                    type: null,
-                    pointA: null,
-                    pointB: null,
-                    highlight: false
-                };
-                MapEditor.render();
-                MapEditor.write("Object " + type + " was mounted.");
-            };
+            var zone = MapEditor.zones[type === 'tiled' ? MapEditor.mounting.tileId : type];
             if (!MapEditor.mounting.pointA) {
-
                 if (zone.staticSize) {
                     if(MapEditor.gridSize <= 1) {
                         point.x = point.x - zone.width / 2;
@@ -152,18 +208,28 @@ var MapEditor = {
                     }
                     MapEditor.mounting.pointA = point;
                     MapEditor.mounting.pointB = {x: point.x + zone.width, y: point.y + zone.height};
-                    finishMount();
+                    MapEditor.doMount(MapEditor.mounting);
                 } else {
                     MapEditor.mounting.pointA = point;
                     MapEditor.write("Set right-bottom corner of " + type);
                 }
             } else {
                 MapEditor.mounting.pointB = point;
-                finishMount();
+                MapEditor.doMount(MapEditor.mounting);
             }
         }
     },
     render: function () {
+        if(MapEditor.x != MapEditor.inputX.value) {
+            MapEditor.inputX.value = MapEditor.x;
+        }
+        if(MapEditor.y != MapEditor.inputY.value) {
+            MapEditor.inputY.value = MapEditor.y;
+        }
+        if(MapEditor.mapName != MapEditor.inputName.value) {
+            MapEditor.inputName.value = MapEditor.mapName;
+        }
+        
         var context = MapEditor.context;
         context.clearRect(0, 0, MapEditor.x, MapEditor.y);
 
@@ -181,6 +247,15 @@ var MapEditor = {
             if (zone.type != 'wall') {
                 context.strokeText(zone.type, rect.x + 3, rect.y + 20, rect.width - 6);
                 context.rect(rect.x, rect.y, rect.width, rect.height);
+                if(zone.type === 'tiled') {
+                    (function(zone, rect) {
+                        var image = new Image();
+                        image.src = "images/zones/" + zone.customSprite;
+                        image.onload = function () {
+                            context.drawImage(image, rect.x, rect.y, rect.width, rect.height);
+                        }
+                    })(zone, rect);
+                }
             } else {
                 context.fillRect(rect.x, rect.y, rect.width, rect.height)
             }
@@ -226,24 +301,32 @@ var MapEditor = {
         return out;
     },
     loadObjects: function () {
-        Rest.doGet('zones/list').then(function (zones) {
-            MapEditor.zones = {};
-            MapEditor.zonesButtons.innerHTML = '';
+        MapEditor.zones = {};
+        MapEditor.zonesButtons.innerHTML = '';
+        
+        return Rest.doGet('zones/list').then(function (zones) {
             var doInput = function (zone) {
-                var name = zone.type;
+                var name = zone.type !== 'tiled' ? zone.type : zone.tileName;
                 var input = Dom.el('input', {
                     type: 'button',
-                    'class': 'item item-' + name,
+                    'class': 'item item-' + zone.type,
                     value: name
                 });
                 input.onclick = function () {
-                    MapEditor.mount(name)
+                    MapEditor.mount(zone)
                 };
+                if(zone.type == 'tiled') {
+                    input.style.width = '64px';
+                    input.style.height = '64px';
+                    input.style.background = "url(images/zones/"+zone.customSprite+") no-repeat";
+                    input.style.backgroundSize = "100% 100%";
+                }
                 return input;
             };
             for (var i = 0; i < zones.length; i++) {
                 var zone = zones[i];
-                MapEditor.zones[zone.type] = zone;
+                var key = zone.type == 'tiled' ? zone.tileId : zone.type;
+                MapEditor.zones[key] = zone;
                 MapEditor.zonesButtons.appendChild(doInput(zone));
             }
         });
@@ -287,14 +370,17 @@ var MapEditor = {
     getMap: function () {
         return MapEditor.map;
     },
-    mount: function (type) {
-        MapEditor.mounting.type = type;
+    mount: function (zone) {
+        MapEditor.mounting.type = zone.type;
+        MapEditor.mounting.tileId = zone.tileId;
         MapEditor.mounting.pointA = null;
         MapEditor.mounting.pointB = null;
-        MapEditor.write("Select left - top corner for " + type);
+        MapEditor.mounting.customSprite = zone.customSprite;
+        
+        MapEditor.write("Select left - top corner for " + zone.type);
     },
     write: function (text) {
-        MapEditor.getConsole().innerHTML = text;
+        MapEditor.getConsole().innerHTML = text + "<br>" + MapEditor.getConsole().innerHTML;
     },
     getConsole: function () {
         return MapEditor.console;
@@ -302,7 +388,8 @@ var MapEditor = {
     appendControlButton: function (obj) {
         var ts = new Date().getTime();
         var type = obj.type;
-        var zone = MapEditor.zones[type];
+        var key = type == 'tiled' ? obj.tileId : type;
+        var zone = MapEditor.zones[key];
         var isStaticSize = zone.staticSize;
         var out = Dom.el('div');
         var createInput = function (point, pointB) {

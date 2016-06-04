@@ -1,18 +1,34 @@
 package org.forweb.commandos.controller;
 
 import org.forweb.commandos.entity.zone.AbstractZone;
+import org.forweb.commandos.entity.zone.Zone;
 import org.forweb.commandos.entity.zone.interactive.Respawn;
 import org.forweb.commandos.entity.zone.items.*;
+import org.forweb.commandos.entity.zone.walls.Tile;
+import org.forweb.commandos.entity.zone.walls.TiledZone;
 import org.forweb.commandos.entity.zone.walls.Wall;
+import org.forweb.commandos.service.MapService;
+import org.forweb.commandos.service.ZoneService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.forweb.commandos.AppInitializer.ROOT;
 
 @RestController
 @RequestMapping("/zones")
 public class ZoneController {
 
+    @Autowired
+    private ZoneService zoneService;
 
     @RequestMapping("/room/{roomId}")
     public List<AbstractZone> getZoneForRoom(@PathVariable("roomId") Integer roomId) {
@@ -35,6 +51,26 @@ public class ZoneController {
         out.add(new MedkitZone(0, 0, 0));
         out.add(new ArmorZone(0, 0, 0));
         out.add(new HelmZone(0, 0, 0));
+
+        List<Tile> tiles = zoneService.getAllTiles();
+        out.addAll(tiles.stream()
+                .map(v -> new TiledZone(0, 0, v))
+                .collect(Collectors.toList())
+        );
         return out;
+    }
+
+    @RequestMapping(value = "/create-zone", method = RequestMethod.POST)
+    public boolean createCustomZone(
+            @RequestParam("title") String title,
+            @RequestParam(value = "width", required = false) Integer width,
+            @RequestParam(value = "height", required = false) Integer height,
+            @RequestParam("fileupload") MultipartFile file
+    ){
+        if (!file.isEmpty()) {
+            return zoneService.createCustomTile(title, width, height, file);
+        } else {
+            return false;
+        }
     }
 }

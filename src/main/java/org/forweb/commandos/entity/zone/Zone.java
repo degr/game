@@ -13,6 +13,8 @@ public class Zone extends AbstractEntity {
     private int height;
     private String type;
     private Integer map;
+    private Integer tile;
+    private String title;
 
     public Integer getMap() {
         return map;
@@ -60,5 +62,23 @@ public class Zone extends AbstractEntity {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+
+    public Integer getTile() {
+        return tile;
+    }
+
+    public void setTile(Integer tile) {
+        this.tile = tile;
+    }
+
+    public String getTitle() {
+        return title;
     }
 }

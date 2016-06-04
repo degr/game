@@ -9,6 +9,7 @@ import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.entity.zone.Zone;
 import org.forweb.commandos.entity.zone.interactive.Respawn;
 import org.forweb.commandos.entity.zone.items.*;
+import org.forweb.commandos.entity.zone.walls.Tile;
 import org.forweb.commandos.entity.zone.walls.Wall;
 import org.forweb.database.AbstractService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +30,7 @@ import java.util.stream.Collectors;
 public class MapService extends AbstractService<Map, MapDao> {
 
     @Autowired
-    private ZoneDao zoneDao;
+    private ZoneService zoneService;
 
     @PostConstruct
     public void postConstruct() {
@@ -58,10 +60,11 @@ public class MapService extends AbstractService<Map, MapDao> {
         }
         map = saveMapGeneral(map, dto, maxPlayers);
         saveMapZones(map, dto.getZonesDto());
-
-        String mapHash = md5Custom(String.valueOf(map.getId() + "_" + System.currentTimeMillis()));
-        save(map);
-        return mapHash;
+        if(map.getMapHash() == null) {
+            map.setMapHash(md5Custom(String.valueOf(map.getId() + "_" + System.currentTimeMillis())));
+            save(map);
+        }
+        return map.getMapHash();
     }
     public static String md5Custom(String st) {
         MessageDigest messageDigest = null;
@@ -92,11 +95,11 @@ public class MapService extends AbstractService<Map, MapDao> {
     }
 
     private void saveMapZones(Map map, List<Zone> zones) {
-        zoneDao.deleteAllForMap(map.getId());
+        zoneService.deleteAllForMap(map.getId());
         for (Zone zone : zones) {
             zone.setMap(map.getId());
         }
-        zoneDao.save(zones);
+        zoneService.save(zones);
     }
 
     private Map saveMapGeneral(Map map, GameMap dto, Integer maxPlayers) {
@@ -151,69 +154,15 @@ public class MapService extends AbstractService<Map, MapDao> {
             map.setRating(row.getRating());
             out.add(map);
         }
-        if(mapIds.size() > 0) {
-            List<Zone> zones = zoneDao.findAllZonesForMaps(mapIds);
-            for (Zone row : zones) {
-                for (GameMap map : out) {
-                    if (!map.getId().equals(row.getMap())) {
-                        continue;
-                    }
-                    if (map.getZones() == null) {
-                        map.setZones(new ArrayList<>());
-                    }
-                    AbstractZone zone = getZone(row);
-                    if (zone != null) {
-                        map.getZones().add(zone);
-                    }
-                }
+        HashMap<Integer, List<AbstractZone>> zones = zoneService.findZonesforMaps(mapIds);
+        for(GameMap map : out) {
+            if(zones.containsKey(map.getId())) {
+                map.setZones(zones.get(map.getId()));
             }
         }
         return out;
     }
 
-    private AbstractZone getZone(Zone row) {
-        AbstractZone zone;
-        Integer x = row.getX(), y = row.getY(), id = row.getId();
-        switch (row.getType()) {
-            case "shotgun":
-                zone = new ShotgunZone(x, y, id);
-                break;
-            case "assault":
-                zone = new AssaultZone(x, y, id);
-                break;
-            case "sniper":
-                zone = new SniperZone(x, y, id);
-                break;
-            case "minigun":
-                zone = new MinigunZone(x, y, id);
-                break;
-            case "rocket":
-                zone = new RocketZone(x, y, id);
-                break;
-            case "flame":
-                zone = new FlameZone(x, y, id);
-                break;
-            case "medkit":
-                zone = new MedkitZone(x, y, id);
-                break;
-            case "armor":
-                zone = new ArmorZone(x, y, id);
-                break;
-            case "helm":
-                zone = new HelmZone(x, y, id);
-                break;
-            case "respawn":
-                zone = new Respawn(x, y);
-                break;
-            case "wall":
-                zone = new Wall(x, y, row.getWidth(), row.getHeight());
-                break;
-            default:
-                System.out.println("Unknown zone type: " + row.getType());
-                zone = null;
-        }
-        return zone;
-    }
 
 
     public Boolean nameEmpty(String name) {
@@ -229,6 +178,26 @@ public class MapService extends AbstractService<Map, MapDao> {
                     item.setAvailable(true);
                 }
             }
+        }
+    }
+
+    public GameMap loadMapByHash(String mapHash) {
+        Map map = findMapByHash(mapHash);
+        if(map != null) {
+            GameMap out = new GameMap();
+            out.setId(map.getId());
+            out.setName(map.getTitle());
+            out.setRating(map.getRating());
+            out.setMaxPlayers(map.getMaxPlayers());
+            out.setGameType(map.getGameType() != null ? map.getGameType().toString() : Map.GameType.dm.toString());
+            out.setMapHash(mapHash);
+            out.setX(map.getX());
+
+            out.setY(map.getY());
+            out.setZones(zoneService.getZonesFormMap(map.getId()));
+            return out;
+        } else {
+            return null;
         }
     }
 }

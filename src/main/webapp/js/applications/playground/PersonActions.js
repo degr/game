@@ -236,9 +236,9 @@ PersonActions.drawPerson = function(person) {
         context.drawImage(PersonActions.reload, + PlayGround.radius + 4,  - PlayGround.radius);
     }
     context.rotate(angle * Math.PI/180);
-    //context.arc(0, 0, PlayGround.radius, 0, 2 * Math.PI, false);
+    context.arc(0, 0, PlayGround.radius, 0, 2 * Math.PI, false);
     context.stroke();
-    context.drawImage(person.image, - PlayGround.radius - 4,  - PlayGround.radius);
+    context.drawImage(person.image, - PlayGround.radius - 8,  - PlayGround.radius - 3, 56, 56);
     context.restore();
     if(PlayGround.showNames) {
         context.strokeText(person.name, x - 10, y + 27);

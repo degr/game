@@ -46,6 +46,15 @@ var ZoneActions = {
             case 'wall':
                 context.drawImage(ZoneActions.images.wall, zone.x, zone.y, zone.width, zone.height);
                 break;
+            case 'tiled':
+                if(!ZoneActions.images[zone.tileId]) {
+                    var image = new Image();
+                    image.src = "images/zones/" + zone.customSprite;
+                    ZoneActions.images[zone.tileId] = image;
+                } 
+                context.drawImage(ZoneActions.images[zone.tileId], zone.x, zone.y, zone.width, zone.height);
+                
+                break;
             default:
                 context.strokeStyle = '#000000';
                 context.rect(zone.x, zone.y, zone.width, zone.height);

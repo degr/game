@@ -7,12 +7,12 @@ public abstract class AbstractZone {
 
     private Integer id;
 
-    public AbstractZone(String type, Bounds rectangle) {
+    public AbstractZone(String type, Bounds bounds) {
         this.type = type;
-        this.setX((int) rectangle.getX());
-        this.setY((int) rectangle.getY());
-        this.setWidth((int) rectangle.getWidth());
-        this.setHeight((int) rectangle.getHeight());
+        this.setX((int) bounds.getX());
+        this.setY((int) bounds.getY());
+        this.setWidth((int) bounds.getWidth());
+        this.setHeight((int) bounds.getHeight());
     }
 
     private int x;
@@ -23,6 +23,7 @@ public abstract class AbstractZone {
     private boolean passable;
     private boolean isShootable;
     private boolean isStaticSize;
+    private String customSprite;
 
     public boolean isShootable() {
         return isShootable;
@@ -92,5 +93,13 @@ public abstract class AbstractZone {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getCustomSprite() {
+        return customSprite;
+    }
+
+    public void setCustomSprite(String customSprite) {
+        this.customSprite = customSprite;
     }
 }

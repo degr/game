@@ -1,6 +1,6 @@
 var Ajax = {
     headers: null,
-    ajax: function(data, resololve, reject){
+    ajax: function(data, resolve, reject){
         var xhr = Ajax.getXhr();
         xhr.open(data.type, data.url, true);
         if(Ajax.headers) {
@@ -10,7 +10,7 @@ var Ajax = {
         }
         xhr.onload = function() {
             if (xhr.status == 200) {
-                resololve(Ajax.process(xhr, data.type), xhr);
+                resolve(Ajax.process(xhr, data.responseType), xhr);
             } else if(data.onError && reject) {
                 reject(xhr)
             }

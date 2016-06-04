@@ -16,14 +16,17 @@ public class AppInitializer implements WebApplicationInitializer {
 
 
     public static final String BASE_PACKAGE = "org.forweb.commandos";
-
+    public static String ROOT;
     @Override
     public void onStartup(ServletContext container) {
         System.out.println("on startup");
         HibernateSupport.init("127.0.0.1:3306", "root", "", "commandos", BASE_PACKAGE + ".entity");
-        HibernateSupport.setDebug(false);
+        //HibernateSupport.init("mysql35608-env-2464409.mycloud.by", "root", "QASsyb01289", "commandos", BASE_PACKAGE + ".entity");
+        //Db.init("mysql35608-env-2464409.mycloud.by", "root", "QASsyb01289", "commandos");
+        HibernateSupport.setDebug(true);
         AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
         rootContext.register(SpringConfiguration.class);
+        ROOT = container.getRealPath("").trim();
         addServlet(new DispatcherServlet(rootContext), "dispatcher", "/server/*", container);
         container.addListener(new ContextLoaderListener(rootContext));
         container.addListener(new RequestContextListener());

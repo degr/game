@@ -67,3 +67,5 @@ CREATE TABLE `zone` (
 
 -- Dump completed on 2016-05-22 22:52:51
 alter table map add COLUMN map_hash VARCHAR (255);
+alter table zone add COLUMN custom_sprite VARCHAR (255);
+alter table zone add COLUMN title VARCHAR (255);

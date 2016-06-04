@@ -19,3 +19,16 @@ map integer (11),
 primary key(id),
 FOREIGN KEY (map) REFERENCES map(id)
 );
+
+alter table map add COLUMN map_hash VARCHAR (255);
+
+create table tile (
+id integer(11) auto_increment not null,
+title varchar(255),
+width integer (11),
+height integer (11),
+image VARCHAR (255),
+primary key(id)
+);
+
+alter table zone add COLUMN tile INTEGER (11);
