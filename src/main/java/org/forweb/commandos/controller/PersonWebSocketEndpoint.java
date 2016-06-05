@@ -10,6 +10,14 @@ import org.springframework.web.socket.server.standard.SpringConfigurator;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.EOFException;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 @ServerEndpoint(value = "/commandos", configurator = SpringConfigurator.class)
@@ -47,6 +55,14 @@ public class PersonWebSocketEndpoint {
 
     @OnMessage
     public void onTextMessage(String message) {
+        /*List<String> lines = Arrays.asList(message.split("\n"));
+        Path file = Paths.get("/var/log/!in-commandos.txt");
+        try {
+            Files.write(file, lines, Charset.forName("UTF-8"), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+
         if(message.startsWith(MESSAGE_MESSAGE)) {
             springDelegationService.onTextMessage(message, roomId, id);
             return;

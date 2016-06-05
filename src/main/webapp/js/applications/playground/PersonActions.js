@@ -206,7 +206,7 @@ PersonActions.updateMouseDirection = function(e){
     }
     PlayGround.xMouse = e.clientX;
     PlayGround.yMouse = e.clientY;
-    var person = PlayGround.getPerson();
+    var person = PlayGround.entities[PlayGround.owner ? PlayGround.owner.id : null];
     if(person) {
         PersonActions.updateMouseDirectionByXy(
             e.clientX,
@@ -236,7 +236,9 @@ PersonActions.drawPerson = function(person) {
         context.drawImage(PersonActions.reload, + PlayGround.radius + 4,  - PlayGround.radius);
     }
     context.rotate(angle * Math.PI/180);
-    context.arc(0, 0, PlayGround.radius, 0, 2 * Math.PI, false);
+    if(PlayGround.drawBounds) {
+        context.arc(0, 0, PlayGround.radius, 0, 2 * Math.PI, false);
+    }
     context.stroke();
     context.drawImage(person.image, - PlayGround.radius - 8,  - PlayGround.radius - 3, 56, 56);
     context.restore();
@@ -244,6 +246,20 @@ PersonActions.drawPerson = function(person) {
         context.strokeText(person.name, x - 10, y + 27);
     }
 
+};
+
+PersonActions.mapPersonFromResponse = function (str) {
+    var data = str.split(":");
+    return {
+        id: parseInt(data[0]),
+        name: data[1],
+        color: data[2],
+        reload: data[3] == 1,
+        gun: data[4],
+        x: parseInt(data[5]),
+        y: parseInt(data[6]),
+        angle: parseInt(data[7])
+    }
 };
 
 PersonActions.reload = new Image();

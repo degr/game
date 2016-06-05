@@ -32,12 +32,6 @@ public class MapService extends AbstractService<Map, MapDao> {
     @Autowired
     private ZoneService zoneService;
 
-    @PostConstruct
-    public void postConstruct() {
-        List<Map> maps = findAll();
-        System.out.println(maps);
-    }
-
     public String saveMap(GameMap dto) throws NoSuchAlgorithmException {
         if (dto.getName() == null || "".equals(dto.getName())) {
             return "-1";

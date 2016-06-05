@@ -22,6 +22,7 @@ var PlayGround = {
     fps:30,
 
     showNames: false,
+    drawBounds: false,
     rocketRadius: 5,
     fireRadius: 7,
     explosionRadius: 40,//different on 20 with server
@@ -118,18 +119,21 @@ var PlayGround = {
             PersonTracker.trackY = true;
         }
 
-        if(PlayGround.owner.id) {
-            if (PersonTracker.trackX || PersonTracker.trackY) {
-                Dom.addClass(document.body, 'no-overflow');
-                PersonTracker.start();
-            } else {
-                Dom.removeClass(document.body, 'no-overflow');
-                PersonTracker.stop();
-            }
+        if(PlayGround.owner && PlayGround.owner.id) {
+            PlayGround.trackPerson();
         } else {
             Dom.removeClass(document.body, 'no-overflow');
         }
         PlayGround.canvasOffset = Dom.calculateOffset(canvas);
+    },
+    trackPerson: function() {
+        if (PersonTracker.trackX || PersonTracker.trackY) {
+            Dom.addClass(document.body, 'no-overflow');
+            PersonTracker.start();
+        } else {
+            Dom.removeClass(document.body, 'no-overflow');
+            PersonTracker.stop();
+        }
     },
     connect: function (onConnectMessage) {
         PlayGround.gameStarted = true;
@@ -184,9 +188,12 @@ var PlayGround = {
         };
     },
     onUpdate: function(packet) {
-        if (packet.owner !== null) {
-            PlayGround.id = packet.owner.id;
+        if (packet.owner !== null ) {
+            var oldOwnerId = PlayGround.owner.id; 
             PlayGround.owner = PlayGround.decryptOwner(packet.owner);
+            if(PlayGround.owner.id != oldOwnerId) {
+                PlayGround.updateCanvas(PlayGround.map);
+            }
         }
         Weapons.update(PlayGround.owner);
         LifeAndArmor.update(PlayGround.owner.life, PlayGround.owner.armor);
@@ -197,19 +204,19 @@ var PlayGround = {
             var subject = message.substring(message.indexOf(':') + 1);
             Chat.update(id, subject);
         }
-        for(var i = 0; i < packet.items.length; i++) {
-            var zones = PlayGround.map.zones;
-            var item = packet.items[i];
-            for(var j = 0; j < zones.length; j++) {
-                var zone = zones[j];
-                if(zone.id === item.id) {
-                    zone.available = item.available;
+        for(var j = 0; j < PlayGround.map.zones.length; j++) {
+            var zone = PlayGround.map.zones[j];
+            zone.available = false;
+            for(var i = 0; i < packet.items.length; i++) {
+                var item = packet.items[i];
+                if(zone.id === item) {
+                    zone.available = true;
                     break;
                 }
             }
         }
         for (var i = 0; i < packet.persons.length; i++) {
-            var person = packet.persons[i];
+            var person = PersonActions.mapPersonFromResponse(packet.persons[i]);
             if (!PlayGround.entities[person.id]) {
                 PlayGround.addPerson(person);
             }
@@ -307,9 +314,5 @@ var PlayGround = {
             PlayGround.viewAngleDirection = direction;
             PlayGround.socket.send('angle:' + direction);
         }
-    },
-    getPerson: function(id){
-        if(!id)id = PlayGround.id;
-        return PlayGround.entities[id];
     }
 };

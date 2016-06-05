@@ -106,16 +106,6 @@ public class SpringDelegationService {
             personService.handlePersons(persons, room);
             projectilesService.onProjectileLifecycle(room.getProjectiles(), room);
             mapService.onItemsLifecycle(room.getMap().getZones());
-            responseService.broadcast(
-                    new Update(
-                            responseService.mapPersons(room.getPersons()),
-                            responseService.mapProjectiles(room.getProjectiles()),
-                            responseService.mapItems(room.getMap().getZones()),
-                            room.getMessages(),
-                            room.getEndTime() - System.currentTimeMillis()
-                    ),
-                    room
-            );
         }
     }
 
@@ -123,14 +113,33 @@ public class SpringDelegationService {
         room.setGameTimer(new Timer(PersonWebSocketEndpoint.class.getSimpleName() + " Timer " + new Random().nextDouble()));
 
         room.getGameTimer().scheduleAtFixedRate(new TimerTask() {
+            private int skip = 1;
+            private int current = 0;
             @Override
             public void run() {
-                try {
-                    tick(room);
-                } catch (RuntimeException e) {
-                    e.printStackTrace();
-                    System.out.println("Caught to prevent timer from shutting down" + e.getMessage());
-                }
+                    try {
+                        tick(room);
+                        if(current >= skip) {
+                            responseService.broadcast(
+                                    new Update(
+                                            responseService.mapPersons(room.getPersons()),
+                                            responseService.mapProjectiles(room.getProjectiles()),
+                                            responseService.mapItems(room.getMap().getZones()),
+                                            room.getMessages(),
+                                            room.getEndTime() - System.currentTimeMillis()
+                                    ),
+                                    room
+                            );
+                        }
+                    } catch (RuntimeException e) {
+                        e.printStackTrace();
+                        System.out.println("Caught to prevent timer from shutting down" + e.getMessage());
+                    }
+                    if(current > skip) {
+                        current = 0;
+                    } else {
+                        current++;
+                    }
             }
         }, Context.TICK_DELAY, Context.TICK_DELAY);
     }

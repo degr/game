@@ -183,4 +183,15 @@ public class Person implements WebSocketResponse {
     public String doResponse() {
         return getId() + ":" + getLife() + ":" + getArmor() + ":" + getScore() + ":" + getWeapon().getName();
     }
+
+    public String doCommonResponse() {
+        return getId() + ":" +
+                getName() + ":" +
+                getHexColor() + ":" +
+                (getWeapon().getCurrentClip() == 0 || isReload() ? 1 : 0)+ ":" +
+                getWeapon().getName() + ":" +
+                ((int)getX()) + ":" +
+                ((int)getY()) + ":" +
+                ((int)getAngle());
+    }
 }

@@ -1,3 +1,4 @@
+
 var PersonTracker = {
     trackX: false,
     trackY: false,
@@ -11,6 +12,9 @@ var PersonTracker = {
         PersonTracker.trackedContainer = document.body;
     },
     start: function() {
+        if(PersonTracker.isStarted){
+            clearInterval(PersonTracker.interval);
+        }
         PersonTracker.window = ScreenUtils.window();
         if(PersonTracker.trackY) {
             document.body.scrollTop = document.body.scrollHeight;

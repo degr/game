@@ -1,25 +1,20 @@
 package org.forweb.commandos.response;
 
-import org.forweb.commandos.dto.ItemDto;
-import org.forweb.commandos.entity.zone.AbstractZone;
-import org.forweb.commandos.response.dto.BulletDto;
 import org.forweb.commandos.response.dto.OwnerDto;
-import org.forweb.commandos.response.dto.PersonDto;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Update {
 
-    private final List<ItemDto> items;
+    private final List<Integer> items;
     private OwnerDto owner;
     private final String type = "update";
     private long time;
-    private List<PersonDto> persons;
+    private List<String> persons;
     private List<String> projectiles;
     private List<String> messages;
 
-    public Update(List<PersonDto> personDto, List<String> projectiles, List<ItemDto> itemDtos, List<String> messages, long time) {
+    public Update(List<String> personDto, List<String> projectiles, List<Integer> itemDtos, List<String> messages, long time) {
         this.persons = personDto;
         this.projectiles = projectiles;
         this.items = itemDtos;
@@ -36,7 +31,7 @@ public class Update {
         return projectiles;
     }
 
-    public List<PersonDto> getPersons() {
+    public List<String> getPersons() {
         return persons;
     }
 
@@ -48,7 +43,7 @@ public class Update {
         this.owner = owner;
     }
 
-    public List<ItemDto> getItems() {
+    public List<Integer> getItems() {
         return items;
     }
 

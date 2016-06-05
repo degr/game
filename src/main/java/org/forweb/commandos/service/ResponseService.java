@@ -2,10 +2,8 @@ package org.forweb.commandos.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.forweb.commandos.dto.ItemDto;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
-import org.forweb.commandos.entity.ammo.Bullet;
 import org.forweb.commandos.entity.ammo.Projectile;
 import org.forweb.commandos.entity.ammo.Shot;
 import org.forweb.commandos.entity.ammo.SubShot;
@@ -15,19 +13,19 @@ import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.game.Context;
 import org.forweb.commandos.response.GameStats;
 import org.forweb.commandos.response.Update;
-import org.forweb.commandos.response.dto.BulletDto;
 import org.forweb.commandos.response.dto.OwnerDto;
-import org.forweb.commandos.response.dto.PersonDto;
 import org.forweb.commandos.response.dto.Stats;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.websocket.CloseReason;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -62,17 +60,22 @@ public class ResponseService {
 
     public void broadcast(Update update, Room room) {
 
-        /*List<String> lines = Arrays.asList(message.split("\n"));
-        Path file = Paths.get("/var/log/the-file-name.txt");
-        try {
-            Files.write(file, lines, Charset.forName("UTF-8"), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+        /*boolean dumpToFile = false;*/
         for (Person person : room.getPersons().values()) {
             try {
                 update.setOwner(mapOwner(person));
                 String message = prepareJson(update);
+
+                /*if (!dumpToFile) {
+                    dumpToFile = true;
+                    List<String> lines = Arrays.asList(message.split("\n"));
+                    Path file = Paths.get("/var/log/!out-commandos.txt");
+                    try {
+                        Files.write(file, lines, Charset.forName("UTF-8"), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }*/
                 sendMessage(person, message);
             } catch (IllegalStateException ise) {
                 // An ISE can occur if an attempt is made to write to a
@@ -82,14 +85,15 @@ public class ResponseService {
                 // removePerson() methods that are already synchronised.
             }
         }
-        for(Map.Entry<Integer, Projectile> entry : room.getProjectiles().entrySet()) {
+        for (Map.Entry<Integer, Projectile> entry : room.getProjectiles().entrySet()) {
             Projectile projectile = entry.getValue();
-            if(projectile.isInstant()) {
+            if (projectile.isInstant()) {
                 room.getProjectiles().remove(entry.getKey());
             }
         }
         room.setMessages(new ArrayList<>());
     }
+
     public void sendStats(List<Stats> stats, Room room) {
         GameStats out = new GameStats();
         out.setStats(stats);
@@ -104,7 +108,7 @@ public class ResponseService {
 
 
     private OwnerDto mapOwner(Person person) {
-        if(person.isInPool()) {
+        if (person.isInPool()) {
             return null;
         }
         OwnerDto out = new OwnerDto();
@@ -133,22 +137,12 @@ public class ResponseService {
         }
     }
 
-    public List<PersonDto> mapPersons(ConcurrentHashMap<Integer, Person> persons) {
-        List<PersonDto> out = new ArrayList<>(persons.size());
+    public List<String> mapPersons(ConcurrentHashMap<Integer, Person> persons) {
+        List<String> out = new ArrayList<>(persons.size());
         for (Person person : persons.values()) {
-            if(person.isInPool()) {
-                continue;
+            if (!person.isInPool()) {
+                out.add(person.doCommonResponse());
             }
-            PersonDto dto = new PersonDto();
-            dto.setName(person.getName());
-            dto.setColor(person.getHexColor());
-            dto.setReload(person.getWeapon().getCurrentClip() == 0 || person.isReload() ? 1 : null);
-            dto.setGun(person.getWeapon().getName());
-            dto.setX((int)person.getX());
-            dto.setY((int)person.getY());
-            dto.setAngle(person.getAngle());
-            dto.setId(person.getId());
-            out.add(dto);
         }
         return out;
     }
@@ -156,7 +150,7 @@ public class ResponseService {
     public List<String> mapProjectiles(ConcurrentHashMap<Integer, Projectile> projectiles) {
         List<String> out = new ArrayList<>(projectiles.size());
         for (Projectile projectile : projectiles.values()) {
-            if(projectile instanceof Shot) {
+            if (projectile instanceof Shot) {
                 for (SubShot subshot : ((Shot) projectile).getSubShots()) {
                     out.add(subshot.doResponse());
                 }
@@ -167,17 +161,16 @@ public class ResponseService {
         return out;
     }
 
-    public List<ItemDto> mapItems(List<AbstractZone> zones) {
+    public List<Integer> mapItems(List<AbstractZone> zones) {
         Iterator<AbstractZone> iterator = zones.iterator();
-        List<ItemDto> out = new ArrayList<>();
+        List<Integer> out = new ArrayList<>();
         while (iterator.hasNext()) {
             AbstractZone zone = iterator.next();
             if (zone instanceof AbstractItem) {
                 AbstractItem item = (AbstractItem) zone;
-                ItemDto dto = new ItemDto();
-                dto.setId(item.getId());
-                dto.setAvailable(item.isAvailable());
-                out.add(dto);
+                if (item.isAvailable()) {
+                    out.add(item.getId());
+                }
             }
         }
         return out;

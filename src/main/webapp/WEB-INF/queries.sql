@@ -32,3 +32,4 @@ primary key(id)
 );
 
 alter table zone add COLUMN tile INTEGER (11);
+alter table zone add COLUMN title varchar (255);

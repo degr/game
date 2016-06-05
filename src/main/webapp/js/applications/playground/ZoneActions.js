@@ -51,8 +51,12 @@ var ZoneActions = {
                     var image = new Image();
                     image.src = "images/zones/" + zone.customSprite;
                     ZoneActions.images[zone.tileId] = image;
-                } 
-                context.drawImage(ZoneActions.images[zone.tileId], zone.x, zone.y, zone.width, zone.height);
+                }
+                try {
+                    context.drawImage(ZoneActions.images[zone.tileId], zone.x, zone.y, zone.width, zone.height);
+                } catch (e) {
+                    context.drawImage(ZoneActions.images.wall, zone.x, zone.y, zone.width, zone.height);
+                }
                 
                 break;
             default:
@@ -64,10 +68,15 @@ var ZoneActions = {
         //
     },
     drawImage: function(zone) {
+        var context = PlayGround.context;
         if(zone.available) {
             var size = 48;
             var shift = (size - 40) / 2;
-            PlayGround.context.drawImage(ZoneActions.images[zone.type], zone.x - shift, zone.y - shift, size, size);
+            context.drawImage(ZoneActions.images[zone.type], zone.x - shift, zone.y - shift, size, size);
+        }
+        if(PlayGround.drawBounds) {
+            context.fillStyle = 'rgba(138, 221, 255, 0.55)';
+            context.fillRect(zone.x, zone.y, zone.width, zone.height);
         }
     }
 };

@@ -60,7 +60,18 @@ var KeyboardSetup = {
             buttons.push(KeyboardSetup.createInput(key));
         }
         buttons.push(KeyboardSetup.buildAngleMistake());
+        buttons.push(KeyboardSetup.buildDrawBounds());
         return Dom.el('div', 'controls', buttons);
+    },
+    buildDrawBounds: function() {
+        var checkbox = Dom.el('input', {type: 'checkbox', id: 'draw_bounds'});
+        checkbox.checked = PlayGround.drawBounds;
+        checkbox.onchange = function() {
+            PlayGround.drawBounds = checkbox.checked;
+            PlayGround.updateCanvas(PlayGround.map);
+        };
+        var label = Dom.el('label', {'for': 'draw_bounds'}, [checkbox, 'Draw bounds']);
+        return Dom.el('div', null, label);
     },
     buildAngleMistake: function() {
         var input = Dom.el('input', {type: 'text', value: PersonActions.angleMistake, id: 'angle_mistake'});
