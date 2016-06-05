@@ -146,6 +146,12 @@ PersonActions.updateMouseDirectionByXy = function(x, y, person, offset) {
         x - offset.left + window.scrollX,
         y - offset.top + window.scrollY
     ));
+
+    if(angle < 0) {
+        angle = 360 + angle;
+    }
+    PlayGround.updatePersonViewAngle(angle);
+    return;
     var pa = person.angle;
     if(pa > 180) {
         pa = pa - 360;

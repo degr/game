@@ -20,6 +20,7 @@ public class Person implements WebSocketResponse {
     private int score;
     private boolean inPool = true;
     private String name;
+    private int selectedAngle;
 
     public List<AbstractWeapon> getWeaponList() {
         return weaponList;
@@ -193,5 +194,13 @@ public class Person implements WebSocketResponse {
                 ((int)getX()) + ":" +
                 ((int)getY()) + ":" +
                 ((int)getAngle());
+    }
+
+    public void setSelectedAngle(int selectedAngle) {
+        this.selectedAngle = selectedAngle;
+    }
+
+    public int getSelectedAngle() {
+        return selectedAngle;
     }
 }
