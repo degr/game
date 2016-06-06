@@ -96,7 +96,7 @@
         <dependency>
             <groupId>com.github.degr</groupId>
             <artifactId>HibernateSupport</artifactId>
-            <version>d6b5208bc6</version>
+            <version>c957e13f95</version>
         </dependency>
     </dependencies>
 

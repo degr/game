@@ -15,13 +15,13 @@ import javax.servlet.ServletRegistration;
 public class AppInitializer implements WebApplicationInitializer {
 
 
-    public static final String BASE_PACKAGE = "org.forweb.commandos";
+    static final String BASE_PACKAGE = "org.forweb.commandos";
     public static String ROOT;
     @Override
     public void onStartup(ServletContext container) {
         System.out.println("on startup");
-        HibernateSupport.init("127.0.0.1:3306", "root", "", "commandos", BASE_PACKAGE + ".entity");
-        //HibernateSupport.init("mysql35608-env-2464409.mycloud.by", "root", "QASsyb01289", "commandos", BASE_PACKAGE + ".entity");
+        //HibernateSupport.init("127.0.0.1:3306", "root", "", "commandos", BASE_PACKAGE + ".entity");
+        HibernateSupport.init("mysql35608-env-2464409.mycloud.by", "root", "QASsyb01289", "commandos", BASE_PACKAGE + ".entity");
         HibernateSupport.setDebug(false);
         AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
         rootContext.register(SpringConfiguration.class);
