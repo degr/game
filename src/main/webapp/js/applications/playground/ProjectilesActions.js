@@ -1,6 +1,6 @@
 var ProjectilesActions = {};
-
-ProjectilesActions.draw = function(projectile) {
+ProjectilesActions.projectileIds = {};
+ProjectilesActions.draw = function(projectile, fire) {
     switch (projectile.type) {
         case 'bullet':
             ProjectilesActions.drawBullet(projectile);
@@ -17,7 +17,6 @@ ProjectilesActions.draw = function(projectile) {
             }
             break;
         case 'shot':
-
             ProjectilesActions.drawBullet(projectile);
             if(!projectile.soundPlayed) {
                 projectile.soundPlayed = true;
@@ -26,6 +25,13 @@ ProjectilesActions.draw = function(projectile) {
             break;
         case 'flame':
             ProjectilesActions.drawFlame(projectile);
+            if(!fire.isFirePlayed) {
+                if(!ProjectilesActions.projectileIds[projectile.id]) {
+                    ProjectilesActions.projectileIds[projectile.id] = true;
+                    fire.isFirePlayed = true;
+                    SoundUtils.play('sound/fire.mp3');
+                }
+            }
             break;
         case 'rocket':
             ProjectilesActions.drawRocket(projectile);
@@ -35,6 +41,11 @@ ProjectilesActions.draw = function(projectile) {
             break;
         case 'explosion':
             ProjectilesActions.drawExplosion(projectile);
+            if(!projectile.soundPlayed) {
+                projectile.soundPlayed = true;
+                SoundUtils.play('sound/explosion.mp3');
+            }
+            break;
     }
 };
 ProjectilesActions.drawBullet = function(projectile){

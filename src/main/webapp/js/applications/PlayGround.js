@@ -224,8 +224,16 @@ var PlayGround = {
         }
         var now = (new Date()).getTime();
         PlayGround.projectiles = [];
+        var playShootgun = false;
         for(var i = 0; i < packet.projectiles.length; i++) {
             var p = ProjectilesActions.decode(packet.projectiles[i]);
+            if(p.type === 'shot') {
+                if(playShootgun) {
+                    p.soundPlayed = true;
+                } else {
+                    playShootgun = true;
+                }
+            }
             if(p.x2 || p.x2 === 0) {
                 PlayGround.instantBullets[i] = p;
                 p.created = now;
@@ -292,13 +300,14 @@ var PlayGround = {
         for (var id in PlayGround.entities) {
             PersonActions.drawPerson(PlayGround.entities[id]);
         }
+        var fire = {isFirePlayed: false};
         if (PlayGround.projectiles != null) {
             for (var i = 0; i < PlayGround.projectiles.length; i++) {
-                ProjectilesActions.draw(PlayGround.projectiles[i]);
+                ProjectilesActions.draw(PlayGround.projectiles[i], fire);
             }
         }
         for(var iKey in PlayGround.instantBullets) {
-            ProjectilesActions.draw(PlayGround.instantBullets[iKey]);
+            ProjectilesActions.draw(PlayGround.instantBullets[iKey], fire);
         }
     },
     stopGameLoop: function () {

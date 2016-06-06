@@ -7,7 +7,7 @@ import org.forweb.commandos.entity.ammo.Rocket;
 public class RocketLauncher extends AbstractWeapon<Rocket> {
     public RocketLauncher(){
         this.setReloadTimeout(2000);
-        this.setShotTimeout(0);
+        this.setShotTimeout(1000);
         setSpread(7);
 
         this.setMaxClip(5);

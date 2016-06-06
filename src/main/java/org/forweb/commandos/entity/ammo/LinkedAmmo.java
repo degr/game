@@ -1,6 +1,5 @@
 package org.forweb.commandos.entity.ammo;
 
-import org.forweb.commandos.entity.Person;
 
 public abstract class LinkedAmmo extends Projectile{
     private int personId;

@@ -5,7 +5,7 @@ public class Rocket extends LinkedAmmo {
 
     public Rocket(int xStart, int yStart, float angle, int personId) {
         super(xStart, yStart, angle, personId);
-        this.setLifeTime(1500L);
+        this.setLifeTime(1000L);
         this.setRadius(700);
     }
 
