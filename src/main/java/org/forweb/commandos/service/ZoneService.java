@@ -50,13 +50,14 @@ public class ZoneService extends AbstractService<Zone, ZoneDao> {
             String filename = zone.getId() + "." + name[name.length - 1];
             zone.setImage(filename);
             tileDao.save(zone);
-            File dir = new File(ROOT + "/images/zones/");
+            String dirStr = ROOT + "/../images/zones/";
+            File dir = new File(dirStr);
             if(!dir.isDirectory() && !dir.mkdirs()) {
                 throw new RuntimeException("Can't create folder for images store.");
             }
 
             BufferedOutputStream stream = new BufferedOutputStream(
-                    new FileOutputStream(new File(ROOT + "/images/zones/" + filename)));
+                    new FileOutputStream(new File(dirStr + filename)));
             FileCopyUtils.copy(file.getInputStream(), stream);
             stream.close();
             return true;
