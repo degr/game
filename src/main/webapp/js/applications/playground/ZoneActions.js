@@ -49,11 +49,17 @@ var ZoneActions = {
             case 'tiled':
                 if(!ZoneActions.images[zone.tileId]) {
                     var image = new Image();
-                    image.src = "images/zones/" + zone.customSprite;
+                    image.src = PlayGround.uploadPath + zone.customSprite;
                     ZoneActions.images[zone.tileId] = image;
                 }
                 try {
-                    context.drawImage(ZoneActions.images[zone.tileId], zone.x, zone.y, zone.width, zone.height);
+
+                    if(zone.tileset) {
+                        context.drawImage(ZoneActions.images[zone.tileId], zone.shiftX, zone.shiftY, zone.width, zone.height, zone.x, zone.y, zone.width, zone.height);
+                    } else {
+                        context.drawImage(ZoneActions.images[zone.tileId], zone.x, zone.y, zone.width, zone.height);
+                    }
+                        
                 } catch (e) {
                     context.drawImage(ZoneActions.images.wall, zone.x, zone.y, zone.width, zone.height);
                 }

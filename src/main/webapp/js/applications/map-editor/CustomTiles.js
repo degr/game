@@ -10,6 +10,8 @@ var CustomTiles = {
         var x = Dom.el('input', {type: 'text', id: 'tile_x', name: 'width', value: 40});
         var labelX = Dom.el('label', {for: 'tile_x'}, 'Tile width');
         var y = Dom.el('input', {type: 'text', id: 'tile_y', name: 'height', value: 40});
+        var tileSet = Dom.el('input', {type: 'checkbox', id: 'is_tileset', name: 'is_tileset'});
+        var tileSetLabel = Dom.el('label', {'for': 'is_tileset'}, [tileSet, 'Is tile set (pack of same sized images)']);
         var labelY = Dom.el('label', {for: 'tile_y'}, 'Tile height');
         var submit = Dom.el('input', {type: 'submit', value: 'Create tile'});
         var target = Dom.el('iframe', {id: 'custom_tile_iframe', name: 'custom_tile_iframe'});
@@ -45,6 +47,7 @@ var CustomTiles = {
                 labelFileupload, fileupload, Dom.el('br'),
                 labelX, x, Dom.el('br'),
                 labelY, y, Dom.el('br'),
+                tileSetLabel, Dom.el('br'),
                 submit, hide, target
             ]
         );

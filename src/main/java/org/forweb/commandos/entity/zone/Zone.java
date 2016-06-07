@@ -3,6 +3,7 @@ package org.forweb.commandos.entity.zone;
 import org.forweb.database.AbstractEntity;
 
 import javax.persistence.Entity;
+import javax.persistence.criteria.CriteriaBuilder;
 
 @Entity
 public class Zone extends AbstractEntity {
@@ -11,6 +12,8 @@ public class Zone extends AbstractEntity {
     private int y;
     private int width;
     private int height;
+    private Integer shiftX;
+    private Integer shiftY;
     private String type;
     private Integer map;
     private Integer tile;
@@ -81,4 +84,22 @@ public class Zone extends AbstractEntity {
     public String getTitle() {
         return title;
     }
+
+    public Integer getShiftX() {
+        return shiftX;
+    }
+
+    public void setShiftX(Integer shiftX) {
+        this.shiftX = shiftX;
+    }
+
+
+    public Integer getShiftY() {
+        return shiftY;
+    }
+
+    public void setShiftY(Integer shiftY) {
+        this.shiftY = shiftY;
+    }
+
 }

@@ -33,3 +33,6 @@ primary key(id)
 
 alter table zone add COLUMN tile INTEGER (11);
 alter table zone add COLUMN title varchar (255);
+alter table tile add COLUMN is_tileset bit(1);
+alter table zone add COLUMN shiftx int(11);
+alter table zone add COLUMN shifty int(11);

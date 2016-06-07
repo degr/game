@@ -1,7 +1,8 @@
 var PlayGround = {
     radius: 20,
     gameStarted: false,
-    
+    dev: true,
+    uploadPath: "upload.images/zones/",
     container: null,
     canvas: null,
     socket: null,//websocket

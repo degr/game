@@ -1,5 +1,6 @@
 package org.forweb.commandos.service;
 
+import org.forweb.commandos.AppInitializer;
 import org.forweb.commandos.dao.TileDao;
 import org.forweb.commandos.dao.ZoneDao;
 import org.forweb.commandos.entity.GameMap;
@@ -34,25 +35,28 @@ public class ZoneService extends AbstractService<Zone, ZoneDao> {
 
     @Autowired private TileDao tileDao;
 
-    public boolean createCustomTile(String title, Integer width, Integer height, MultipartFile file) {
+    public boolean createCustomTile(String title, Integer width, Integer height, Boolean isTileSet, MultipartFile file) {
         try {
-            Tile zone = new Tile();
-            zone.setWidth(width);
-            zone.setHeight(height);
-            zone.setTitle(title);
-            tileDao.save(zone);
+            Tile tile = new Tile();
+            tile.setWidth(width);
+            tile.setHeight(height);
+            tile.setTitle(title);
+            tile.setTileset(isTileSet);
+            tileDao.save(tile);
 
             String[] name = file.getOriginalFilename().trim().split("\\.");
             String ext =  name[name.length - 1];
             if(!isImage(ext)) {
+                tileDao.delete(tile);
                 throw new RuntimeException("File must be an image with extension png, jpg, gif, jpeg.");
             }
-            String filename = zone.getId() + "." + name[name.length - 1];
-            zone.setImage(filename);
-            tileDao.save(zone);
-            String dirStr = ROOT + "/../images/zones/";
+            String filename = tile.getId() + "." + name[name.length - 1];
+            tile.setImage(filename);
+            tileDao.save(tile);
+            String dirStr = ROOT + (AppInitializer.DEV ? "/" : "/../upload." ) +"images/zones/";
             File dir = new File(dirStr);
             if(!dir.isDirectory() && !dir.mkdirs()) {
+                tileDao.delete(tile);
                 throw new RuntimeException("Can't create folder for images store.");
             }
 
@@ -138,7 +142,7 @@ public class ZoneService extends AbstractService<Zone, ZoneDao> {
                 break;
             case "tiled":
                 if(tile != null) {
-                    out = new TiledZone(x, y, tile);
+                    out = new TiledZone(x, y, zone, tile);
                 } else {
                     out = new Wall(x, y, zone.getWidth(), zone.getHeight());
                 }

@@ -10,6 +10,7 @@ public class Tile extends AbstractEntity{
     private Integer width;
     private Integer height;
     private String image;
+    private Boolean isTileset;
 
     public String getTitle() {
         return title;
@@ -42,4 +43,13 @@ public class Tile extends AbstractEntity{
     public void setImage(String image) {
         this.image = image;
     }
+
+    public Boolean getTileset() {
+        return isTileset;
+    }
+
+    public void setTileset(Boolean tileset) {
+        isTileset = tileset;
+    }
+
 }

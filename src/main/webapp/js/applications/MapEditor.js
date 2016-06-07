@@ -117,14 +117,24 @@ var MapEditor = {
                         if(r.zones) {
                             for(var i = 0; i < r.zones.length; i++) {
                                 var zone = r.zones[i];
+
+                                if(zone.type === 'tiled') {
+                                    zone.stepX = zone.shiftX / zone.width;
+                                    zone.stepY = zone.shiftY / zone.height;
+                                    zone.tileId = zone.tileId + "_" + (zone.shiftX)+"x" + (zone.shiftY);
+                                }
                                 var mounting = {
                                     type: zone.type,
                                     pointA: {x: zone.x, y: zone.y},
                                     pointB: {x: zone.x + zone.width, y: zone.y + zone.height},
                                     highlight: false,
                                     customSprite: zone.customSprite,
-                                    tileId: zone.tileId
+                                    tileId: zone.tileId,
+                                    tileset: zone.tileset,
+                                    stepX: zone.stepX,
+                                    stepY: zone.stepY
                                 };
+
                                 MapEditor.doMount(mounting);
                             }
                         }
@@ -151,7 +161,17 @@ var MapEditor = {
             var zone = MapEditor.mountedObjects[i];
             var rect = MapEditor.doRectangle(zone);
             rect.type = zone.type;
-            rect.tile = zone.tileId;
+            if(zone.type === 'tiled') {
+                if(zone.tileset) {
+                    var data = zone.tileId.split('_');
+                    rect.tile = data[0];
+                    var cord = data[1].split('x');
+                    rect.shiftX = cord[0];
+                    rect.shiftY = cord[1];
+                } else {
+                    rect.tile = zone.tileId;
+                }
+            }
             zones.push(rect);
         }
         var map = {
@@ -199,8 +219,13 @@ var MapEditor = {
                     point.y = Math.ceil(point.y / MapEditor.gridSize) * MapEditor.gridSize;
                 }
             }
-            var zone = MapEditor.zones[type === 'tiled' ? MapEditor.mounting.tileId : type];
+            var zone = MapEditor.findZone(type);
             if (!MapEditor.mounting.pointA) {
+                if(zone.type === 'tiled' && zone.tileset) {
+                    MapEditor.mounting.stepX = zone.stepX;
+                    MapEditor.mounting.stepY = zone.stepY;
+                    MapEditor.mounting.tileset = true;
+                }
                 if (zone.staticSize) {
                     if(MapEditor.gridSize <= 1) {
                         point.x = point.x - zone.width / 2;
@@ -217,6 +242,13 @@ var MapEditor = {
                 MapEditor.mounting.pointB = point;
                 MapEditor.doMount(MapEditor.mounting);
             }
+        }
+    },
+    findZone: function(type) {
+        if(type === 'tiled') {
+            return MapEditor.zones[MapEditor.mounting.tileId]
+        } else {
+            return MapEditor.zones[type]
         }
     },
     render: function () {
@@ -250,9 +282,13 @@ var MapEditor = {
                 if(zone.type === 'tiled') {
                     (function(zone, rect) {
                         var image = new Image();
-                        image.src = "images/zones/" + zone.customSprite;
+                        image.src = PlayGround.uploadPath + zone.customSprite;
                         image.onload = function () {
-                            context.drawImage(image, rect.x, rect.y, rect.width, rect.height);
+                            if(zone.tileset) {
+                                context.drawImage(image, zone.stepX * rect.width, zone.stepY * rect.height, rect.width, rect.height, rect.x, rect.y, rect.width, rect.height);
+                            } else {
+                                context.drawImage(image, rect.x, rect.y, rect.width, rect.height);
+                            }
                         }
                     })(zone, rect);
                 }
@@ -305,7 +341,7 @@ var MapEditor = {
         MapEditor.zonesButtons.innerHTML = '';
         
         return Rest.doGet('zones/list').then(function (zones) {
-            var doInput = function (zone) {
+            var doInput = function (zone, key) {
                 var name = zone.type !== 'tiled' ? zone.type : zone.tileName;
                 var input = Dom.el('input', {
                     type: 'button',
@@ -316,18 +352,74 @@ var MapEditor = {
                     MapEditor.mount(zone)
                 };
                 if(zone.type == 'tiled') {
-                    input.style.width = '64px';
-                    input.style.height = '64px';
-                    input.style.background = "url(images/zones/"+zone.customSprite+") no-repeat";
-                    input.style.backgroundSize = "100% 100%";
+                    input.style.background = "url(" + PlayGround.uploadPath + zone.customSprite+") no-repeat";
+                    if(zone.tileset) {
+                        input.style.height = zone.height + 'px';
+                        input.style.width = zone.width + 'px';
+                        input.style.backgroundPosition = (-zone.width * zone.stepX) + 'px ' + (-zone.height * zone.stepY) + "px ";
+                    } else {
+                        input.style.height = '64px';
+                        input.style.width = '64px';
+                        input.style.backgroundSize = "100% 100%";
+                    }
                 }
+                MapEditor.zones[key] = zone;
                 return input;
+            };
+            var doTileset = function(zone) {
+                var image = new Image();
+                var header = Dom.el('div');
+                var container = Dom.el('div');
+                var out = new Dom.el('div', 'tileset', [header, container]);
+                image.onload = function() {
+                    var width = this.width;
+                    var height = this.height;
+                    var zWidth = parseInt(zone.width);
+                    var zHeight = parseInt(zone.height);
+                    header.innerText = zone.tileName + ' ' + zWidth + "x" + zHeight;
+                    if(zWidth < 1 || zHeight < 1) {
+                        return;
+                    }
+                    var stepY = 0;
+                    while(stepY * zHeight <= height) {
+                        var stepX = 0;
+                        var row = Dom.el('div');
+                        while(stepX * zWidth <= width) {
+                            var tileId = zone.tileId + "_" + (stepX * zWidth)+"x" + (stepY * zHeight);
+                            row.appendChild(doInput({
+                                id: zone.id,
+                                tileId: tileId,
+                                tileName: '',
+                                x: zone.x,
+                                y: zone.y,
+                                width: zWidth,
+                                height: zHeight,
+                                type: 'tiled',
+                                passable: zone.passable,
+                                shootable: zone.shootable,
+                                staticSize: zone.staticSize,
+                                tileset: true,
+                                stepX: stepX,
+                                stepY: stepY,
+                                customSprite: zone.customSprite
+                            }, tileId));
+                            stepX++;
+                        }
+                        container.appendChild(row);
+                        stepY++;
+                    }
+                };
+                image.src = PlayGround.uploadPath + "/"+zone.customSprite;
+                return out;
             };
             for (var i = 0; i < zones.length; i++) {
                 var zone = zones[i];
-                var key = zone.type == 'tiled' ? zone.tileId : zone.type;
-                MapEditor.zones[key] = zone;
-                MapEditor.zonesButtons.appendChild(doInput(zone));
+                if(zone.tileset) {
+                    MapEditor.zonesButtons.appendChild(doTileset(zone));
+                } else {
+                    var key = zone.type == 'tiled' ? zone.tileId : zone.type;
+                    MapEditor.zonesButtons.appendChild(doInput(zone, key));
+                }
             }
         });
     },

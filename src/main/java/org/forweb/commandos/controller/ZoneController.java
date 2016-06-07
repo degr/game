@@ -1,5 +1,6 @@
 package org.forweb.commandos.controller;
 
+import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.entity.zone.Zone;
 import org.forweb.commandos.entity.zone.interactive.Respawn;
@@ -7,6 +8,7 @@ import org.forweb.commandos.entity.zone.items.*;
 import org.forweb.commandos.entity.zone.walls.Tile;
 import org.forweb.commandos.entity.zone.walls.TiledZone;
 import org.forweb.commandos.entity.zone.walls.Wall;
+import org.forweb.commandos.game.Context;
 import org.forweb.commandos.service.MapService;
 import org.forweb.commandos.service.ZoneService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +32,12 @@ public class ZoneController {
     @Autowired
     private ZoneService zoneService;
 
+    @Autowired
+    private Context context;
     @RequestMapping("/room/{roomId}")
     public List<AbstractZone> getZoneForRoom(@PathVariable("roomId") Integer roomId) {
-        List<AbstractZone> out = new ArrayList<>();
-
-        return out;
+        Room room = context.getRoom(roomId);
+        return room.getMap().getZones();
     }
 
     @RequestMapping("/list")
@@ -54,7 +57,7 @@ public class ZoneController {
 
         List<Tile> tiles = zoneService.getAllTiles();
         out.addAll(tiles.stream()
-                .map(v -> new TiledZone(0, 0, v))
+                .map(v -> new TiledZone(0, 0, null, v))
                 .collect(Collectors.toList())
         );
         return out;
@@ -63,12 +66,13 @@ public class ZoneController {
     @RequestMapping(value = "/create-zone", method = RequestMethod.POST)
     public boolean createCustomZone(
             @RequestParam("title") String title,
-            @RequestParam(value = "width", required = false) Integer width,
-            @RequestParam(value = "height", required = false) Integer height,
+            @RequestParam(value = "width") Integer width,
+            @RequestParam(value = "height") Integer height,
+            @RequestParam(value = "is_tileset", required = false) Boolean isTileSet,
             @RequestParam("fileupload") MultipartFile file
     ){
         if (!file.isEmpty()) {
-            return zoneService.createCustomTile(title, width, height, file);
+            return zoneService.createCustomTile(title, width, height, isTileSet, file);
         } else {
             return false;
         }
