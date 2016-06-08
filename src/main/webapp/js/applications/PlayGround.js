@@ -77,7 +77,8 @@ var PlayGround = {
         PlayGround.context = canvas.getContext('2d');
         canvas.addEventListener('mousedown', PersonActions.startFire);
         canvas.addEventListener('mouseup', PersonActions.stopFire);
-        canvas.style.backgroundImage = 'url(images/map/background/1.png)';
+        var background = localStorage.getItem('background');
+        canvas.style.backgroundImage = background ? background : 'url(images/map/background/1.png)';
         window.addEventListener('keydown', PersonActions.startMovement, false);
         window.addEventListener('keydown', Weapons.changeWeapon, false);
         window.addEventListener('keyup', PersonActions.stopMovement, false);

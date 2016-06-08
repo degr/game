@@ -69,7 +69,9 @@ var KeyboardSetup = {
         var buildButton = function(i) {
             var out = Dom.el('input', {type: 'button', value: i});
             out.onclick = function() {
-                PlayGround.canvas.style.backgroundImage = 'url(images/map/background/'+i+'.png)';
+                var background = 'url(images/map/background/'+i+'.png)';
+                localStorage.setItem('background', background);
+                PlayGround.canvas.style.backgroundImage = background;
             };
             return out;
         };
