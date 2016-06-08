@@ -231,11 +231,23 @@ PersonActions.angle = function(cx, cy, ex, ey) {
 };
 PersonActions.drawPerson = function(person) {
     var context = PlayGround.context;
-    context.save();
     var x = person.x;
     var y = person.y;
-    context.beginPath();
     var angle = person.angle + 90;
+    context.save();
+    context.beginPath();
+    context.translate(x,y);
+    context.rotate((angle - 90) * Math.PI / 180);
+    if(person.gun != 'knife' && person.gun != 'pistol') {
+        context.drawImage(ZoneActions.images[person.gun], -6, -14)
+    }
+
+    context.restore();
+
+
+
+    context.save();
+    context.beginPath();
     context.strokeStyle = person.hexColor;
     context.translate(x,y);
     if(person.reload) {
@@ -248,6 +260,8 @@ PersonActions.drawPerson = function(person) {
     context.stroke();
     context.drawImage(person.image, - PlayGround.radius - 8,  - PlayGround.radius - 3, 56, 56);
     context.restore();
+    
+    
     if(PlayGround.showNames) {
         context.strokeText(person.name, x - 10, y + 27);
     }

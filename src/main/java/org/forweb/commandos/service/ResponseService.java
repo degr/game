@@ -2,6 +2,7 @@ package org.forweb.commandos.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.forweb.commandos.entity.OwnerFacade;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.ammo.Projectile;
@@ -112,7 +113,7 @@ public class ResponseService {
             return null;
         }
         OwnerDto out = new OwnerDto();
-        out.setOwner(person.doResponse());
+        out.setOwner(new OwnerFacade(person).doResponse());
 
         out.setGuns(person.getWeaponList().stream()
                 .map(AbstractWeapon::doResponse)
@@ -141,7 +142,7 @@ public class ResponseService {
         List<String> out = new ArrayList<>(persons.size());
         for (Person person : persons.values()) {
             if (!person.isInPool()) {
-                out.add(person.doCommonResponse());
+                out.add(person.doResponse());
             }
         }
         return out;

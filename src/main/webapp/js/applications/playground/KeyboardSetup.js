@@ -61,7 +61,22 @@ var KeyboardSetup = {
         }
         buttons.push(KeyboardSetup.buildAngleMistake());
         buttons.push(KeyboardSetup.buildDrawBounds());
+        buttons.push(KeyboardSetup.buildBackgounds())
         return Dom.el('div', 'controls', buttons);
+    },
+    buildBackgounds: function() {
+        var buttons = ["Background: "];
+        var buildButton = function(i) {
+            var out = Dom.el('input', {type: 'button', value: i});
+            out.onclick = function() {
+                PlayGround.canvas.style.backgroundImage = 'url(images/map/background/'+i+'.png)';
+            };
+            return out;
+        };
+        for(var i = 1; i < 9; i++) {
+           buttons.push(buildButton(i));
+        }
+        return Dom.el('div', null, buttons);
     },
     buildDrawBounds: function() {
         var checkbox = Dom.el('input', {type: 'checkbox', id: 'draw_bounds'});

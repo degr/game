@@ -26,7 +26,7 @@ public class ItemService {
             case "rocket":
                 handleWeaponPick(player, new RocketLauncher());
                 break;
-            case "flame":
+            case "flamethrower":
                 handleWeaponPick(player, new Flamethrower());
                 break;
             case "shotgun":

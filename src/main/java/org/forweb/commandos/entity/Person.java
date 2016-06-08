@@ -182,10 +182,6 @@ public class Person implements WebSocketResponse {
     }
 
     public String doResponse() {
-        return getId() + ":" + getLife() + ":" + getArmor() + ":" + getScore() + ":" + getWeapon().getName();
-    }
-
-    public String doCommonResponse() {
         return getId() + ":" +
                 getName() + ":" +
                 getHexColor() + ":" +

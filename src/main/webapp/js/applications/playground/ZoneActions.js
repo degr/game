@@ -5,8 +5,8 @@ var ZoneActions = {
         ZoneActions.images.armor.src = 'images/map/armor.png';
         ZoneActions.images.assault = new Image();
         ZoneActions.images.assault.src = 'images/map/assault.png';
-        ZoneActions.images.flame = new Image();
-        ZoneActions.images.flame.src = 'images/map/flame.png';
+        ZoneActions.images.flamethrower = new Image();
+        ZoneActions.images.flamethrower.src = 'images/map/flame.png';
         ZoneActions.images.helm = new Image();
         ZoneActions.images.helm.src = 'images/map/helm.jpg';
         ZoneActions.images.medkit = new Image();
@@ -37,7 +37,7 @@ var ZoneActions = {
             case "sniper":
             case "minigun":
             case "rocket":
-            case "flame":
+            case "flamethrower":
             case "medkit":
             case "armor":
             case "helm":

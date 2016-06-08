@@ -77,6 +77,7 @@ var PlayGround = {
         PlayGround.context = canvas.getContext('2d');
         canvas.addEventListener('mousedown', PersonActions.startFire);
         canvas.addEventListener('mouseup', PersonActions.stopFire);
+        canvas.style.backgroundImage = 'url(images/map/background/1.png)';
         window.addEventListener('keydown', PersonActions.startMovement, false);
         window.addEventListener('keydown', Weapons.changeWeapon, false);
         window.addEventListener('keyup', PersonActions.stopMovement, false);
@@ -253,6 +254,7 @@ var PlayGround = {
         p.y = personDto.y;
         p.angle = personDto.angle;
         p.reload = personDto.reload;
+        p.gun = personDto.gun;
         if(PlayGround.owner.id == id) {
             PersonActions.updateMouseDirectionByXy(
                 PlayGround.xMouse,
