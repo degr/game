@@ -283,4 +283,4 @@ PersonActions.mapPersonFromResponse = function (str) {
 };
 
 PersonActions.reload = new Image();
-PersonActions.reload.src = 'images/map/reload.jpg';
+PersonActions.reload.src = 'images/map/reload.png';
