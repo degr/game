@@ -29,7 +29,7 @@ var Chat = {
     },
     update: function(personId, message) {
         if(PlayGround.entities[personId]) {
-            var writer = Dom.el('span', 'writer', decodeURIComponent(PlayGround.entities[personId].name) + " : ");
+            var writer = Dom.el('span', 'writer', PlayGround.entities[personId].name + " : ");
             var messageHolder = Dom.el('span', 'message', message);
             var comment = Dom.el('div', 'comment', [writer, messageHolder]);
             Chat.screen.appendChild(comment);

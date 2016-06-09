@@ -17,14 +17,14 @@ public class AppInitializer implements WebApplicationInitializer {
 
     static final String BASE_PACKAGE = "org.forweb.commandos";
     public static String ROOT;
-    public static Boolean DEV = true;
+    public static Boolean DEV = false;
     @Override
     public void onStartup(ServletContext container) {
         System.out.println("on startup");
         if(DEV) {
             HibernateSupport.init("127.0.0.1:3306", "root", "", "commandos", BASE_PACKAGE + ".entity");
         } else {
-            HibernateSupport.init("mysql35608-env-2464409.mycloud.by", "root", "QASsyb01289", "commandos", BASE_PACKAGE + ".entity");
+            HibernateSupport.init("mysql35801-env-0391540.mycloud.by", "root", "XPMikf51734", "commandos", BASE_PACKAGE + ".entity");
         }
         HibernateSupport.setDebug(DEV);
         AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();

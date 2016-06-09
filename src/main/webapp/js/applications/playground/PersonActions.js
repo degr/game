@@ -240,7 +240,7 @@ PersonActions.drawPerson = function(person) {
     context.rotate((angle - 90) * Math.PI / 180);
     if(person.gun != 'knife' && person.gun != 'pistol') {
         context.drawImage(ZoneActions.images[person.gun], -6, -14)
-    }
+    } 
 
     context.restore();
 
@@ -258,7 +258,12 @@ PersonActions.drawPerson = function(person) {
         context.arc(0, 0, PlayGround.radius, 0, 2 * Math.PI, false);
     }
     context.stroke();
-    context.drawImage(person.image, - PlayGround.radius - 8,  - PlayGround.radius - 3, 56, 56);
+    if(person.gun == 'knife' || person.gun == 'pistol') {
+        context.drawImage(PersonActions.personOld, - PlayGround.radius - 8,  - PlayGround.radius - 3, 56, 56);
+    } else {
+        context.drawImage(person.image, - PlayGround.radius - 8,  - PlayGround.radius - 3, 56, 56);
+    }
+
     context.restore();
     
     
@@ -272,7 +277,7 @@ PersonActions.mapPersonFromResponse = function (str) {
     var data = str.split(":");
     return {
         id: parseInt(data[0]),
-        name: data[1],
+        name: decodeURIComponent(data[1]),
         color: data[2],
         reload: data[3] == 1,
         gun: data[4],
@@ -282,5 +287,7 @@ PersonActions.mapPersonFromResponse = function (str) {
     }
 };
 
+PersonActions.personOld = new Image();
+PersonActions.personOld.src = 'images/soldier1.png';
 PersonActions.reload = new Image();
 PersonActions.reload.src = 'images/map/reload.png';

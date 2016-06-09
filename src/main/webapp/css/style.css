@@ -192,7 +192,6 @@ body, html {
 }
 
 .weapon-holder {
-    opacity: 0.5;
     position: fixed;
     right: 0;
     top: 0;

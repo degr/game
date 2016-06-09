@@ -122,7 +122,7 @@ public class ZoneService extends AbstractService<Zone, ZoneDao> {
             case "rocket":
                 out = new RocketZone(x, y, id);
                 break;
-            case "flame":
+            case "flamethrower":
                 out = new FlameZone(x, y, id);
                 break;
             case "medkit":

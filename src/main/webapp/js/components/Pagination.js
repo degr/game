@@ -45,7 +45,7 @@ Pagination.prototype.regexp = /^\d*$/;
 
 Pagination.prototype.onChange = function(e) {
     if(this.regexp.test(this.page.value)) {
-        this.pageNumber = this.page.value;
+        this.pageNumber = parseInt(this.page.value);
         this.openPage(this.pageNumber);
     } else {
         this.page.value = this.pageNumber;
