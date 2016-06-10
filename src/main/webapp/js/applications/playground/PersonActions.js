@@ -5,11 +5,19 @@ var PersonActions = {
     buttonRight: false,
     directionX: null,
     directionY: null,
-    angleMistake: 0
+    noPassiveReload: false
 };
 
 PersonActions.setDirection  = function(direction) {
     PlayGround.socket.send("direction:" + direction);
+};
+PersonActions.doReload = function(e){
+    if(e) {
+        e = e || window.event;
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    PlayGround.socket.send("reload");
 };
 PersonActions.startFire = function(e){
     if(e) {
@@ -29,11 +37,11 @@ PersonActions.startFire = function(e){
             }
         }
         var data = gun.split(":");
-        if(data[2] > 0) {
-            PlayGround.socket.send("fire:1");
-        } else {
+        if(data[2] <= 0) {
             SoundUtils.play('sound/no-ammo.mp3');
         }
+        //prevent reload stacking
+        PlayGround.socket.send("fire:1");
     }
 };
 PersonActions.stopFire = function(e){
@@ -43,7 +51,7 @@ PersonActions.stopFire = function(e){
     }
     PlayGround.socket.send("fire:0");
 };
-PersonActions.startMovement = function(e){
+PersonActions.onKeyDown = function(e){
     if(!PlayGround.gameStarted || Chat.active || KeyboardSetup.isActive)return;
     e = e || window.event;
     var code = e.keyCode;
@@ -65,6 +73,9 @@ PersonActions.startMovement = function(e){
             PersonActions.buttonBottom = true;
             thisEvent = true;
             break;
+        case Controls.reload:
+            PersonActions.doReload(e);
+            return;
         default:
     }
     if(thisEvent) {
@@ -151,58 +162,6 @@ PersonActions.updateMouseDirectionByXy = function(x, y, person, offset) {
         angle = 360 + angle;
     }
     PlayGround.updatePersonViewAngle(angle);
-    return;
-    var pa = person.angle;
-    if(pa > 180) {
-        pa = pa - 360;
-    }
-    var clockAngle = null;
-    var antiClockAngle = null;
-    if(pa >= 0) {
-        if(angle >= 0) {
-            if(angle > pa) {
-                clockAngle = angle - pa;
-            } else if (angle < pa) {
-                antiClockAngle = pa - angle;
-            } else {
-                clockAngle = 180;
-            }
-        } else {
-            antiClockAngle = pa + (-1 * angle);
-        }
-    } else {
-        if(angle >= 0) {
-            clockAngle = angle + (-1 * pa);
-        } else {
-            if(angle < pa) {
-                antiClockAngle = (angle - pa) * -1;
-            } else if (angle > pa) {
-                clockAngle = (pa - angle) * -1;
-            } else {
-                clockAngle = 180;
-            }
-        }
-    }
-    if(clockAngle == null) {
-        clockAngle = 360 - antiClockAngle;
-    } else {
-        antiClockAngle = 360 - clockAngle;
-    }
-    if(clockAngle < antiClockAngle ) {
-        if(clockAngle <= PersonActions.angleMistake ) {
-            PlayGround.updatePersonViewAngle(0);
-        } else {
-            PlayGround.updatePersonViewAngle(clockAngle > 5 ? 2 : 1);
-        }
-    } else if(clockAngle > antiClockAngle) {
-        if(antiClockAngle <= PersonActions.angleMistake ) {
-            PlayGround.updatePersonViewAngle(0);
-        } else {
-            PlayGround.updatePersonViewAngle(antiClockAngle > 5 ? -2 : -1);
-        }
-    } else {
-        PlayGround.updatePersonViewAngle(0);
-    }
 };
 
 PersonActions.updateMouseDirection = function(e){

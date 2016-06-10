@@ -195,7 +195,23 @@ body, html {
     position: fixed;
     right: 0;
     top: 0;
+    background: white;
+    border-bottom-left-radius: 3px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid gray;
+    padding-left: 3px;
+    border-left: 1px solid gray;
 }
+.weapon-holder.left {
+    right: initial;
+    left: 0;
+    padding-left: 0;
+    border-left: none;
+    border-bottom-left-radius: 0;
+    padding-right: 3px;
+    border-right: 1px solid gray;
+    border-bottom-right-radius: 3px;
+ }
 
 .weapon-holder .weapon {
     width: 60px;
@@ -264,7 +280,7 @@ body, html {
 
 
 .keyboard-setup, .game-stats{
-    width: 400px;
+    width: 468px;
     position: fixed;
     margin-left: -200px;
     left: 50%;
@@ -284,9 +300,9 @@ body, html {
 }
 .playground .chat {
     position: fixed;
-    right: 0;
-    bottom: 40px;
-    min-width: 229px;
+    left: 66px;
+    top: 0;
+    width: 468px;
     background: rgba(0,0,0,0.3);
 }
 .playground .chat .message {
@@ -312,4 +328,20 @@ body, html {
     padding: 2px;
     margin: 0;
     box-sizing: border-box;
+}
+.form-control{
+    margin-bottom: 10px;
+}
+.form-control > label{
+    display: inline-block;
+    min-width: 128px;
+}
+
+.tab-name {
+    display: inline-block;
+    padding: 10px;
+}
+
+a.tab-name.active {
+    background: #C3CFF1;
 }

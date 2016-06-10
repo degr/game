@@ -44,7 +44,7 @@ public class ZoneController {
     public List<AbstractZone> getZones() {
         List<AbstractZone> out = new ArrayList<>();
         out.add(new Wall(0,0,0,0));
-        out.add(new Respawn(0,0));
+        out.add(new Respawn(0,0, 0));
         out.add(new ShotgunZone(0, 0, 0));
         out.add(new AssaultZone(0, 0, 0));
         out.add(new SniperZone(0, 0, 0));

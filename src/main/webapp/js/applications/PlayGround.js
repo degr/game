@@ -34,10 +34,10 @@ var PlayGround = {
         ZoneActions.init();
         Weapons.init();
         LifeAndArmor.init();
+        Chat.init();
         KeyboardSetup.init();
         GameStats.init();
         Score.init();
-        Chat.init();
 
         setInterval(function(){
             if(PlayGround.gameStarted) {
@@ -79,7 +79,7 @@ var PlayGround = {
         canvas.addEventListener('mouseup', PersonActions.stopFire);
         var background = localStorage.getItem('background');
         canvas.style.backgroundImage = background ? background : 'url(images/map/background/1.png)';
-        window.addEventListener('keydown', PersonActions.startMovement, false);
+        window.addEventListener('keydown', PersonActions.onKeyDown, false);
         window.addEventListener('keydown', Weapons.changeWeapon, false);
         window.addEventListener('keyup', PersonActions.stopMovement, false);
         window.addEventListener('mousemove', PersonActions.updateMouseDirection);

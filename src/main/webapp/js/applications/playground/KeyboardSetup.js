@@ -15,54 +15,104 @@ var KeyboardSetup = {
     init: function() {
         var oldConfig = localStorage.getItem('keyboard');
         if(oldConfig) {
-            var obj = JSON.parse(oldConfig);
-            if(obj) {
-                for (var k in obj) {
-                    Controls[k] = obj[k];
+            try {
+                var obj = JSON.parse(oldConfig);
+                if (obj) {
+                    for (var k in obj) {
+                        Controls[k] = obj[k];
+                    }
                 }
+            } catch (e){
+                console.log('something wrong with config keyboard config');
+                localStorage.removeItem('keyboard');
             }
         }
         var title = Dom.el('h3', null, 'Keyboard settings');
-        var buttons = KeyboardSetup.buildButtons();
-        KeyboardSetup.chatToggler = Dom.el('input', {'class': 'toggler', type: 'button', value: KeyboardSetup.hideChatMessage});
-        KeyboardSetup.chatToggler.onclick = function() {
-            if(Chat.isHidden) {
-                Chat.show();
-                KeyboardSetup.chatToggler.value = KeyboardSetup.hideChatMessage;
-            } else {
-                Chat.hide();
-                KeyboardSetup.chatToggler.value = KeyboardSetup.showChatMessage;
-            }
-        };
+        var tabs = new Tabs();
+        tabs.addTab('Movement', KeyboardSetup.buildMovementSettings());
+        tabs.addTab('Fire', KeyboardSetup.buildFireSettings());
+        tabs.addTab('HUD', KeyboardSetup.buildHudSettings());
+        tabs.addTab('Chat', KeyboardSetup.buildChatSettings());
+        
         var esc = Dom.el('input', {type: 'button', value: 'Close'});
         esc.onclick = KeyboardSetup.hide;
-        
-        KeyboardSetup.showNames = Dom.el('input', {type: 'button', value: PlayGround.showNames ? 'Hide names' : 'Show names'});
-        KeyboardSetup.showNames.onclick = function() {
-            PlayGround.showNames = !PlayGround.showNames;
-            KeyboardSetup.showNames.value = PlayGround.showNames ? 'Hide names' : 'Show names';
-        };
         window.addEventListener('keyup', KeyboardSetup.onEscapeButton, false);
+        
         KeyboardSetup.container = Dom.el(
             'div',
             {class: 'keyboard-setup hidden'},
-            [title, buttons, KeyboardSetup.showNames, KeyboardSetup.chatToggler, esc]
+            [title, tabs.container, esc]
         );
+    },
+    buildChatToggler: function() {
+        var chatToggler = Dom.el('input', {'class': 'toggler', type: 'button', value: KeyboardSetup.hideChatMessage});
+        chatToggler.onclick = function() {
+            if(Chat.isHidden) {
+                Chat.show();
+                chatToggler.value = KeyboardSetup.hideChatMessage;
+            } else {
+                Chat.hide();
+                chatToggler.value = KeyboardSetup.showChatMessage;
+            }
+        };
+        return Dom.el('div', 'form-control', chatToggler);
+    },
+    buildShowNames: function() {
+        var showNames = Dom.el('input', {type: 'button', value: PlayGround.showNames ? 'Hide names' : 'Show names'});
+        showNames.onclick = function() {
+            PlayGround.showNames = !PlayGround.showNames;
+            showNames.value = PlayGround.showNames ? 'Hide names' : 'Show names';
+        };
+
+        return Dom.el('div', 'form-control', showNames);
     },
     onEscapeButton: function(e) {
         if(KeyboardSetup.isActive && e.keyCode === 27) {
             KeyboardSetup.hide();
         }
     },
-    buildButtons: function() {
-        var buttons = [];
-        for(var key in Controls) {
-            buttons.push(KeyboardSetup.createInput(key));
+    buildChatSettings: function() {
+        var binds = ['bind1', 'bind2', 'bind3', 'bind4', 'bind5', 'bind6', 'bind7', 'bind8', 'bind9'];
+        var out = KeyboardSetup.buildGenericSettings(['chat']);
+        for(var i = 0; i < binds.length; i++) {
+            out.push(KeyboardSetup.createChatInput(binds[i]));
         }
-        buttons.push(KeyboardSetup.buildAngleMistake());
-        buttons.push(KeyboardSetup.buildDrawBounds());
-        buttons.push(KeyboardSetup.buildBackgounds())
-        return Dom.el('div', 'controls', buttons);
+        return out;
+    },
+    buildFireSettings: function() {
+        var out = KeyboardSetup.buildGenericSettings(['nextWeapon', 'previousWeapon', 'reload',
+            'knife', 'pistol', 'shotgun', 'assault', 'sniper', 'flamethrower',
+            'minigun', 'rocket']);
+        out.push(KeyboardSetup.buildNoReload());
+        return out;
+    },
+    buildNoReload: function() {
+        var checkbox = Dom.el('input', {type: 'checkbox', id: 'no_passive_reload',title: 'Next weapon on empty ammo'});
+        checkbox.checked = PersonActions.noPassiveReload;
+        checkbox.onchange = function() {
+            PlayGround.noPassiveReload = checkbox.checked;
+            PlayGround.send('passiveReload:' + (checkbox.checked ? '0' : '1'));
+        };
+        var label = Dom.el('label', {'for': 'no_passive_reload', title: 'Next weapon on empty ammo'}, [checkbox, 'No passive reload']);
+        return Dom.el('div', 'form-control', label);
+    },
+    buildMovementSettings: function() {
+        return KeyboardSetup.buildGenericSettings(['left', 'top', 'right', 'bottom']);
+    },
+    buildGenericSettings: function(keys) {
+        var out = [];
+        for(var i = 0; i < keys.length; i++) {
+            out.push(KeyboardSetup.createInput(keys[i]));
+        }
+        return out;
+    },
+    buildHudSettings: function() {
+        return [
+            KeyboardSetup.buildBackgounds(),
+            KeyboardSetup.buildDrawBounds(),
+            KeyboardSetup.buildShowNames(),
+            KeyboardSetup.buildChatToggler()
+        ];
     },
     buildBackgounds: function() {
         var buttons = ["Background: "];
@@ -78,7 +128,7 @@ var KeyboardSetup = {
         for(var i = 1; i < 9; i++) {
            buttons.push(buildButton(i));
         }
-        return Dom.el('div', null, buttons);
+        return Dom.el('div', 'form-control', buttons);
     },
     buildDrawBounds: function() {
         var checkbox = Dom.el('input', {type: 'checkbox', id: 'draw_bounds'});
@@ -88,22 +138,25 @@ var KeyboardSetup = {
             PlayGround.updateCanvas(PlayGround.map);
         };
         var label = Dom.el('label', {'for': 'draw_bounds'}, [checkbox, 'Draw bounds']);
-        return Dom.el('div', null, label);
+        return Dom.el('div', 'form-control', label);
     },
-    buildAngleMistake: function() {
-        var input = Dom.el('input', {type: 'text', value: PersonActions.angleMistake, id: 'angle_mistake'});
-        var label = Dom.el('label', {'for': 'angle_mistake'}, 'Angle Mistake (for slow internet)');
-        input.onkeyup = function() {
-            var value = parseFloat(input.value);
-            if(value >= 0) {
-                PersonActions.angleMistake = value;
-            } else {
-                input.value = PersonActions.angleMistake;
-            }
+    createChatInput: function(key) {
+        var container = KeyboardSetup.createInput(key);
+        var messageInput = Dom.el('input', {
+            type: 'text',
+            id: 'chat_' + key,
+            value: Chat.binds[key] || ''
+        });
+        messageInput.onblur = function() {
+            Chat.binds[key] = this.value;
+            Chat.save();
         };
-        return Dom.el('div', null, [label, input])
+        container.appendChild(messageInput);
+        return container;
     },
     createInput: function(key) {
+        if(Controls[key] === undefined) throw "Undefined key in controls: " + key;
+
         var id = "control_" + key;
         var input = Dom.el('input', {id: id, type:'text', value: KeyboardSetup.translateButton(Controls[key])});
         input.onkeyup = function(e) {
@@ -120,7 +173,7 @@ var KeyboardSetup = {
             }
         };
         var label = Dom.el('label', {'for': id}, key);
-        return Dom.el('div', null, [label, input]);
+        return Dom.el('div', 'form-control', [label, input]);
     },
     translateButton: function(code) {
         switch (code) {

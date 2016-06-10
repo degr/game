@@ -6,10 +6,10 @@ import org.forweb.commandos.entity.zone.AbstractItem;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ItemService {
+class ItemService {
 
-    public void onGetItem(AbstractItem item, Person player) {
-        if(!item.isAvailable()) {
+    void onGetItem(AbstractItem item, Person player) {
+        if (!item.isAvailable()) {
             return;
         }
         switch (item.getType()) {
@@ -32,12 +32,12 @@ public class ItemService {
             case "shotgun":
                 handleWeaponPick(player, new Shotgun());
                 break;
-                //items
+            //items
             case "medkit":
                 int life = player.getLife();
-                if(life < 100) {
+                if (life < 100) {
                     life += 25;
-                    if(life > 100) {
+                    if (life > 100) {
                         life = 100;
                     }
                 } else {
@@ -46,28 +46,10 @@ public class ItemService {
                 player.setLife(life);
                 break;
             case "armor":
-                int armor = player.getArmor();
-                if(armor < 100) {
-                    armor += 100;
-                    if(armor > 100) {
-                        armor = 100;
-                    }
-                } else {
-                    return;
-                }
-                player.setArmor(armor);
+                onArmor(100, player);
                 break;
             case "helm":
-                int armor1 = player.getArmor();
-                if(armor1 < 150) {
-                    armor1 += 50;
-                    if(armor1 > 150) {
-                        armor1 = 150;
-                    }
-                } else {
-                    return;
-                }
-                player.setArmor(armor1);
+                onArmor(50, player);
                 break;
             default:
                 throw new RuntimeException("Unknonwn weapon name - " + item.getType());
@@ -76,16 +58,27 @@ public class ItemService {
         item.setTimeout(System.currentTimeMillis() + item.getTime());
     }
 
+    private void onArmor(int armor, Person person) {
+        int armor1 = person.getArmor();
+        if (armor1 < 150) {
+            armor1 += armor;
+            if (armor1 > 150) {
+                armor1 = 150;
+            }
+            person.setArmor(armor1);
+        }
+    }
+
     private void handleWeaponPick(Person player, AbstractWeapon weapon) {
-        for(AbstractWeapon personHaving : player.getWeaponList()) {
-            if(personHaving.getClass().equals(weapon.getClass())) {
+        for (AbstractWeapon personHaving : player.getWeaponList()) {
+            if (personHaving.getClass().equals(weapon.getClass())) {
                 personHaving.setTotalClip(personHaving.getTotalClip() + weapon.getTotalClip());
                 personHaving.setCurrentClip(personHaving.getClipSize());
-                if(player.isReload() && personHaving == player.getWeapon()) {
+                if (player.isReload() && personHaving == player.getWeapon()) {
                     player.setReload(false);
                     player.setReloadCooldown(0);
                 }
-                if(personHaving.getTotalClip() > personHaving.getMaxClip()) {
+                if (personHaving.getTotalClip() > personHaving.getMaxClip()) {
                     personHaving.setTotalClip(weapon.getMaxClip());
                 }
                 return;

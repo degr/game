@@ -174,4 +174,10 @@ public class SpringDelegationService {
     public void changeWeapon(Person person, Integer weaponCode) {
         projectilesService.changeWeapon(person, weaponCode);
     }
+
+    public void reloadWeapon(Person person) {
+        if(!person.isReload() && person.getWeapon().getCurrentClip() != person.getWeapon().getClipSize()) {
+            projectilesService.doReload(person, System.currentTimeMillis());
+        }
+    }
 }

@@ -1,5 +1,6 @@
 var Weapons = {
     container: '',
+    rightSide: true,
     updater: {},
     weapons: {
         knife: {type: 'knife', code: 1, active: false, enable: true, max: 1, clip: 1, total: 0, current: 0},
@@ -14,6 +15,14 @@ var Weapons = {
     },
     init: function () {
         Weapons.container = Dom.el('div', {'class': 'weapon-holder'});
+        Weapons.container.addEventListener('mouseover', function() {
+            if(Weapons.rightSide) {
+                Dom.addClass(Weapons.container, 'left');
+            } else {
+                Dom.removeClass(Weapons.container, 'left');
+            }
+            Weapons.rightSide = !Weapons.rightSide;
+        }, false);
         for (var i in Weapons.weapons) {
             Weapons.buildWeapon(Weapons.weapons[i]);
         }

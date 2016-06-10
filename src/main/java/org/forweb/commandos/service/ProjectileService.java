@@ -315,13 +315,17 @@ public class ProjectileService {
             AbstractWeapon weapon = person.getWeapon();
             long now = System.currentTimeMillis();
             if(!person.isReload() && weapon.getCurrentClip() <= 0) {
-                if(weapon.getTotalClip() > 0) {
-                    person.setIsReload(true);
-                    person.setReloadCooldown(now + person.getWeapon().getReloadTimeout());
-                }
+                doReload(person, now);
             } else if (!person.isReload() && weapon.getCurrentClip() > 0 && person.getShotCooldown() < now) {
                 fire(person, room);
             }
+        }
+    }
+
+    public void doReload(Person person, long now) {
+        if(person.getWeapon().getTotalClip() > 0) {
+            person.setIsReload(true);
+            person.setReloadCooldown(now + person.getWeapon().getReloadTimeout());
         }
     }
 

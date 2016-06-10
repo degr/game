@@ -135,7 +135,7 @@ public class ZoneService extends AbstractService<Zone, ZoneDao> {
                 out = new HelmZone(x, y, id);
                 break;
             case "respawn":
-                out = new Respawn(x, y);
+                out = new Respawn(x, y, id);
                 break;
             case "wall":
                 out = new Wall(x, y, zone.getWidth(), zone.getHeight());

@@ -26,6 +26,7 @@ public class PersonWebSocketEndpoint {
     private static final String MESSAGE_JOIN = "join";
     private static final String MESSAGE_CREATE = "create";
     private static final String MESSAGE_SHOT = "fire";
+    private static final String MESSAGE_RELOAD = "reload";
     private static final String MESSAGE_DIRECTION = "direction";
     private static final String MESSAGE_ANGLE = "angle";
     private static final String MESSAGE_MESSAGE = "message";
@@ -85,6 +86,9 @@ public class PersonWebSocketEndpoint {
                 break;
             case MESSAGE_CHANGE_WEAPON:
                 springDelegationService.changeWeapon(getPerson(), Integer.parseInt(parts[1]));
+                break;
+            case MESSAGE_RELOAD:
+                springDelegationService.reloadWeapon(getPerson());
                 break;
             case MESSAGE_CREATE:
                 String roomName;

@@ -22,6 +22,8 @@ public class Person implements WebSocketResponse {
     private String name;
     private int selectedAngle;
 
+    private Integer lastRespawnId = 0;
+
     public List<AbstractWeapon> getWeaponList() {
         return weaponList;
     }
@@ -199,4 +201,13 @@ public class Person implements WebSocketResponse {
     public int getSelectedAngle() {
         return selectedAngle;
     }
+
+    public Integer getLastRespawnId() {
+        return lastRespawnId;
+    }
+
+    public void setLastRespawnId(Integer lastRespawnId) {
+        this.lastRespawnId = lastRespawnId;
+    }
+
 }

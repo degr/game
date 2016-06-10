@@ -5,6 +5,7 @@ var Controls = {
     bottom: 83,
     nextWeapon: 0,
     previousWeapon: null,
+    reload: null,
     knife: 49,
     pistol: 50,
     shotgun: 51,
@@ -13,6 +14,15 @@ var Controls = {
     flamethrower: 54,
     minigun: 55,
     rocket: 56,
+    bind1: null,
+    bind2: null,
+    bind3: null,
+    bind4: null,
+    bind5: null,
+    bind6: null,
+    bind7: null,
+    bind8: null,
+    bind9: null,
     //grenage: 9
     chat: 13
 };

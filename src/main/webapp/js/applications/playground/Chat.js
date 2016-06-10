@@ -1,21 +1,50 @@
 var Chat = {
     container: null,
+    isTextareaShown: false,
     screen: null,
     textarea: null,
     active: null,
     isHidden: false,
+    binds: {},
     init: function () {
-        Chat.textarea = Dom.el('textarea');
-        Chat.textarea.onkeydown = Chat.onkeyup;
-        Chat.textarea.onfocus = function () {Chat.active = true;PersonActions.stopFire()};
-        Chat.textarea.onblur = function () {Chat.active = false;};
+        window.addEventListener('keyup', Chat.onChatKeyup, false);
+        try {
+            var value = localStorage.getItem('chat');
+            if(value) {
+                Chat.binds = JSON.parse(value);
+            }
+        } catch (e){
+            Chat.binds = {};
+        }
+        Chat.textarea = Dom.el('textarea', Chat.isTextareaShown ? '' : 'hidden');
+        Chat.textarea.onkeyup = Chat.onkeyup;
+        Chat.textarea.onfocus = function () {
+            Chat.active = true;
+            Chat.isTextareaShown = true;
+            PersonActions.stopFire()
+        };
+        Chat.textarea.onblur = function () {
+            Chat.active = false;
+            Chat.isTextareaShown = false;
+            Dom.addClass(Chat.textarea, 'hidden');
+        };
         Chat.screen = Dom.el('div', 'console');
         Chat.container = Dom.el('div', 'chat', [Chat.screen, Chat.textarea]);
+    },
+    save: function() {
+        localStorage.setItem('chat', JSON.stringify(Chat.binds));
     },
     onkeyup: function(e) {
         if(e.keyCode == 13) {
             var message = Chat.textarea.value;
-            Chat.textarea.value = '';
+            if(message && message.trim()) {
+                Chat.textarea.value = '';
+                Chat.sendMessage(message);
+            }
+        }
+    },
+    sendMessage: function(message) {
+        if(!KeyboardSetup.isActive && message) {
             PlayGround.writeMessage(message.trim());
         }
     },
@@ -27,13 +56,48 @@ var Chat = {
         Chat.isHidden = true;
         Dom.addClass(Chat.container, 'hidden');
     },
+    onChatKeyup: function(e) {
+        switch (e.keyCode) {
+            case Controls.chat: 
+                e.preventDefault();
+                e.stopPropagation();
+                Chat.show();
+                Dom.removeClass(Chat.textarea, 'hidden');
+                setTimeout(function(){
+                    Chat.textarea.focus()
+                }, 50);
+                break;
+            case Controls.bind1:
+            case Controls.bind2:
+            case Controls.bind3:
+            case Controls.bind4:
+            case Controls.bind5:
+            case Controls.bind6:
+            case Controls.bind7:
+            case Controls.bind8:
+            case Controls.bind9:
+                for(var bindKey in Controls) {
+                    if(Controls[bindKey] === e.keyCode) {
+                        Chat.sendMessage(Chat.binds[bindKey]);
+                        break;
+                    }
+                }
+                break;
+        }
+    },
     update: function(personId, message) {
+        var screen = Chat.screen;
         if(PlayGround.entities[personId]) {
             var writer = Dom.el('span', 'writer', PlayGround.entities[personId].name + " : ");
             var messageHolder = Dom.el('span', 'message', message);
             var comment = Dom.el('div', 'comment', [writer, messageHolder]);
-            Chat.screen.appendChild(comment);
-            Chat.screen.scrollTop =  Chat.screen.scrollHeight;
+            screen.appendChild(comment);
+            screen.scrollTop =  Chat.screen.scrollHeight;
+        }
+        if(screen.childNodes.length > 100) {
+            for(var i = 20; i >= 0; i--) {
+                screen.childNodes[i].remove(true);
+            }
         }
     }
 };

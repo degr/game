@@ -3,14 +3,13 @@ package org.forweb.commandos.service;
 import org.forweb.commandos.controller.PersonWebSocketEndpoint;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
-import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.entity.zone.AbstractItem;
+import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.entity.zone.interactive.Respawn;
 import org.forweb.geometry.services.CircleService;
 import org.forweb.geometry.services.PointService;
 import org.forweb.geometry.shapes.Circle;
 import org.forweb.geometry.shapes.Point;
-import org.forweb.geometry.shapes.Bounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,18 +26,22 @@ public class LocationService {
 
     private static final Random random = new Random();
 
-    public Point getRespawnCenter(Room room){
+    Respawn getRespawn(Room room, Person person) {
         List<Respawn> list = new ArrayList<>();
-        for(AbstractZone zone : room.getMap().getZones()) {
-            if(zone instanceof Respawn) {
+        for (AbstractZone zone : room.getMap().getZones()) {
+            if (zone instanceof Respawn) {
                 list.add((Respawn) zone);
             }
         }
-        Respawn out = list.get(random.nextInt(list.size()));
-        return new Point(
-                out.getX() + PersonWebSocketEndpoint.PERSON_RADIUS,
-                out.getY() + PersonWebSocketEndpoint.PERSON_RADIUS
-        );
+        int i = 0;
+        while (i < 100) {
+            i++;
+            Respawn out = list.get(random.nextInt(list.size()));
+            if (!out.getId().equals(person.getLastRespawnId())) {
+                return out;
+            }
+        }
+        return null;
     }
 
     public String getRandomHexColor() {
@@ -52,14 +55,15 @@ public class LocationService {
     }
 
     public Point[] canGoEast(Person player, Room room, double distance) {
-        if(player.getX() >= room.getMap().getX() - PersonWebSocketEndpoint.PERSON_RADIUS) {
+        if (player.getX() >= room.getMap().getX() - PersonWebSocketEndpoint.PERSON_RADIUS) {
             return null;
         } else {
             return calculateCollistions(player, room, distance, 0);
         }
     }
+
     public Point[] canGoWest(Person player, Room room, double distance) {
-        if(player.getX() <= PersonWebSocketEndpoint.PERSON_RADIUS) {
+        if (player.getX() <= PersonWebSocketEndpoint.PERSON_RADIUS) {
             return null;
         } else {
             return calculateCollistions(player, room, -1 * distance, 0);
@@ -67,7 +71,7 @@ public class LocationService {
     }
 
     public Point[] canGoNorth(Person player, Room room, double distance) {
-        if(player.getY() <= PersonWebSocketEndpoint.PERSON_RADIUS) {
+        if (player.getY() <= PersonWebSocketEndpoint.PERSON_RADIUS) {
             return null;
         } else {
             return calculateCollistions(player, room, 0, -1 * distance);
@@ -75,36 +79,36 @@ public class LocationService {
     }
 
     public Point[] canGoSouth(Person player, Room room, double distance) {
-        if(player.getY() + PersonWebSocketEndpoint.PERSON_RADIUS >= room.getMap().getY()) {
+        if (player.getY() + PersonWebSocketEndpoint.PERSON_RADIUS >= room.getMap().getY()) {
             return null;
         } else {
             return calculateCollistions(player, room, 0, distance);
         }
     }
 
-    private Point[] calculateCollistions(Person player, Room room, double xShift, double yShift){
+    private Point[] calculateCollistions(Person player, Room room, double xShift, double yShift) {
         Circle playerCircle = new Circle(
                 player.getX() + xShift,
                 player.getY() + yShift,
                 PersonWebSocketEndpoint.PERSON_RADIUS
         );
         List<AbstractItem> itemsToPick = null;
-        for(AbstractZone zone : room.getMap().getZones()) {
+        for (AbstractZone zone : room.getMap().getZones()) {
             Point[] point = CircleService.circleBoundsIntersection(playerCircle, GeometryService.getRectangle(zone));
             if (point.length > 0) {
-                if(zone.isPassable()) {
-                    if(zone instanceof AbstractItem) {
-                        if(itemsToPick == null) {
+                if (zone.isPassable()) {
+                    if (zone instanceof AbstractItem) {
+                        if (itemsToPick == null) {
                             itemsToPick = new ArrayList<>();
                         }
-                        itemsToPick.add((AbstractItem)zone);
+                        itemsToPick.add((AbstractItem) zone);
                     }
                 } else {
                     return point;
                 }
             }
         }
-        if(itemsToPick != null) {
+        if (itemsToPick != null) {
             for (AbstractItem item : itemsToPick) {
                 itemService.onGetItem(item, player);
             }
