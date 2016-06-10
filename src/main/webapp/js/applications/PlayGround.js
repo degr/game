@@ -30,6 +30,7 @@ var PlayGround = {
     instantBullets: {},
     
     init: function () {
+        PersonActions.init();
         PersonTracker.init();
         ZoneActions.init();
         Weapons.init();
@@ -146,9 +147,13 @@ var PlayGround = {
                 PlayGround.socket.send(onConnectMessage);
                 PlayGround.startGameLoop();
                 PlayGround.gameStarted = true;
+                setTimeout(function() {
+                    if(PersonActions.noPassiveReload) {
+                        PersonActions.updatePassiveReload(true);
+                    }
+                }, 2000)
             },
             function onMessage(message) {
-                // _Potential_ security hole, consider using json lib to parse data in production.
                 var data = eval('(' + message.data + ')');
                 switch (data.type) {
                     case 'update':

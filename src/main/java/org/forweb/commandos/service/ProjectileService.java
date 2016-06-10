@@ -17,6 +17,7 @@ import org.forweb.geometry.shapes.Bounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -315,11 +316,63 @@ public class ProjectileService {
             AbstractWeapon weapon = person.getWeapon();
             long now = System.currentTimeMillis();
             if(!person.isReload() && weapon.getCurrentClip() <= 0) {
-                doReload(person, now);
+                if(person.isNoPassiveReload()) {
+                    if(person.getShotCooldown() < now) {
+                        AbstractWeapon newWeapon = findBestWeapon(person.getWeaponList());
+                        if (newWeapon != null) {
+                            person.setWeapon(newWeapon);
+                            fire(person, room);
+                        }
+                    }
+                } else {
+                    doReload(person, now);
+                }
             } else if (!person.isReload() && weapon.getCurrentClip() > 0 && person.getShotCooldown() < now) {
                 fire(person, room);
             }
         }
+    }
+
+    private AbstractWeapon findBestWeapon(List<AbstractWeapon> weaponList) {
+        int index = -1;
+        int weight = -1;
+        for(int i = 0; i < weaponList.size(); i++) {
+            AbstractWeapon weapon = weaponList.get(i);
+            if(weapon.getCurrentClip() > 0) {
+                if (weapon instanceof Pistol) {
+                    if (weight < 1) {
+                        weight = 1;
+                        index = i;
+                    }
+                } else if(weapon instanceof Shotgun ) {
+                    if (weight < 2) {
+                        weight = 2;
+                        index = i;
+                    }
+                } else if(weapon instanceof AssaultRifle) {
+                    if (weight < 3) {
+                        weight = 3;
+                        index = i;
+                    }
+                } else if(weapon instanceof SniperRifle) {
+                    if (weight < 4) {
+                        weight = 4;
+                        index = i;
+                    }
+                } else if(weapon instanceof Flamethrower) {
+                    if (weight < 5) {
+                        weight = 5;
+                        index = i;
+                    }
+                } else if(weapon instanceof Minigun) {
+                    if (weight < 6) {
+                        weight = 6;
+                        index = i;
+                    }
+                }
+            }
+        }
+        return index > -1 ? weaponList.get(index) : null;
     }
 
     public void doReload(Person person, long now) {

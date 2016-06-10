@@ -7,6 +7,15 @@ var PersonActions = {
     directionY: null,
     noPassiveReload: false
 };
+PersonActions.updatePassiveReload = function(value) {
+    localStorage.setItem('no_passive_reload', value);
+    PersonActions.noPassiveReload = value;
+    PlayGround.socket.send('noPassiveReload:' + (value ? '1' : '0'));
+};
+PersonActions.init = function() {
+    var noPassivereload = localStorage.getItem('no_passive_reload');
+    PersonActions.noPassiveReload = noPassivereload === 'true';
+}
 
 PersonActions.setDirection  = function(direction) {
     PlayGround.socket.send("direction:" + direction);

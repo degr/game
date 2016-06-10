@@ -90,8 +90,7 @@ var KeyboardSetup = {
         var checkbox = Dom.el('input', {type: 'checkbox', id: 'no_passive_reload',title: 'Next weapon on empty ammo'});
         checkbox.checked = PersonActions.noPassiveReload;
         checkbox.onchange = function() {
-            PlayGround.noPassiveReload = checkbox.checked;
-            PlayGround.send('passiveReload:' + (checkbox.checked ? '0' : '1'));
+            PersonActions.updatePassiveReload(checkbox.checked);
         };
         var label = Dom.el('label', {'for': 'no_passive_reload', title: 'Next weapon on empty ammo'}, [checkbox, 'No passive reload']);
         return Dom.el('div', 'form-control', label);

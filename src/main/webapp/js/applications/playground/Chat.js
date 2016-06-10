@@ -57,6 +57,7 @@ var Chat = {
         Dom.addClass(Chat.container, 'hidden');
     },
     onChatKeyup: function(e) {
+        if(Chat.active)return;
         switch (e.keyCode) {
             case Controls.chat: 
                 e.preventDefault();

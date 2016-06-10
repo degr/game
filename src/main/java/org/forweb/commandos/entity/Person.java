@@ -23,6 +23,7 @@ public class Person implements WebSocketResponse {
     private int selectedAngle;
 
     private Integer lastRespawnId = 0;
+    private boolean noPassiveReload;
 
     public List<AbstractWeapon> getWeaponList() {
         return weaponList;
@@ -210,4 +211,11 @@ public class Person implements WebSocketResponse {
         this.lastRespawnId = lastRespawnId;
     }
 
+    public void setNoPassiveReload(boolean noPassiveReload) {
+        this.noPassiveReload = noPassiveReload;
+    }
+
+    public boolean isNoPassiveReload() {
+        return noPassiveReload;
+    }
 }

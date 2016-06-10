@@ -31,6 +31,7 @@ public class PersonWebSocketEndpoint {
     private static final String MESSAGE_ANGLE = "angle";
     private static final String MESSAGE_MESSAGE = "message";
     private static final String MESSAGE_CHANGE_WEAPON = "gun";
+    private static final String MESSAGE_NO_PASSIVE_RELOAD = "noPassiveReload";
 
     public static final int PERSON_RADIUS = 20;
     public static final int ROCKET_RADIUS = 8;
@@ -89,6 +90,9 @@ public class PersonWebSocketEndpoint {
                 break;
             case MESSAGE_RELOAD:
                 springDelegationService.reloadWeapon(getPerson());
+                break;
+            case MESSAGE_NO_PASSIVE_RELOAD:
+                getPerson().setNoPassiveReload("1".equals(parts[1]));
                 break;
             case MESSAGE_CREATE:
                 String roomName;
