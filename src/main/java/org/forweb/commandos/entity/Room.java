@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Room {
 
     private Integer id;
 
-    public Room(){}
+    private final AtomicInteger personIds = new AtomicInteger(0);
+    private final AtomicInteger projectilesIds = new AtomicInteger(0);
 
     private String name;
     private String description;
@@ -24,12 +26,33 @@ public class Room {
     private long endTime;
 
     private boolean showStats;
+    private Timer gameTimer = null;
+    private Integer team2Score = 0;
+    private Integer team1Score = 0;
+    private boolean coOp;
+
+    public Integer getTeam1Score() {
+        return team1Score;
+    }
+
+    public void setTeam1Score(Integer team1Score) {
+        this.team1Score = team1Score;
+    }
+
+    public Integer getTeam2Score() {
+        return team2Score;
+    }
+
+    public void setTeam2Score(Integer team2Score) {
+        this.team2Score = team2Score;
+    }
+
+
     private List<String> messages = new ArrayList<>();
+
     public ConcurrentHashMap<Integer, Person> getPersons() {
         return persons;
     }
-
-    private Timer gameTimer = null;
     public void setGameTimer(Timer timer) {
         this.gameTimer = timer;
     }
@@ -115,5 +138,19 @@ public class Room {
     }
     public void setMessages(ArrayList<String> messages) {
         this.messages = messages;
+    }
+
+    public AtomicInteger getPersonIds() {
+        return personIds;
+    }
+    public AtomicInteger getProjectilesIds() {
+        return projectilesIds;
+    }
+
+    public void setCoOp(boolean coOp) {
+        this.coOp = coOp;
+    }
+    public boolean isCoOp() {
+        return coOp;
     }
 }

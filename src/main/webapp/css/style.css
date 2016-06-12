@@ -129,7 +129,7 @@ body, html {
     background: rgb(234, 145, 145);
 }
 
-.editor .mounted {
+.editor .mounted-wrapper {
     width: 250px;
     position: fixed;
     top: 10px;
@@ -304,6 +304,8 @@ body, html {
     top: 0;
     width: 468px;
     background: rgba(0,0,0,0.3);
+    border: 1px solid;
+    border-top: none;
 }
 .playground .chat .message {
     color: rgb(53, 42, 191);
@@ -344,4 +346,24 @@ body, html {
 
 a.tab-name.active {
     background: #C3CFF1;
+}
+.score-overview {
+    background: rgba(0,0,0,0.4);
+    color: white;
+    font-size: 19px;
+}
+.score-overview td, .score-overview th{
+    padding: 3px 10px;
+    text-align: center;
+}
+.score-overview .owner{
+    color: cadetblue;
+}
+.team-control {
+    position: fixed;
+    top: 0;
+    left: 540px;
+    background: white;
+    border: 1px solid black;
+    border-top: none;
 }

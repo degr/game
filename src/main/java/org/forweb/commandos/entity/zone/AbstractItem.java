@@ -4,7 +4,7 @@ import org.forweb.commandos.controller.PersonWebSocketEndpoint;
 import org.forweb.geometry.shapes.Bounds;
 
 
-public abstract class AbstractItem extends AbstractZone{
+public abstract class AbstractItem extends AbstractZone implements Interactive{
 
     private boolean isAvailable;
     private long timeout;
@@ -25,6 +25,7 @@ public abstract class AbstractItem extends AbstractZone{
         this.setId(id);
     }
 
+    @Override
     public boolean isAvailable() {
         return isAvailable;
     }
@@ -44,4 +45,5 @@ public abstract class AbstractItem extends AbstractZone{
     public long getTime() {
         return time;
     }
+
 }

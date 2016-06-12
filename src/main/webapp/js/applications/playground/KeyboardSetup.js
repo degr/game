@@ -110,8 +110,12 @@ var KeyboardSetup = {
             KeyboardSetup.buildBackgounds(),
             KeyboardSetup.buildDrawBounds(),
             KeyboardSetup.buildShowNames(),
-            KeyboardSetup.buildChatToggler()
+            KeyboardSetup.buildChatToggler(),
+            KeyboardSetup.buildScoreButton()
         ];
+    },
+    buildScoreButton: function () {
+        return KeyboardSetup.createInput('score');
     },
     buildBackgounds: function() {
         var buttons = ["Background: "];
@@ -158,7 +162,11 @@ var KeyboardSetup = {
 
         var id = "control_" + key;
         var input = Dom.el('input', {id: id, type:'text', value: KeyboardSetup.translateButton(Controls[key])});
+        input.onkeydown = function (e) {
+            e.preventDefault();
+        };
         input.onkeyup = function(e) {
+            e.preventDefault();
             var value = KeyboardSetup.translateButton(e.keyCode);
             if(value === 'esc') {
                 return;

@@ -23,7 +23,7 @@ public class SpringConfiguration {
     @Bean(name="multipartResolver")
     public MultipartResolver multipartResolver() {
         CommonsMultipartResolver out = new CommonsMultipartResolver();
-        out.setMaxUploadSize(100000);
+        out.setMaxUploadSize(10000000);
         return out;
     }
 

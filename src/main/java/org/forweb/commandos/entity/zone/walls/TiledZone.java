@@ -7,6 +7,8 @@ import org.forweb.geometry.shapes.Point;
 
 public class TiledZone extends AbstractZone {
 
+    public static final String TITLE = "tiled";
+
     private Integer tileId;
     private String tileName;
     private Boolean tileset;
@@ -15,7 +17,7 @@ public class TiledZone extends AbstractZone {
     private Integer shiftY;
 
     public TiledZone(Integer x, Integer y, Zone zone, Tile tile) {
-        super("tiled", new Bounds(new Point(x, y), new Point(x + tile.getWidth(), y + tile.getHeight())));
+        super(TITLE, new Bounds(new Point(x, y), new Point(x + tile.getWidth(), y + tile.getHeight())));
         setStaticSize(true);
         setCustomSprite(tile.getImage());
         setTileId(tile.getId());

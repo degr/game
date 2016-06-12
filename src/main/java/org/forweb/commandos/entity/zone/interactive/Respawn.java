@@ -8,7 +8,10 @@ public class Respawn extends AbstractZone {
     public static final String TITLE = "respawn";
 
     public Respawn(int leftTopX, int leftTopY, int id) {
-        super(TITLE, new Bounds(
+        this(TITLE, leftTopX, leftTopY, id);
+    }
+    protected Respawn(String title, int leftTopX, int leftTopY, int id) {
+        super(title, new Bounds(
                 leftTopX,
                 leftTopY,
                 PersonWebSocketEndpoint.PERSON_RADIUS * 2,
@@ -18,5 +21,9 @@ public class Respawn extends AbstractZone {
         setPassable(true);
         setShootable(true);
         setStaticSize(true);
+    }
+
+    public int getTeam() {
+        return 0;
     }
 }

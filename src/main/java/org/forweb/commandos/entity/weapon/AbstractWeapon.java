@@ -3,6 +3,7 @@ package org.forweb.commandos.entity.weapon;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.WebSocketResponse;
 import org.forweb.commandos.entity.ammo.Projectile;
+import org.forweb.commandos.entity.zone.Interactive;
 
 import java.util.Random;
 

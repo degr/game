@@ -7,7 +7,7 @@ import java.awt.*;
 
 public class Wall extends AbstractZone {
 
-    private static final String TITLE = "wall";
+    public static final String TITLE = "wall";
 
     public Wall(int leftTopX, int leftTopY, int width, int height) {
         this(new Bounds(leftTopX, leftTopY, width, height));

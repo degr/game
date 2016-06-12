@@ -24,8 +24,6 @@ public class SpringDelegationService {
     @Autowired
     private Context gameContext;
     @Autowired
-    private LocationService locationService;
-    @Autowired
     private PersonService personService;
     @Autowired
     private TurnService turnService;
@@ -42,26 +40,21 @@ public class SpringDelegationService {
     public void onJoin(Session session, Integer personId, Integer roomId, String name) {
         Room room = gameContext.getRoom(roomId);
         Person person = new Person(personId);
-        if(room.getPersons().size() >= room.getMap().getMaxPlayers()) {
+        if (room.getPersons().size() >= room.getMap().getMaxPlayers()) {
             person.setInPool(true);
         } else {
             person.setInPool(false);
         }
         gameContext.getSessionStorage().put(personId, session);
         person.setName(name);
-        person.setHexColor(locationService.getRandomHexColor());
         personService.resetState(person, gameContext.getRoom(roomId));
         room.getPersons().put(person.getId(), person);
-    }
-
-    public int addAndIncrementPersonId() {
-        return gameContext.getPersonIds().getAndIncrement();
     }
 
     public void onTextMessage(String message, int roomId, Integer personId) {
         Room room = gameContext.getRoom(roomId);
         Person person = room.getPersons().get(personId);
-        if(!person.isInPool()) {
+        if (!person.isInPool()) {
             room.addMessage(personId + ":" + message.substring(message.indexOf(":") + 1));
         }
     }
@@ -109,55 +102,49 @@ public class SpringDelegationService {
         }
     }
 
-    public void startTimer(Room room) {
+    private void startTimer(Room room) {
         room.setGameTimer(new Timer(PersonWebSocketEndpoint.class.getSimpleName() + " Timer " + new Random().nextDouble()));
 
         room.getGameTimer().scheduleAtFixedRate(new TimerTask() {
             private int skip = 1;
             private int current = 0;
+
             @Override
             public void run() {
-                    try {
-                        tick(room);
-                        if(current >= skip) {
-                            responseService.broadcast(
-                                    new Update(
-                                            responseService.mapPersons(room.getPersons()),
-                                            responseService.mapProjectiles(room.getProjectiles()),
-                                            responseService.mapItems(room.getMap().getZones()),
-                                            room.getMessages(),
-                                            room.getEndTime() - System.currentTimeMillis()
-                                    ),
-                                    room
-                            );
-                        }
-                    } catch (RuntimeException e) {
-                        e.printStackTrace();
-                        System.out.println("Caught to prevent timer from shutting down" + e.getMessage());
+                try {
+                    tick(room);
+                    if (current >= skip) {
+                        responseService.broadcast(
+                                new Update(
+                                        responseService.mapPersons(room.getPersons()),
+                                        responseService.mapProjectiles(room.getProjectiles()),
+                                        responseService.mapItems(room.getMap().getZones()),
+                                        room.getMessages(),
+                                        room.getEndTime() - System.currentTimeMillis()
+                                ),
+                                room
+                        );
                     }
-                    if(current > skip) {
-                        current = 0;
-                    } else {
-                        current++;
-                    }
+                } catch (RuntimeException e) {
+                    e.printStackTrace();
+                    System.out.println("Caught to prevent timer from shutting down" + e.getMessage());
+                }
+                if (current > skip) {
+                    current = 0;
+                } else {
+                    current++;
+                }
             }
         }, Context.TICK_DELAY, Context.TICK_DELAY);
     }
 
 
-
     private synchronized void removePerson(Integer personId, Integer roomId) {
         Room room = gameContext.getRoom(roomId);
-        if(room != null) {
+        if (room != null) {
             room.getPersons().remove(personId);
         }
     }
-
-    /*private void stopTimer(Room room) {
-        if (room.getGameTimer() != null) {
-            room.getGameTimer().cancel();
-        }
-    }*/
 
     public void updatePersonViewAngle(Person person, int direction) {
         turnService.updatePersonViewAngle(person, direction);
@@ -176,8 +163,19 @@ public class SpringDelegationService {
     }
 
     public void reloadWeapon(Person person) {
-        if(!person.isReload() && person.getWeapon().getCurrentClip() != person.getWeapon().getClipSize()) {
+        if (!person.isReload() && person.getWeapon().getCurrentClip() != person.getWeapon().getClipSize()) {
             projectilesService.doReload(person, System.currentTimeMillis());
+        }
+    }
+
+    public void onChangeTeam(Person person, int roomId, int team) {
+        Room room = gameContext.getRoom(roomId);
+        if (room.isCoOp()) {
+            if (team == 1) {
+                person.setTeam(1);
+            } else {
+                person.setTeam(2);
+            }
         }
     }
 }

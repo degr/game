@@ -14,7 +14,7 @@ import java.util.List;
 public class Shotgun extends AbstractWeapon<Shot> {
     public Shotgun() {
         this.setShotTimeout(500);
-        this.setReloadTimeout(3000);
+        this.setReloadTimeout(2000);
         setSpread(15);
         this.setBulletsPerShot(10);
 

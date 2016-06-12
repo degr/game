@@ -4,9 +4,53 @@ var MapEditor = {
     inputX: null,
     inputY: null,
     inputName: null,
+    filterValue: '',
     init: function () {
         CustomTiles.init();
+
         MapEditor.console = Dom.el('p', {id: 'editor_console'});
+
+
+        MapEditor.zonesButtons = Dom.el('div', {'class': 'zones panel'});
+        DomComponents.doModal(MapEditor.zonesButtons);
+        MapEditor.zoneTypeHolder = Dom.el('div', {'class': 'mounted'});
+        var filter = Dom.el('input', {type: 'text', placeholder: 'Filter by zone name'});
+        filter.onkeyup = function () {
+            MapEditor.filterValue = filter.value.toLowerCase();
+            MapEditor.updateMountedObjects();
+        };
+        var zoneTypeWrapper = Dom.el('div', 'mounted-wrapper panel',[filter, MapEditor.zoneTypeHolder]);
+        DomComponents.doModal(zoneTypeWrapper);
+        MapEditor.map = Dom.el('canvas', {width: MapEditor.x, height: MapEditor.y});
+        MapEditor.container = Dom.el('div', {'class': 'editor'}, [
+            CustomTiles.container,
+            MapEditor.doMapControl(), MapEditor.zonesButtons, zoneTypeWrapper, Dom.el('div', 'map-editor-wrapper', MapEditor.map)
+        ]);
+        MapEditor.map.onclick = function (e) {
+            MapEditor.onClick(e)
+        };
+        MapEditor.context = MapEditor.map.getContext('2d');
+    },
+    x: 640,
+    y: 480,
+    gameType: 'dm',
+    map: null,
+    mapName: '',
+    console: null,
+    objectsLoaded: false,
+    mounting: {
+        type: null,
+        pointA: null,
+        pointB: null,
+        highlight: false,
+        customSprite: null
+    },
+    context: null,
+    mounted: null,
+    mountedObjects: [],
+    zonesButtons: null,
+    zonesButtonsData: null,
+    doMapControl: function() {
         var labelX = Dom.el('label', {'for': 'x'}, 'Map X');
         var inputX = Dom.el('input', {type: 'text', name: 'x', value: MapEditor.x});
         inputX.onkeyup = function () {
@@ -47,46 +91,37 @@ var MapEditor = {
         var mapControl = Dom.el('form', {'class': 'panel main-control'}, [
             labelX, inputX, mapName, mapNameEror,labelGridSize, inputGridSize,
             Dom.el('br'),
-            labelY, inputY, Dom.el('input', {type: 'submit', value: 'Save map'}), createTile, goBack,
+            labelY, inputY,
+            MapEditor.doMapType('dm', true, false),MapEditor.doMapType('tdm', false, false),MapEditor.doMapType('ctf', false, true),
+            Dom.el('input', {type: 'submit', value: 'Save map'}), createTile, goBack,
+            
             MapEditor.console
         ]);
         mapControl.onsubmit = function (e) {
             MapEditor.onSubmit(e);
         };
-
         DomComponents.doModal(mapControl);
-        MapEditor.zonesButtons = Dom.el('div', {'class': 'zones panel'});
-        DomComponents.doModal(MapEditor.zonesButtons);
-        MapEditor.zoneTypeHolder = Dom.el('div', {'class': 'mounted panel'});
-        DomComponents.doModal(MapEditor.zoneTypeHolder);
-        MapEditor.map = Dom.el('canvas', {width: MapEditor.x, height: MapEditor.y});
-        MapEditor.container = Dom.el('div', {'class': 'editor'}, [
-            CustomTiles.container,
-            mapControl, MapEditor.zonesButtons, MapEditor.zoneTypeHolder, Dom.el('div', 'map-editor-wrapper', MapEditor.map)
-        ]);
-        MapEditor.map.onclick = function (e) {
-            MapEditor.onClick(e)
+        return mapControl;
+    },
+    doMapType: function (gameType, isChecked, teamRespawns) {
+        var id = "gameType_" + gameType;
+        var input = Dom.el('input', {name: 'gameType', type: 'radio', value: gameType, id: id});
+        input.onclick = function() {
+            for(var i = MapEditor.mountedObjects.length - 1; i >= 0; i--) {
+                var obj = MapEditor.mountedObjects[i];
+                if((teamRespawns && obj.type == 'respawn') || (!teamRespawns && (obj.type == 'respawn_blue' || obj.type == 'respawn_red' || obj.type == 'flag_red' || obj.type == 'flag_blue'))) {
+                    MapEditor.mountedObjects.splice(i, 1);
+                }
+            }
+            MapEditor.gameType = gameType;
+            MapEditor.redrawZoneButtons();
+            MapEditor.render();
         };
-        MapEditor.context = MapEditor.map.getContext('2d');
+        if(isChecked) {
+            input.checked = true;
+        }
+        return Dom.el('label', {'for': id}, [input, gameType]);
     },
-    x: 640,
-    y: 480,
-    gameType: 'dm',
-    map: null,
-    mapName: '',
-    console: null,
-    objectsLoaded: false,
-    mounting: {
-        type: null,
-        pointA: null,
-        pointB: null,
-        highlight: false,
-        customSprite: null
-    },
-    context: null,
-    mounted: null,
-    mountedObjects: [],
-    zonesButtons: null,
     checkMapName: function (name, mapNameEror) {
         MapEditor.mapName = name;
         if (!name) {
@@ -178,6 +213,7 @@ var MapEditor = {
             name: MapEditor.mapName,
             x: MapEditor.x,
             y: MapEditor.y,
+            gameType: MapEditor.gameType,
             zonesDto: zones
         };
         if(document.location.hash) {
@@ -336,91 +372,107 @@ var MapEditor = {
         }
         return out;
     },
+    redrawZoneButtons: function() {
+        var doInput = function (zone, key) {
+            var name = zone.type !== 'tiled' ? zone.type : zone.tileName;
+            var input = Dom.el('input', {
+                type: 'button',
+                'class': 'item item-' + zone.type,
+                value: name
+            });
+            input.onclick = function () {
+                MapEditor.mount(zone)
+            };
+            if(zone.type == 'tiled') {
+                input.style.background = "url(" + PlayGround.uploadPath + zone.customSprite+") no-repeat";
+                if(zone.tileset) {
+                    input.style.height = zone.height + 'px';
+                    input.style.width = zone.width + 'px';
+                    input.style.backgroundPosition = (-zone.width * zone.stepX) + 'px ' + (-zone.height * zone.stepY) + "px ";
+                } else {
+                    input.style.height = '64px';
+                    input.style.width = '64px';
+                    input.style.backgroundSize = "100% 100%";
+                }
+            }
+            MapEditor.zones[key] = zone;
+            return input;
+        };
+        var doTileset = function(zone) {
+            var image = new Image();
+            var header = Dom.el('div');
+            var container = Dom.el('div');
+            var out = new Dom.el('div', 'tileset', [header, container]);
+            image.onload = function() {
+                var width = this.width;
+                var height = this.height;
+                var zWidth = parseInt(zone.width);
+                var zHeight = parseInt(zone.height);
+                header.innerText = zone.tileName + ' ' + zWidth + "x" + zHeight;
+                if(zWidth < 1 || zHeight < 1) {
+                    return;
+                }
+                var stepY = 0;
+                while(stepY * zHeight <= height) {
+                    var stepX = 0;
+                    var row = Dom.el('div');
+                    while(stepX * zWidth <= width) {
+                        var tileId = zone.tileId + "_" + (stepX * zWidth)+"x" + (stepY * zHeight);
+                        row.appendChild(doInput({
+                            id: zone.id,
+                            tileId: tileId,
+                            tileName: '',
+                            x: zone.x,
+                            y: zone.y,
+                            width: zWidth,
+                            height: zHeight,
+                            type: 'tiled',
+                            passable: zone.passable,
+                            shootable: zone.shootable,
+                            staticSize: zone.staticSize,
+                            tileset: true,
+                            stepX: stepX,
+                            stepY: stepY,
+                            customSprite: zone.customSprite
+                        }, tileId));
+                        stepX++;
+                    }
+                    container.appendChild(row);
+                    stepY++;
+                }
+            };
+            image.src = PlayGround.uploadPath + "/"+zone.customSprite;
+            return out;
+        };
+        MapEditor.zonesButtons.innerHTML = '';
+        var ctfZones = [
+            'respawn_red', 'respawn_blue', 'flag_red', 'flag_blue'
+        ];
+        var nonCtfZones = [
+            'respawn'
+        ];
+        for (var i = 0; i < MapEditor.zonesButtonsData.length; i++) {
+            var zone = MapEditor.zonesButtonsData[i];
+            var type = zone.type;
+            if(nonCtfZones.indexOf(type) > -1 && MapEditor.gameType === 'ctf')continue;
+            if(ctfZones.indexOf(type) > -1 && MapEditor.gameType !== 'ctf')continue;
+            
+            if(zone.tileset) {
+                MapEditor.zonesButtons.appendChild(doTileset(zone));
+            } else {
+                var key = zone.type == 'tiled' ? zone.tileId : zone.type;
+                MapEditor.zonesButtons.appendChild(doInput(zone, key));
+            }
+        }
+    },
     loadObjects: function () {
         MapEditor.zones = {};
         MapEditor.zonesButtons.innerHTML = '';
-        
+        MapEditor.zonesButtonsData = [];
+
         return Rest.doGet('zones/list').then(function (zones) {
-            var doInput = function (zone, key) {
-                var name = zone.type !== 'tiled' ? zone.type : zone.tileName;
-                var input = Dom.el('input', {
-                    type: 'button',
-                    'class': 'item item-' + zone.type,
-                    value: name
-                });
-                input.onclick = function () {
-                    MapEditor.mount(zone)
-                };
-                if(zone.type == 'tiled') {
-                    input.style.background = "url(" + PlayGround.uploadPath + zone.customSprite+") no-repeat";
-                    if(zone.tileset) {
-                        input.style.height = zone.height + 'px';
-                        input.style.width = zone.width + 'px';
-                        input.style.backgroundPosition = (-zone.width * zone.stepX) + 'px ' + (-zone.height * zone.stepY) + "px ";
-                    } else {
-                        input.style.height = '64px';
-                        input.style.width = '64px';
-                        input.style.backgroundSize = "100% 100%";
-                    }
-                }
-                MapEditor.zones[key] = zone;
-                return input;
-            };
-            var doTileset = function(zone) {
-                var image = new Image();
-                var header = Dom.el('div');
-                var container = Dom.el('div');
-                var out = new Dom.el('div', 'tileset', [header, container]);
-                image.onload = function() {
-                    var width = this.width;
-                    var height = this.height;
-                    var zWidth = parseInt(zone.width);
-                    var zHeight = parseInt(zone.height);
-                    header.innerText = zone.tileName + ' ' + zWidth + "x" + zHeight;
-                    if(zWidth < 1 || zHeight < 1) {
-                        return;
-                    }
-                    var stepY = 0;
-                    while(stepY * zHeight <= height) {
-                        var stepX = 0;
-                        var row = Dom.el('div');
-                        while(stepX * zWidth <= width) {
-                            var tileId = zone.tileId + "_" + (stepX * zWidth)+"x" + (stepY * zHeight);
-                            row.appendChild(doInput({
-                                id: zone.id,
-                                tileId: tileId,
-                                tileName: '',
-                                x: zone.x,
-                                y: zone.y,
-                                width: zWidth,
-                                height: zHeight,
-                                type: 'tiled',
-                                passable: zone.passable,
-                                shootable: zone.shootable,
-                                staticSize: zone.staticSize,
-                                tileset: true,
-                                stepX: stepX,
-                                stepY: stepY,
-                                customSprite: zone.customSprite
-                            }, tileId));
-                            stepX++;
-                        }
-                        container.appendChild(row);
-                        stepY++;
-                    }
-                };
-                image.src = PlayGround.uploadPath + "/"+zone.customSprite;
-                return out;
-            };
-            for (var i = 0; i < zones.length; i++) {
-                var zone = zones[i];
-                if(zone.tileset) {
-                    MapEditor.zonesButtons.appendChild(doTileset(zone));
-                } else {
-                    var key = zone.type == 'tiled' ? zone.tileId : zone.type;
-                    MapEditor.zonesButtons.appendChild(doInput(zone, key));
-                }
-            }
+            MapEditor.zonesButtonsData = zones;
+            MapEditor.redrawZoneButtons();
         });
     },
     changeMapSize: function () {
@@ -531,10 +583,17 @@ var MapEditor = {
         var highLightLabel = Dom.el('label', {'for': 'h_' + ts}, [highlight, 'highlight']);
         var label = Dom.el('p', null, [type, delButton, highLightLabel]);
         Dom.append(out, [label, input1, input2]);
-        if (MapEditor.mountedObjects.length === 0) {
-            MapEditor.zoneTypeHolder.appendChild(out);
-        } else {
-            MapEditor.zoneTypeHolder.insertBefore(out, MapEditor.zoneTypeHolder.children[0])
+        obj.component = out;
+        MapEditor.updateMountedObjects();
+    },
+    updateMountedObjects: function() {
+        var length = MapEditor.mountedObjects.length;
+        MapEditor.zoneTypeHolder.innerHTML = '';
+        while(length--) {
+            var obj = MapEditor.mountedObjects[length];
+            if(!MapEditor.filterValue || obj.type.indexOf(MapEditor.filterValue) == 0) {
+                MapEditor.zoneTypeHolder.appendChild(obj.component);
+            }
         }
     }
 };

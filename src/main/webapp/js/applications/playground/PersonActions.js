@@ -202,6 +202,18 @@ PersonActions.drawPerson = function(person) {
     var x = person.x;
     var y = person.y;
     var angle = person.angle + 90;
+    if(person.team > 0) {
+        var image = person.team == 1 ? PersonActions.bulletRed : PersonActions.bulletBlue;
+        context.drawImage(image, person.x -25, person.y-25, 8, 8);
+        if(person.opponentFlag) {
+            var opponentFlag = person.team == 1 ? PersonActions.flagBlue : PersonActions.flagRed;
+            context.drawImage(opponentFlag, person.x +25, person.y+25, 12, 12)
+        }
+        if(person.selfFlag) {
+            var selfFlag = person.team == 2 ? PersonActions.flagBlue : PersonActions.flagRed;
+            context.drawImage(selfFlag, person.x +31, person.y+25, 12, 12)
+        }
+    }
     context.save();
     context.beginPath();
     context.translate(x,y);
@@ -243,19 +255,54 @@ PersonActions.drawPerson = function(person) {
 
 PersonActions.mapPersonFromResponse = function (str) {
     var data = str.split(":");
-    return {
+    var personDto = {
         id: parseInt(data[0]),
         name: decodeURIComponent(data[1]),
-        color: data[2],
-        reload: data[3] == 1,
-        gun: data[4],
-        x: parseInt(data[5]),
-        y: parseInt(data[6]),
-        angle: parseInt(data[7])
+        reload: data[2] == 1,
+        gun: data[3],
+        x: parseInt(data[4]),
+        y: parseInt(data[5]),
+        angle: parseInt(data[6]),
+        score: parseInt(data[7]),
+        team: parseInt(data[8]),
+        opponentFlag: parseInt(data[9]) == 1,
+        selfFlag: parseInt(data[10]) == 1
+    };
+    var id = personDto.id;
+    if (!PlayGround.entities[id]) {
+        PlayGround.addPerson(personDto);
+    }
+
+    var p = PlayGround.entities[id];
+    p.x = personDto.x;
+    p.y = personDto.y;
+    p.angle = personDto.angle;
+    p.reload = personDto.reload;
+    p.gun = personDto.gun;
+    p.score = personDto.score;
+    p.team = personDto.team;
+    p.opponentFlag = personDto.opponentFlag;
+    p.selfFlag = personDto.selfFlag;
+
+    if(PlayGround.owner.id == id) {
+        PersonActions.updateMouseDirectionByXy(
+            PlayGround.xMouse,
+            PlayGround.yMouse,
+            p,
+            PlayGround.canvasOffset
+        );
     }
 };
-
 PersonActions.personOld = new Image();
 PersonActions.personOld.src = 'images/soldier1.png';
 PersonActions.reload = new Image();
 PersonActions.reload.src = 'images/map/reload.png';
+
+PersonActions.bulletRed = new Image();
+PersonActions.bulletRed.src = 'images/teams/bullet_red.png';
+PersonActions.bulletBlue = new Image();
+PersonActions.bulletBlue.src = 'images/teams/bullet_blue.png';
+PersonActions.flagRed = new Image();
+PersonActions.flagRed.src = 'images/teams/flag_red.png';
+PersonActions.flagBlue = new Image();
+PersonActions.flagBlue.src = 'images/teams/flag_blue.png';

@@ -20,7 +20,7 @@ var GameStats = {
         GameStats.statistics.innerHTML = '';
         var content = [];
         for(var i = 0; i < stats.length; i++) {
-            GameStats.statistics.appendChild(Dom.el('div', null, stats[i].person + " " + stats[i].frags));
+            GameStats.statistics.appendChild(Dom.el('div', null, decodeURIComponent(stats[i].person) + " " + stats[i].frags));
         }
     }
 };

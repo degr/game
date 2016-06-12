@@ -5,6 +5,7 @@ import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.zone.AbstractItem;
 import org.forweb.commandos.entity.zone.AbstractZone;
+import org.forweb.commandos.entity.zone.Interactive;
 import org.forweb.commandos.entity.zone.interactive.Respawn;
 import org.forweb.geometry.services.CircleService;
 import org.forweb.geometry.services.PointService;
@@ -28,30 +29,32 @@ public class LocationService {
 
     Respawn getRespawn(Room room, Person person) {
         List<Respawn> list = new ArrayList<>();
-        for (AbstractZone zone : room.getMap().getZones()) {
-            if (zone instanceof Respawn) {
-                list.add((Respawn) zone);
+        room.getMap().getZones().stream()
+                .filter(zone -> zone instanceof Respawn).forEach(zone -> {
+            Respawn candidate = (Respawn) zone;
+            if (candidate.getTeam() == person.getTeam() || candidate.getTeam() == 0) {
+                list.add(candidate);
+            }
+        });
+        if(list.size() == 0) {
+            throw new RuntimeException("Map was not properly instantiated for this type of game");
+        } else if(list.size() == 1) {
+            return list.get(0);
+        } else {
+            while (true) {
+                int index = random.nextInt(list.size());
+                Respawn out = list.get(index);
+                if (!out.getId().equals(person.getLastRespawnId())) {
+                    return out;
+                } else {
+                    list.remove(index);
+                    if(list.size() == 0) {
+                        //it can't happen
+                        throw new RuntimeException("lol");
+                    }
+                }
             }
         }
-        int i = 0;
-        while (i < 100) {
-            i++;
-            Respawn out = list.get(random.nextInt(list.size()));
-            if (!out.getId().equals(person.getLastRespawnId())) {
-                return out;
-            }
-        }
-        return null;
-    }
-
-    public String getRandomHexColor() {
-        float hue = random.nextFloat();
-        // sat between 0.1 and 0.3
-        float saturation = (random.nextInt(2000) + 1000) / 10000f;
-        float luminance = 0.9f;
-        Color color = Color.getHSBColor(hue, saturation, luminance);
-        return '#' + Integer.toHexString(
-                (color.getRGB() & 0xffffff) | 0x1000000).substring(1);
     }
 
     public Point[] canGoEast(Person player, Room room, double distance) {
@@ -92,12 +95,12 @@ public class LocationService {
                 player.getY() + yShift,
                 PersonWebSocketEndpoint.PERSON_RADIUS
         );
-        List<AbstractItem> itemsToPick = null;
+        List<Interactive> itemsToPick = null;
         for (AbstractZone zone : room.getMap().getZones()) {
             Point[] point = CircleService.circleBoundsIntersection(playerCircle, GeometryService.getRectangle(zone));
             if (point.length > 0) {
                 if (zone.isPassable()) {
-                    if (zone instanceof AbstractItem) {
+                    if (zone instanceof Interactive) {
                         if (itemsToPick == null) {
                             itemsToPick = new ArrayList<>();
                         }
@@ -109,7 +112,7 @@ public class LocationService {
             }
         }
         if (itemsToPick != null) {
-            for (AbstractItem item : itemsToPick) {
+            for (Interactive item : itemsToPick) {
                 itemService.onGetItem(item, player);
             }
         }

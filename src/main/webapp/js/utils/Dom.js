@@ -51,7 +51,7 @@ var Dom = {
     append: function(o, content) {
         if(content) {
             if(typeof content === 'string' || typeof content === 'number') {
-                o.appendChild(document.createTextNode(content));
+                o.appendChild(document.createTextNode(content + ""));
             } else if(content.length) {
                 for(var i = 0;i<content.length;i++) {
                     var child = content[i];

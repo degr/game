@@ -14,6 +14,7 @@ var Controls = {
     flamethrower: 54,
     minigun: 55,
     rocket: 56,
+    score: 9,
     bind1: null,
     bind2: null,
     bind3: null,

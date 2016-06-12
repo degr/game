@@ -31,6 +31,9 @@ public class RoomService {
         room.setDescription(room.getName());
         GameMap map = mapService.loadMap(mapId);
         room.setMap(map);
+        if(map.getGameType() != null && !"dm".equals(map.getGameType())) {
+            room.setCoOp(true);
+        }
         room.setPersons(new ConcurrentHashMap<>(map.getMaxPlayers()));
         room.setProjectiles(new ConcurrentHashMap<>());
         room.setTotalPlayers(0);

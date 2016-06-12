@@ -37,7 +37,7 @@ public class Flame extends LinkedAmmo {
 
     @Override
     public int getDamage() {
-        return 10;
+        return 15;
     }
 
     public boolean isStoped() {

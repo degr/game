@@ -45,11 +45,15 @@ public class PersonService {
         //responseService.sendMessage(person, "{\"type\": \"dead\"}");
     }
 
-    public synchronized void reward(Person shooter, Person target) {
-        if (shooter == target) {
-            shooter.setScore(shooter.getScore() - 1);
-        } else {
-            shooter.setScore(shooter.getScore() + 1);
+    public synchronized void reward(Person shooter, Person target, Room room) {
+        int factor = shooter == target || shooter.getTeam() > 0 && target.getTeam() == shooter.getTeam() ? -1 : 1;
+        shooter.setScore(shooter.getScore() + factor);
+        if(shooter.getTeam() > 0) {
+            if(shooter.getTeam() == 1) {
+                room.setTeam1Score(room.getTeam1Score() + factor);
+            } else {
+                room.setTeam2Score(room.getTeam2Score() + factor);
+            }
         }
     }
 

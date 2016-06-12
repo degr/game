@@ -13,9 +13,12 @@ var Score = {
         Score.container = Dom.el('div', 'score', [fragWrapper, timeWrapper]);
     },
     update: function(owner, time) {
-        if(owner.score != Score.frags) {
-            Score.fragContainer.innerText = owner.score;
-            Score.frags = owner.score;
+        var p = PlayGround.entities[owner.id];
+        if(!p)return;
+        var score = p.score; 
+        if(score != Score.frags) {
+            Score.fragContainer.innerText = score;
+            Score.frags = score;
         }
         Score.timeContainer.innerText = Score.doTime(time);
     },

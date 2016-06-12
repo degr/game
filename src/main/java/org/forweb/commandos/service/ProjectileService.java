@@ -151,11 +151,14 @@ public class ProjectileService {
                 }
             }
         }
+        if(explosion != null) {
+
+        }
 
         if(explosion != null) {
             explosion.setxEnd((int)explosion.getxStart());
             explosion.setyEnd((int)explosion.getyStart());
-            int id = gameContext.getProjectilesIds().getAndIncrement();
+            int id = room.getProjectilesIds().getAndIncrement();
             room.getProjectiles().put(id, explosion);
 
             Circle explosionCircle = new Circle(
@@ -281,7 +284,7 @@ public class ProjectileService {
 
         if (person.getLife() <= 0) {
             personService.kill(person, room);
-            personService.reward(shooter, person);
+            personService.reward(shooter, person, room);
         }
     }
 
@@ -405,12 +408,12 @@ public class ProjectileService {
         gun.setCurrentClip(gun.getCurrentClip() - 1);
 
         Projectile projectile = getCompatibleProjectile(person);
-        Integer id = gameContext.getProjectilesIds().getAndIncrement();
+        Integer id = room.getProjectilesIds().getAndIncrement();
         projectile.setId(id);
         if(projectile instanceof Shot) {
             Shot shotProjectile = (Shot) projectile;
             for(SubShot subShot : shotProjectile.getSubShots()) {
-                Integer subId = gameContext.getProjectilesIds().getAndIncrement();
+                Integer subId = room.getProjectilesIds().getAndIncrement();
                 subShot.setId(subId);
                 onProjectileInstantiation(person, subShot, room);
             }

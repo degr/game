@@ -10,14 +10,6 @@ import org.springframework.web.socket.server.standard.SpringConfigurator;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.EOFException;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 @ServerEndpoint(value = "/commandos", configurator = SpringConfigurator.class)
@@ -31,6 +23,8 @@ public class PersonWebSocketEndpoint {
     private static final String MESSAGE_ANGLE = "angle";
     private static final String MESSAGE_MESSAGE = "message";
     private static final String MESSAGE_CHANGE_WEAPON = "gun";
+    private static final String MESSAGE_READY = "ready";
+    private static final String MESSAGE_TEAM = "team";
     private static final String MESSAGE_NO_PASSIVE_RELOAD = "noPassiveReload";
 
     public static final int PERSON_RADIUS = 20;
@@ -48,10 +42,9 @@ public class PersonWebSocketEndpoint {
     private int roomId;
     private Person person;
     private Session session;
-    
+
     @OnOpen
     public void onOpen(Session session) {
-        this.id = springDelegationService.addAndIncrementPersonId();
         this.session = session;
     }
 
@@ -65,13 +58,12 @@ public class PersonWebSocketEndpoint {
             e.printStackTrace();
         }*/
 
-        if(message.startsWith(MESSAGE_MESSAGE)) {
+        if (message.startsWith(MESSAGE_MESSAGE)) {
             springDelegationService.onTextMessage(message, roomId, id);
             return;
         }
         String[] parts = message.split(":");
-        Person person = getPerson();
-        if(person != null && person.isInPool()) {
+        if (personInPull()) {
             return;
         }
 
@@ -94,13 +86,16 @@ public class PersonWebSocketEndpoint {
             case MESSAGE_NO_PASSIVE_RELOAD:
                 getPerson().setNoPassiveReload("1".equals(parts[1]));
                 break;
+            case MESSAGE_TEAM:
+                springDelegationService.onChangeTeam(getPerson(), roomId, Integer.parseInt(parts[1]));
+                break;
             case MESSAGE_CREATE:
                 String roomName;
                 String personName;
-                if(parts.length < 4) {
+                if (parts.length < 4) {
                     Random r = new Random();
                     personName = "player-" + r.nextInt(998) + 1;
-                    if(parts.length < 3) {
+                    if (parts.length < 3) {
                         roomName = "unnamed-room-" + r.nextInt(998) + 1;
                     } else {
                         roomName = parts[2];
@@ -110,21 +105,32 @@ public class PersonWebSocketEndpoint {
                     roomName = parts[2];
                 }
                 roomId = springDelegationService.createRoom(Integer.parseInt(parts[1]), roomName);
+                initPersonId(roomId);
                 springDelegationService.onJoin(session, id, roomId, personName);
                 break;
             case MESSAGE_JOIN:
                 String personNameJoin;
-                if(parts.length < 3) {
+                if (parts.length < 3) {
                     Random r = new Random();
                     personNameJoin = "player-" + r.nextInt(998) + 1;
                 } else {
                     personNameJoin = parts[2];
                 }
                 roomId = Integer.parseInt(parts[1]);
+                initPersonId(roomId);
                 springDelegationService.onJoin(session, id, roomId, personNameJoin);
                 break;
         }
     }
+
+    private boolean personInPull() {
+        return person != null && person.isInPool();
+    }
+
+    private void initPersonId(int roomId){
+        this.id = gameContext.getRoom(roomId).getPersonIds().getAndIncrement();;
+    }
+
 
     @OnClose
     public void onClose() {

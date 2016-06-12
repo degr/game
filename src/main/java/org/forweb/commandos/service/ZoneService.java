@@ -7,7 +7,7 @@ import org.forweb.commandos.entity.GameMap;
 import org.forweb.commandos.entity.Map;
 import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.entity.zone.Zone;
-import org.forweb.commandos.entity.zone.interactive.Respawn;
+import org.forweb.commandos.entity.zone.interactive.*;
 import org.forweb.commandos.entity.zone.items.*;
 import org.forweb.commandos.entity.zone.walls.Tile;
 import org.forweb.commandos.entity.zone.walls.TiledZone;
@@ -107,40 +107,52 @@ public class ZoneService extends AbstractService<Zone, ZoneDao> {
         AbstractZone out;
         Integer x = zone.getX(), y = zone.getY(), id = zone.getId();
         switch (zone.getType()) {
-            case "shotgun":
+            case ShotgunZone.TITLE:
                 out = new ShotgunZone(x, y, id);
                 break;
-            case "assault":
+            case AssaultZone.TITLE:
                 out = new AssaultZone(x, y, id);
                 break;
-            case "sniper":
+            case SniperZone.TITLE:
                 out = new SniperZone(x, y, id);
                 break;
-            case "minigun":
+            case MinigunZone.TITLE:
                 out = new MinigunZone(x, y, id);
                 break;
-            case "rocket":
+            case RocketZone.TITLE:
                 out = new RocketZone(x, y, id);
                 break;
-            case "flamethrower":
+            case FlameZone.TITLE:
                 out = new FlameZone(x, y, id);
                 break;
-            case "medkit":
+            case MedkitZone.TITLE:
                 out = new MedkitZone(x, y, id);
                 break;
-            case "armor":
+            case ArmorZone.TITLE:
                 out = new ArmorZone(x, y, id);
                 break;
-            case "helm":
+            case HelmZone.TITLE:
                 out = new HelmZone(x, y, id);
                 break;
-            case "respawn":
+            case Respawn.TITLE:
                 out = new Respawn(x, y, id);
                 break;
-            case "wall":
+            case RespawnBlue.TITLE:
+                out = new RespawnBlue(x, y, id);
+                break;
+            case RespawnRed.TITLE:
+                out = new RespawnRed(x, y, id);
+                break;
+            case FlagBlue.TITLE:
+                out = new FlagBlue(x, y, id);
+                break;
+            case FlagRed.TITLE:
+                out = new FlagRed(x, y, id);
+                break;
+            case Wall.TITLE:
                 out = new Wall(x, y, zone.getWidth(), zone.getHeight());
                 break;
-            case "tiled":
+            case TiledZone.TITLE:
                 if(tile != null) {
                     out = new TiledZone(x, y, zone, tile);
                 } else {

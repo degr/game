@@ -9,12 +9,13 @@ import java.util.List;
 public class Person implements WebSocketResponse {
 
     private int id;
+
+    private int team = 0;
     private Direction direction;
     private double x;
     private double y;
     private float angle;
     private int turnDirection;
-    private String hexColor;
     private Integer life = PersonWebSocketEndpoint.LIFE_AT_START;
     private AbstractWeapon weapon;
     private int score;
@@ -24,6 +25,8 @@ public class Person implements WebSocketResponse {
 
     private Integer lastRespawnId = 0;
     private boolean noPassiveReload;
+    private boolean opponentFlag;
+    private boolean selfFlag;
 
     public List<AbstractWeapon> getWeaponList() {
         return weaponList;
@@ -55,10 +58,7 @@ public class Person implements WebSocketResponse {
     public void setDirection(Direction direction) {
         this.direction = direction;
     }
-    
-    public String getHexColor() {
-        return hexColor;
-    }
+
 
     public Integer getLife() {
         return life;
@@ -66,10 +66,6 @@ public class Person implements WebSocketResponse {
 
     public void setLife(Integer life) {
         this.life = life;
-    }
-
-    public void setHexColor(String hexColor) {
-        this.hexColor = hexColor;
     }
 
     public long getReloadCooldown() {
@@ -187,12 +183,15 @@ public class Person implements WebSocketResponse {
     public String doResponse() {
         return getId() + ":" +
                 getName() + ":" +
-                getHexColor() + ":" +
                 (getWeapon().getCurrentClip() == 0 || isReload() ? 1 : 0)+ ":" +
                 getWeapon().getName() + ":" +
                 ((int)getX()) + ":" +
                 ((int)getY()) + ":" +
-                ((int)getAngle());
+                ((int)getAngle()) + ":" +
+                getScore() + ":" +
+                (getTeam() != 0 ? getTeam() : "")+ ":" +
+                (isOpponentFlag() ? "1" : "0") + ":" +
+                (isSelfFlag() ? "1" : "0");
     }
 
     public void setSelectedAngle(int selectedAngle) {
@@ -217,5 +216,33 @@ public class Person implements WebSocketResponse {
 
     public boolean isNoPassiveReload() {
         return noPassiveReload;
+    }
+
+    public int getTeam() {
+        return team;
+    }
+
+    public void setTeam(int team) {
+        this.team = team;
+    }
+
+    public void setOpponentFlag(boolean opponentFlag) {
+        this.opponentFlag = opponentFlag;
+    }
+
+    public boolean isOpponentFlag() {
+        return opponentFlag;
+    }
+
+    public boolean getSelfFlag() {
+        return selfFlag;
+    }
+
+    public boolean isSelfFlag() {
+        return selfFlag;
+    }
+
+    public void setSelfFlag(boolean selfFlag) {
+        this.selfFlag = selfFlag;
     }
 }

@@ -1,30 +1,24 @@
 package org.forweb.commandos.service;
 
 import org.forweb.commandos.dao.MapDao;
-import org.forweb.commandos.dao.ZoneDao;
 import org.forweb.commandos.entity.GameMap;
 import org.forweb.commandos.entity.Map;
 import org.forweb.commandos.entity.zone.AbstractItem;
 import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.entity.zone.Zone;
 import org.forweb.commandos.entity.zone.interactive.Respawn;
-import org.forweb.commandos.entity.zone.items.*;
-import org.forweb.commandos.entity.zone.walls.Tile;
-import org.forweb.commandos.entity.zone.walls.Wall;
+import org.forweb.commandos.entity.zone.interactive.RespawnBlue;
+import org.forweb.commandos.entity.zone.interactive.RespawnRed;
 import org.forweb.database.AbstractService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class MapService extends AbstractService<Map, MapDao> {
@@ -37,33 +31,55 @@ public class MapService extends AbstractService<Map, MapDao> {
             return "-1";
         }
         int maxPlayers = 0;
-        for (Zone zone : dto.getZonesDto()) {
-            if (Respawn.TITLE.equals(zone.getType())) {
-                maxPlayers++;
+        int bluePlayers = 0;
+        int redPlayers = 0;
+        boolean coOpRespawns = Map.GameType.ctf.toString().equals(dto.getGameType());
+        for (int i = dto.getZonesDto().size() - 1; i >= 0; i--) {
+            Zone zone = dto.getZonesDto().get(i);
+            if (coOpRespawns) {
+                if (RespawnBlue.TITLE.equals(zone.getType())) {
+                    bluePlayers++;
+                } else if (RespawnRed.TITLE.equals(zone.getType())) {
+                    redPlayers++;
+                } else if (Respawn.TITLE.equals(zone.getType())) {
+                    dto.getZonesDto().remove(i);
+                }
+            } else {
+                if (Respawn.TITLE.equals(zone.getType())) {
+                    maxPlayers++;
+                } else if (RespawnBlue.TITLE.equals(zone.getType()) || RespawnRed.TITLE.equals(zone.getType())) {
+                    dto.getZonesDto().remove(i);
+                }
             }
+        }
+        if (coOpRespawns) {
+            if (bluePlayers == 0 || redPlayers == 0) {
+                return "-1";
+            }
+            maxPlayers = bluePlayers + redPlayers;
         }
         if (maxPlayers < 2) {
             return "-1";
         }
 
         Map map;
-        if(dto.getMapHash() != null) {
+        if (dto.getMapHash() != null) {
             map = findMapByHash(dto.getMapHash());
         } else {
             map = new Map();
         }
         map = saveMapGeneral(map, dto, maxPlayers);
         saveMapZones(map, dto.getZonesDto());
-        if(map.getMapHash() == null) {
+        if (map.getMapHash() == null) {
             map.setMapHash(md5Custom(String.valueOf(map.getId() + "_" + System.currentTimeMillis())));
             save(map);
         }
         return map.getMapHash();
     }
-    public static String md5Custom(String st) {
-        MessageDigest messageDigest = null;
-        byte[] digest = new byte[0];
 
+    private static String md5Custom(String st) {
+        MessageDigest messageDigest;
+        byte[] digest = new byte[0];
         try {
             messageDigest = MessageDigest.getInstance("MD5");
             messageDigest.reset();
@@ -78,12 +94,13 @@ public class MapService extends AbstractService<Map, MapDao> {
         BigInteger bigInt = new BigInteger(1, digest);
         String md5Hex = bigInt.toString(16);
 
-        while( md5Hex.length() < 32 ){
+        while (md5Hex.length() < 32) {
             md5Hex = "0" + md5Hex;
         }
 
         return md5Hex;
     }
+
     private Map findMapByHash(String hash) {
         return dao.findMapByMapHash(hash);
     }
@@ -106,22 +123,22 @@ public class MapService extends AbstractService<Map, MapDao> {
         return save(map);
     }
 
-    public GameMap loadMap(Integer mapId) {
+    GameMap loadMap(Integer mapId) {
         List<GameMap> maps = loadMaps(null, null, null, mapId);
-        if(maps.size() > 0) {
+        if (maps.size() > 0) {
             return maps.get(0);
         } else {
             return null;
         }
     }
+
     public List<GameMap> loadMaps(String mapName, Integer page, Integer size) {
         return loadMaps(mapName, page, size, null);
     }
 
-    public List<GameMap> loadMaps(String mapName, Integer page, Integer size, Integer mapId) {
-
+    private List<GameMap> loadMaps(String mapName, Integer page, Integer size, Integer mapId) {
         List<Map> maps;
-        if(mapId == null) {
+        if (mapId == null) {
             page = (page - 1) * size;
             if (mapName != null && !"".equals(mapName)) {
                 maps = dao.findMapsForPage(mapName + "%", page, size);
@@ -135,7 +152,7 @@ public class MapService extends AbstractService<Map, MapDao> {
 
         List<GameMap> out = new ArrayList<>(maps.size());
         List<Integer> mapIds = new ArrayList<>();
-        for(Map row : maps) {
+        for (Map row : maps) {
             Integer id = row.getId();
             mapIds.add(id);
             GameMap map = new GameMap();
@@ -149,14 +166,11 @@ public class MapService extends AbstractService<Map, MapDao> {
             out.add(map);
         }
         HashMap<Integer, List<AbstractZone>> zones = zoneService.findZonesforMaps(mapIds);
-        for(GameMap map : out) {
-            if(zones.containsKey(map.getId())) {
-                map.setZones(zones.get(map.getId()));
-            }
-        }
+        out.stream().
+                filter(map -> zones.containsKey(map.getId())).
+                forEach(map -> map.setZones(zones.get(map.getId())));
         return out;
     }
-
 
 
     public Boolean nameEmpty(String name) {
@@ -164,20 +178,20 @@ public class MapService extends AbstractService<Map, MapDao> {
         return out == null;
     }
 
-    public void onItemsLifecycle(List<AbstractZone> zones) {
-        for(AbstractZone zone : zones) {
-            if(zone instanceof AbstractItem) {
-                AbstractItem item = (AbstractItem) zone;
-                if(!item.isAvailable() && item.getTimeout() < System.currentTimeMillis()) {
-                    item.setAvailable(true);
-                }
-            }
-        }
+    void onItemsLifecycle(List<AbstractZone> zones) {
+        zones.stream()
+                .filter(zone -> zone instanceof AbstractItem)
+                .forEach(zone -> {
+                        AbstractItem item = (AbstractItem) zone;
+                        if (!item.isAvailable() && item.getTimeout() < System.currentTimeMillis()) {
+                            item.setAvailable(true);
+                        }
+                });
     }
 
     public GameMap loadMapByHash(String mapHash) {
         Map map = findMapByHash(mapHash);
-        if(map != null) {
+        if (map != null) {
             GameMap out = new GameMap();
             out.setId(map.getId());
             out.setName(map.getTitle());

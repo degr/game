@@ -39,6 +39,8 @@ var PlayGround = {
         KeyboardSetup.init();
         GameStats.init();
         Score.init();
+        ScoreOverview.init();
+        TeamControl.init();
 
         setInterval(function(){
             if(PlayGround.gameStarted) {
@@ -61,7 +63,7 @@ var PlayGround = {
             {'class': 'playground'},
             [
                 openKeyboard, Weapons.container, Chat.container, LifeAndArmor.container,KeyboardSetup.container,
-                Score.container, GameStats.container, canvas
+                Score.container, GameStats.container, ScoreOverview.container, TeamControl.container, canvas
             ]
         );
         
@@ -190,8 +192,7 @@ var PlayGround = {
             id: data[0],
             life: data[1],
             armor: data[2],
-            score: data[3],
-            gun: data[4],
+            gun: data[3],
             guns: owner.guns
         };
     },
@@ -224,11 +225,7 @@ var PlayGround = {
             }
         }
         for (var i = 0; i < packet.persons.length; i++) {
-            var person = PersonActions.mapPersonFromResponse(packet.persons[i]);
-            if (!PlayGround.entities[person.id]) {
-                PlayGround.addPerson(person);
-            }
-            PlayGround.updatePerson(person);
+            PersonActions.mapPersonFromResponse(packet.persons[i]);
         }
         var now = (new Date()).getTime();
         PlayGround.projectiles = [];
@@ -252,23 +249,6 @@ var PlayGround = {
     },
     addPerson: function(person) {
         PlayGround.entities[person.id] = new Person(person)
-    },
-    updatePerson: function(personDto) {
-        var id = personDto.id;
-        var p = PlayGround.entities[id];
-        p.x = personDto.x;
-        p.y = personDto.y;
-        p.angle = personDto.angle;
-        p.reload = personDto.reload;
-        p.gun = personDto.gun;
-        if(PlayGround.owner.id == id) {
-            PersonActions.updateMouseDirectionByXy(
-                PlayGround.xMouse,
-                PlayGround.yMouse,
-                p,
-                PlayGround.canvasOffset
-            );
-        }
     },
     removePerson: function(id) {
         delete PlayGround.entities[id];

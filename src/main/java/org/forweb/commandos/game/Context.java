@@ -19,8 +19,6 @@ public class Context {
     private LinkedHashMap<Integer, Room> rooms;
 
     public static final long TICK_DELAY = 10;
-    private final AtomicInteger personIds = new AtomicInteger(0);
-    private final AtomicInteger projectilesIds = new AtomicInteger(0);
 
 
     public Room getRoom(int key) {
@@ -36,9 +34,6 @@ public class Context {
     }
 
 
-    public AtomicInteger getPersonIds() {
-        return personIds;
-    }
 
     
     public ConcurrentHashMap<Integer, Session> getSessionStorage() {
@@ -47,10 +42,6 @@ public class Context {
 
     public Session getSession(int id) {
         return sessionStorage.get(id);
-    }
-
-    public AtomicInteger getProjectilesIds() {
-        return projectilesIds;
     }
 
     public Integer addRoom(Room room) {
