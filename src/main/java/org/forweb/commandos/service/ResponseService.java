@@ -11,6 +11,7 @@ import org.forweb.commandos.entity.ammo.SubShot;
 import org.forweb.commandos.entity.weapon.AbstractWeapon;
 import org.forweb.commandos.entity.zone.AbstractItem;
 import org.forweb.commandos.entity.zone.AbstractZone;
+import org.forweb.commandos.entity.zone.Interactive;
 import org.forweb.commandos.game.Context;
 import org.forweb.commandos.response.GameStats;
 import org.forweb.commandos.response.Update;
@@ -34,13 +35,13 @@ public class ResponseService {
     @Autowired
     private Context gameContext;
 
-    public void sendMessage(Person person, String msg) {
+    public void sendMessage(Room room, Person person, String msg) {
         try {
-            gameContext.getSession(person.getId()).getBasicRemote().sendText(msg);
+            room.getSession(person.getId()).getBasicRemote().sendText(msg);
         } catch (IOException ioe) {
             CloseReason cr = new CloseReason(CloseReason.CloseCodes.CLOSED_ABNORMALLY, ioe.getMessage());
             try {
-                gameContext.getSession(person.getId()).close(cr);
+                room.getSession(person.getId()).close(cr);
             } catch (IOException ioe2) {
                 // Ignore
             }
@@ -75,7 +76,7 @@ public class ResponseService {
                         e.printStackTrace();
                     }
                 }*/
-                sendMessage(person, message);
+                sendMessage(room, person, message);
             } catch (IllegalStateException ise) {
                 // An ISE can occur if an attempt is made to write to a
                 // WebSocket connection after it has been closed. The
@@ -99,7 +100,7 @@ public class ResponseService {
         String message = prepareJson(out);
         for (Person person : room.getPersons().values()) {
             try {
-                sendMessage(person, message);
+                sendMessage(room, person, message);
             } catch (IllegalStateException ise) {
             }
         }
@@ -125,7 +126,7 @@ public class ResponseService {
         String message = prepareJson(object);
         for (Person person : room.getPersons().values()) {
             try {
-                sendMessage(person, message);
+                sendMessage(room, person, message);
             } catch (IllegalStateException ise) {
                 // An ISE can occur if an attempt is made to write to a
                 // WebSocket connection after it has been closed. The
@@ -165,8 +166,8 @@ public class ResponseService {
         List<Integer> out = new ArrayList<>();
         while (iterator.hasNext()) {
             AbstractZone zone = iterator.next();
-            if (zone instanceof AbstractItem) {
-                AbstractItem item = (AbstractItem) zone;
+            if (zone instanceof Interactive) {
+                Interactive item = (Interactive) zone;
                 if (item.isAvailable()) {
                     out.add(item.getId());
                 }

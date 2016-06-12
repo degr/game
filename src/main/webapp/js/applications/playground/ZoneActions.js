@@ -23,6 +23,10 @@ var ZoneActions = {
         ZoneActions.images.pistol.src = 'images/map/pistol.jpg';
         ZoneActions.images.wall = new Image();
         ZoneActions.images.wall.src = 'images/map/wall.jpg';
+        ZoneActions.images.flag_blue = new Image();
+        ZoneActions.images.flag_blue.src = 'images/teams/flag_blue.png';
+        ZoneActions.images.flag_red = new Image();
+        ZoneActions.images.flag_red.src = 'images/teams/flag_red.png';
     },
     drawZone: function(zone) {
         var context = PlayGround.context;
@@ -31,6 +35,28 @@ var ZoneActions = {
             case 'respawn':
                 context.fillStyle = 'rgba(129, 195, 114, 0.5)';
                 context.fillRect(zone.x, zone.y, zone.width, zone.height);
+                break;
+            case 'respawn_blue':
+                context.fillStyle = 'rgba(54, 159, 236, 0.71)';
+                context.fillRect(zone.x, zone.y, zone.width, zone.height);
+                break;
+            case 'respawn_red':
+                context.fillStyle = 'rgba(210, 63, 63, 0.71)';
+                context.fillRect(zone.x, zone.y, zone.width, zone.height);
+                break;
+            case 'flag_blue':
+                context.fillStyle = 'rgb(54, 159, 236)';
+                context.fillRect(zone.x, zone.y, zone.width, zone.height);
+                if(zone.available) {
+                    context.drawImage(ZoneActions.images.flag_blue, zone.x, zone.y);
+                }
+                break;
+            case 'flag_red':
+                context.fillStyle = 'rgb(210, 63, 63)';
+                context.fillRect(zone.x, zone.y, zone.width, zone.height);
+                if(zone.available) {
+                    context.drawImage(ZoneActions.images.flag_red, zone.x, zone.y);
+                }
                 break;
             case "shotgun":
             case "assault":
@@ -59,11 +85,11 @@ var ZoneActions = {
                     } else {
                         context.drawImage(ZoneActions.images[zone.tileId], zone.x, zone.y, zone.width, zone.height);
                     }
-                        
+
                 } catch (e) {
                     context.drawImage(ZoneActions.images.wall, zone.x, zone.y, zone.width, zone.height);
                 }
-                
+
                 break;
             default:
                 context.strokeStyle = '#000000';

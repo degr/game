@@ -1,9 +1,8 @@
 package org.forweb.commandos.entity;
 
 import org.forweb.commandos.controller.PersonWebSocketEndpoint;
-import org.forweb.commandos.entity.weapon.*;
+import org.forweb.commandos.entity.weapon.AbstractWeapon;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Person implements WebSocketResponse {
@@ -27,6 +26,7 @@ public class Person implements WebSocketResponse {
     private boolean noPassiveReload;
     private boolean opponentFlag;
     private boolean selfFlag;
+    private boolean ready;
 
     public List<AbstractWeapon> getWeaponList() {
         return weaponList;
@@ -124,10 +124,6 @@ public class Person implements WebSocketResponse {
         return isFire;
     }
 
-    public void setFire(boolean isFire) {
-        this.isFire = isFire;
-    }
-
     public void setShotCooldown(long shotCooldown) {
         this.shotCooldown = shotCooldown;
     }
@@ -183,13 +179,13 @@ public class Person implements WebSocketResponse {
     public String doResponse() {
         return getId() + ":" +
                 getName() + ":" +
-                (getWeapon().getCurrentClip() == 0 || isReload() ? 1 : 0)+ ":" +
+                (getWeapon().getCurrentClip() == 0 || isReload() ? 1 : 0) + ":" +
                 getWeapon().getName() + ":" +
-                ((int)getX()) + ":" +
-                ((int)getY()) + ":" +
-                ((int)getAngle()) + ":" +
+                ((int) getX()) + ":" +
+                ((int) getY()) + ":" +
+                ((int) getAngle()) + ":" +
                 getScore() + ":" +
-                (getTeam() != 0 ? getTeam() : "")+ ":" +
+                (getTeam() != 0 ? getTeam() : "") + ":" +
                 (isOpponentFlag() ? "1" : "0") + ":" +
                 (isSelfFlag() ? "1" : "0");
     }
@@ -244,5 +240,13 @@ public class Person implements WebSocketResponse {
 
     public void setSelfFlag(boolean selfFlag) {
         this.selfFlag = selfFlag;
+    }
+
+    public void setReady(boolean ready) {
+        this.ready = ready;
+    }
+
+    public boolean isReady() {
+        return ready;
     }
 }

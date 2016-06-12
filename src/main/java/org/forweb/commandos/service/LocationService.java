@@ -14,7 +14,6 @@ import org.forweb.geometry.shapes.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -27,32 +26,45 @@ public class LocationService {
 
     private static final Random random = new Random();
 
-    Respawn getRespawn(Room room, Person person) {
+    Respawn getRespawn(Room room, Person person, List<Integer> respawnIds) {
         List<Respawn> list = new ArrayList<>();
         room.getMap().getZones().stream()
                 .filter(zone -> zone instanceof Respawn).forEach(zone -> {
             Respawn candidate = (Respawn) zone;
-            if (candidate.getTeam() == person.getTeam() || candidate.getTeam() == 0) {
+            if (!room.isEverybodyReady() || candidate.getTeam() == person.getTeam() || candidate.getTeam() == 0) {
                 list.add(candidate);
             }
         });
-        if(list.size() == 0) {
+        if (list.size() == 0) {
             throw new RuntimeException("Map was not properly instantiated for this type of game");
-        } else if(list.size() == 1) {
+        } else if (list.size() == 1) {
             return list.get(0);
         } else {
-            while (true) {
-                int index = random.nextInt(list.size());
-                Respawn out = list.get(index);
-                if (!out.getId().equals(person.getLastRespawnId())) {
-                    return out;
-                } else {
-                    list.remove(index);
-                    if(list.size() == 0) {
-                        //it can't happen
-                        throw new RuntimeException("lol");
+            if(respawnIds == null) {
+                while (true) {
+                    int index = random.nextInt(list.size());
+                    Respawn out = list.get(index);
+                    if (!out.getId().equals(person.getLastRespawnId())) {
+                        return out;
+                    } else {
+                        list.remove(index);
+                        if (list.size() == 0) {
+                            //it can't happen
+                            throw new RuntimeException("lol");
+                        }
                     }
                 }
+            } else {
+                respawn: for(Respawn respawn : list) {
+                    for(Integer id : respawnIds ) {
+                        if(respawn.getId().equals(id)) {
+                            continue respawn;
+                        }
+                    }
+                    respawnIds.add(respawn.getId());
+                    return respawn;
+                }
+                return null;
             }
         }
     }
@@ -104,7 +116,7 @@ public class LocationService {
                         if (itemsToPick == null) {
                             itemsToPick = new ArrayList<>();
                         }
-                        itemsToPick.add((AbstractItem) zone);
+                        itemsToPick.add((Interactive) zone);
                     }
                 } else {
                     return point;
@@ -113,9 +125,18 @@ public class LocationService {
         }
         if (itemsToPick != null) {
             for (Interactive item : itemsToPick) {
-                itemService.onGetItem(item, player);
+                itemService.onGetItem(item, player, room);
             }
         }
         return PointService.EMPTY;
+    }
+
+    public void resetLocationsOnRoomReady(Room room) {
+        for(AbstractZone zone : room.getMap().getZones()) {
+            if(zone instanceof Interactive) {
+                Interactive interactive = (Interactive)zone;
+                interactive.reset();
+            }
+        }
     }
 }

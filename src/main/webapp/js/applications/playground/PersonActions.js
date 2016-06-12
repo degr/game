@@ -33,6 +33,7 @@ PersonActions.startFire = function(e){
         e = e || window.event;
         e.preventDefault();
     }
+    if(!PlayGround.owner.id)return;
     if(Chat.active) {
         Chat.active = false;
         document.activeElement.blur();
@@ -264,7 +265,7 @@ PersonActions.mapPersonFromResponse = function (str) {
         y: parseInt(data[5]),
         angle: parseInt(data[6]),
         score: parseInt(data[7]),
-        team: parseInt(data[8]),
+        team: data[8] ? parseInt(data[8]) : 0,
         opponentFlag: parseInt(data[9]) == 1,
         selfFlag: parseInt(data[10]) == 1
     };
@@ -292,6 +293,7 @@ PersonActions.mapPersonFromResponse = function (str) {
             PlayGround.canvasOffset
         );
     }
+    return p.id;
 };
 PersonActions.personOld = new Image();
 PersonActions.personOld.src = 'images/soldier1.png';

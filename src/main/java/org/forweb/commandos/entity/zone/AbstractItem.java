@@ -46,4 +46,8 @@ public abstract class AbstractItem extends AbstractZone implements Interactive{
         return time;
     }
 
+    @Override
+    public void reset() {
+        setAvailable(true);
+    }
 }

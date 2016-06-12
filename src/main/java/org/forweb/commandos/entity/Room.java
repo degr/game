@@ -2,7 +2,10 @@ package org.forweb.commandos.entity;
 
 import org.forweb.commandos.entity.ammo.Projectile;
 import org.forweb.commandos.entity.zone.AbstractZone;
+import org.forweb.commandos.entity.zone.interactive.FlagBlue;
+import org.forweb.commandos.entity.zone.interactive.FlagRed;
 
+import javax.websocket.Session;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -30,6 +33,18 @@ public class Room {
     private Integer team2Score = 0;
     private Integer team1Score = 0;
     private boolean coOp;
+    private boolean everybodyReady;
+
+
+    private ConcurrentHashMap<Integer, Session> sessionStorage = new ConcurrentHashMap<>();
+
+    public ConcurrentHashMap<Integer, Session> getSessionStorage() {
+        return sessionStorage;
+    }
+
+    public Session getSession(int id) {
+        return sessionStorage.get(id);
+    }
 
     public Integer getTeam1Score() {
         return team1Score;
@@ -53,6 +68,7 @@ public class Room {
     public ConcurrentHashMap<Integer, Person> getPersons() {
         return persons;
     }
+
     public void setGameTimer(Timer timer) {
         this.gameTimer = timer;
     }
@@ -136,6 +152,7 @@ public class Room {
     public List<String> getMessages() {
         return messages;
     }
+
     public void setMessages(ArrayList<String> messages) {
         this.messages = messages;
     }
@@ -143,6 +160,7 @@ public class Room {
     public AtomicInteger getPersonIds() {
         return personIds;
     }
+
     public AtomicInteger getProjectilesIds() {
         return projectilesIds;
     }
@@ -150,7 +168,30 @@ public class Room {
     public void setCoOp(boolean coOp) {
         this.coOp = coOp;
     }
+
     public boolean isCoOp() {
         return coOp;
+    }
+
+    public boolean isEverybodyReady() {
+        return everybodyReady;
+    }
+
+    public void setEverybodyReady(boolean everybodyReady) {
+        this.everybodyReady = everybodyReady;
+    }
+
+    public void updateFlag(int team) {
+        for(AbstractZone zone : getMap().getZones()) {
+            if(team == 1) {
+                if (zone instanceof FlagBlue) {
+                    ((FlagBlue) zone).reset();
+                }
+            } else {
+                if (zone instanceof FlagRed) {
+                    ((FlagRed) zone).reset();
+                }
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 package org.forweb.commandos.entity.zone.items;
 
 import org.forweb.commandos.entity.Person;
+import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.weapon.AbstractWeapon;
 import org.forweb.commandos.entity.zone.AbstractItem;
 
@@ -13,7 +14,7 @@ public abstract class WeaponZone extends AbstractItem{
 
 
     @Override
-    public void onEnter(Person player) {
+    public void onEnter(Person player, Room room) {
         AbstractWeapon weapon = generateWeapon();
         setAvailable(false);
         setTimeout(System.currentTimeMillis() + getTime());
@@ -33,4 +34,5 @@ public abstract class WeaponZone extends AbstractItem{
         }
         player.getWeaponList().add(weapon);
     }
+
 }

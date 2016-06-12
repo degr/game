@@ -307,6 +307,9 @@ body, html {
     border: 1px solid;
     border-top: none;
 }
+.playground .chat .system {
+    color: red;
+}
 .playground .chat .message {
     color: rgb(53, 42, 191);
     text-shadow: white 1px 1px, white -1px -1px, white 1px -1px, white -1px 1px;

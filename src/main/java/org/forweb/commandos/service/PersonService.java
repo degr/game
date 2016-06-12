@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,6 +32,8 @@ public class PersonService {
     LocationService locationService;
     @Autowired
     TurnService turnService;
+    @Autowired
+    RoomService roomService;
 
     @Autowired
     Context gameContext;
@@ -46,22 +49,31 @@ public class PersonService {
     }
 
     public synchronized void reward(Person shooter, Person target, Room room) {
-        int factor = shooter == target || shooter.getTeam() > 0 && target.getTeam() == shooter.getTeam() ? -1 : 1;
-        shooter.setScore(shooter.getScore() + factor);
-        if(shooter.getTeam() > 0) {
-            if(shooter.getTeam() == 1) {
-                room.setTeam1Score(room.getTeam1Score() + factor);
-            } else {
-                room.setTeam2Score(room.getTeam2Score() + factor);
+        if(room.isEverybodyReady()) {
+            int factor = shooter == target || shooter.getTeam() > 0 && target.getTeam() == shooter.getTeam() ? -1 : 1;
+            shooter.setScore(shooter.getScore() + factor);
+            if (shooter.getTeam() > 0) {
+                if (shooter.getTeam() == 1) {
+                    room.setTeam1Score(room.getTeam1Score() + factor);
+                } else {
+                    room.setTeam2Score(room.getTeam2Score() + factor);
+                }
             }
         }
     }
 
 
+
     public void resetState(Person person, Room room) {
+        resetState(person, room, null);
+    }
+    public void resetState(Person person, Room room, List<Integer> respawnIds) {
+        if(person.isInPool()){
+            return;
+        }
         person.setDirection(Direction.NONE);
         person.setLife(PersonWebSocketEndpoint.LIFE_AT_START);
-        Respawn respawn = locationService.getRespawn(room, person);
+        Respawn respawn = locationService.getRespawn(room, person, respawnIds);
         if (respawn == null) {
             throw new RuntimeException("No respawn points on map");
         } else {
@@ -75,12 +87,11 @@ public class PersonService {
         weaponList.add(person.getWeapon());
         person.setWeaponList(weaponList);
         person.setReloadCooldown(0);
+        person.setOpponentFlag(false);
+        person.setSelfFlag(false);
         person.setReload(false);
     }
 
-    public void remove(Room room, int id) {
-
-    }
 
     public void handleDirection(Person person, String message) {
         person.setDirection(Direction.valueOf(message.toUpperCase()));
@@ -93,6 +104,14 @@ public class PersonService {
             projectileService.onReload(person, now);
             projectileService.handleFire(person, room);
             turnService.onPersonChangeViewAngle(person);
+        }
+    }
+
+    public void resetPersonsOnRoomReady(Room room) {
+        List<Integer> ids = new ArrayList<>();
+        for(Person person : room.getPersons().values()) {
+            resetState(person, room, ids);
+            person.setScore(0);
         }
     }
 }

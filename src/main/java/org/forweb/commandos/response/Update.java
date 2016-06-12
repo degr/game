@@ -6,20 +6,27 @@ import java.util.List;
 
 public class Update {
 
-    private final List<Integer> items;
-    private OwnerDto owner;
     private final String type = "update";
     private long time;
+
+    public int getStarted() {
+        return started;
+    }
+
+    private int started;
+    private OwnerDto owner;
+    private List<Integer> items;
     private List<String> persons;
     private List<String> projectiles;
     private List<String> messages;
 
-    public Update(List<String> personDto, List<String> projectiles, List<Integer> itemDtos, List<String> messages, long time) {
+    public Update(List<String> personDto, List<String> projectiles, List<Integer> itemDtos, List<String> messages, long time, boolean gameStarted) {
         this.persons = personDto;
         this.projectiles = projectiles;
         this.items = itemDtos;
         this.messages = messages;
         this.time = time;
+        started = gameStarted ? 1 : 0;
     }
 
     public String getType() {

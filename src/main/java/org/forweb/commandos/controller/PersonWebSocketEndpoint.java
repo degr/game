@@ -86,6 +86,9 @@ public class PersonWebSocketEndpoint {
             case MESSAGE_NO_PASSIVE_RELOAD:
                 getPerson().setNoPassiveReload("1".equals(parts[1]));
                 break;
+            case MESSAGE_READY:
+                springDelegationService.onReady(getPerson(), roomId, "1".equals(parts[1]));
+                break;
             case MESSAGE_TEAM:
                 springDelegationService.onChangeTeam(getPerson(), roomId, Integer.parseInt(parts[1]));
                 break;
@@ -106,6 +109,7 @@ public class PersonWebSocketEndpoint {
                 }
                 roomId = springDelegationService.createRoom(Integer.parseInt(parts[1]), roomName);
                 initPersonId(roomId);
+                System.out.println("create: room:" +roomId + " person: " + id);
                 springDelegationService.onJoin(session, id, roomId, personName);
                 break;
             case MESSAGE_JOIN:
@@ -118,6 +122,8 @@ public class PersonWebSocketEndpoint {
                 }
                 roomId = Integer.parseInt(parts[1]);
                 initPersonId(roomId);
+
+                System.out.println("join: room:" +roomId + " person: " + id + " session: " + session.getId());
                 springDelegationService.onJoin(session, id, roomId, personNameJoin);
                 break;
         }

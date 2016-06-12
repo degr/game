@@ -1,6 +1,7 @@
 package org.forweb.commandos.entity.zone.items;
 
 import org.forweb.commandos.entity.Person;
+import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.zone.AbstractItem;
 
 public class HelmZone extends AbstractItem {
@@ -10,7 +11,7 @@ public class HelmZone extends AbstractItem {
     }
 
     @Override
-    public void onEnter(Person person) {
+    public void onEnter(Person person, Room rom) {
         ArmorZone.onEnter(person, 50);
     }
 }

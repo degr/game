@@ -5,7 +5,8 @@ import org.forweb.commandos.controller.PersonWebSocketEndpoint;
 public class Explosion extends Projectile{
     public Explosion(int xStart, int yStart) {
         super(xStart, yStart, 0);
-        this.setRadius(40 + PersonWebSocketEndpoint.PERSON_RADIUS);
+        //real radius is 60. Additional person radius is required for damage calculation.
+        this.setRadius(60 + PersonWebSocketEndpoint.PERSON_RADIUS);
         setLifeTime(600L);
     }
 
@@ -21,10 +22,10 @@ public class Explosion extends Projectile{
 
     @Override
     public int getDamage() {
-        return 70;
+        return 40;
     }
 
     public int getDamageFactor() {
-        return 60;
+        return 90;
     }
 }

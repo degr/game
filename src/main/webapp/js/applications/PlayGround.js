@@ -28,6 +28,7 @@ var PlayGround = {
     fireRadius: 7,
     explosionRadius: 40,//different on 20 with server
     instantBullets: {},
+    readyToPlay: false,
     
     init: function () {
         PersonActions.init();
@@ -130,6 +131,7 @@ var PlayGround = {
         } else {
             Dom.removeClass(document.body, 'no-overflow');
         }
+        TeamControl.updateTeamHolder();
         PlayGround.canvasOffset = Dom.calculateOffset(canvas);
     },
     trackPerson: function() {
@@ -207,6 +209,10 @@ var PlayGround = {
         Weapons.update(PlayGround.owner);
         LifeAndArmor.update(PlayGround.owner.life, PlayGround.owner.armor);
         Score.update(PlayGround.owner, packet.time);
+        if(!PlayGround.readyToPlay && packet.started == 1) {
+            PlayGround.readyToPlay = true;
+            TeamControl.hide();
+        }
         for(var i = 0; i < packet.messages.length; i++) {
             var message = packet.messages[i];
             var id = message.substring(0, message.indexOf(":"));
@@ -224,8 +230,14 @@ var PlayGround = {
                 }
             }
         }
+        var personIds = [];
         for (var i = 0; i < packet.persons.length; i++) {
-            PersonActions.mapPersonFromResponse(packet.persons[i]);
+            personIds.push(PersonActions.mapPersonFromResponse(packet.persons[i]));
+        }
+        for(var id in PlayGround.entities) {
+            if(personIds.indexOf(parseInt(id)) === -1) {
+                delete PlayGround.entities[id];
+            }
         }
         var now = (new Date()).getTime();
         PlayGround.projectiles = [];

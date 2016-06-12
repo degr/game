@@ -52,7 +52,8 @@ ProjectilesActions.drawBullet = function(projectile){
     var context = PlayGround.context;
     context.save();
     context.beginPath();
-    context.strokeStyle="rgba(202, 4, 4, 0.55)";
+    //context.strokeStyle="rgba(202, 4, 4, 0.55)";
+    context.strokeStyle="rgba(251, 76, 2, 0.85)";
     context.moveTo(projectile.x1, projectile.y1);
     context.lineTo(projectile.x2, projectile.y2);
     context.stroke();
@@ -62,10 +63,18 @@ ProjectilesActions.drawBullet = function(projectile){
 ProjectilesActions.drawFlame = function(projectile) {
     var context = PlayGround.context;
     context.drawImage(ProjectilesActions.fire, projectile.x1 - 9, projectile.y1 - 9);
+    if(PlayGround.drawBounds) {
+        context.arc(projectile.x1, projectile.y1, 9, 0, 2 * Math.PI, false);
+    }
 };
 ProjectilesActions.drawExplosion = function(projectile) {
     var context = PlayGround.context;
-    context.drawImage(ProjectilesActions.explosion, projectile.x1 - 40, projectile.y1 - 40);
+    context.drawImage(ProjectilesActions.explosion, projectile.x1 - 60, projectile.y1 - 60, 120, 120);
+    if(PlayGround.drawBounds) {
+        context.beginPath();
+        context.arc(projectile.x1, projectile.y1, 60, 0, 2 * Math.PI, false);
+        context.stroke();
+    }
 };
 
 ProjectilesActions.drawRocket = function(projectile) {

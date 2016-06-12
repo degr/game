@@ -35,6 +35,8 @@ public class SpringDelegationService {
     private MapService mapService;
     @Autowired
     private RoomService roomService;
+    @Autowired
+    private LocationService locationService;
 
 
     public void onJoin(Session session, Integer personId, Integer roomId, String name) {
@@ -45,7 +47,7 @@ public class SpringDelegationService {
         } else {
             person.setInPool(false);
         }
-        gameContext.getSessionStorage().put(personId, session);
+        room.getSessionStorage().put(personId, session);
         person.setName(name);
         personService.resetState(person, gameContext.getRoom(roomId));
         room.getPersons().put(person.getId(), person);
@@ -72,7 +74,7 @@ public class SpringDelegationService {
 
     private void tick(Room room) {
 
-        if (room.getEndTime() - System.currentTimeMillis() < 0) {
+        if (room.isEverybodyReady() && room.getEndTime() - System.currentTimeMillis() < 0) {
             room.setShowStats(true);
         }
 
@@ -120,7 +122,8 @@ public class SpringDelegationService {
                                         responseService.mapProjectiles(room.getProjectiles()),
                                         responseService.mapItems(room.getMap().getZones()),
                                         room.getMessages(),
-                                        room.getEndTime() - System.currentTimeMillis()
+                                        room.isEverybodyReady() ? room.getEndTime() - System.currentTimeMillis() : 0,
+                                        room.isEverybodyReady()
                                 ),
                                 room
                         );
@@ -142,6 +145,31 @@ public class SpringDelegationService {
     private synchronized void removePerson(Integer personId, Integer roomId) {
         Room room = gameContext.getRoom(roomId);
         if (room != null) {
+            Person person = room.getPersons().get(personId);
+            if(person != null) {
+                if(person.getTeam() == 1) {
+                    if(person.isOpponentFlag()) {
+                        room.updateFlag(2);
+                    }
+                    if(person.isSelfFlag()) {
+                        room.updateFlag(1);
+                    }
+                } else if(person.getTeam() == 2) {
+                    if(person.isOpponentFlag()) {
+                        room.updateFlag(1);
+                    }
+                    if(person.isSelfFlag()) {
+                        room.updateFlag(2);
+                    }
+                } else {
+                    //it must never happen
+                    if(person.isOpponentFlag() || person.isSelfFlag()) {
+                        room.updateFlag(1);
+                        room.updateFlag(2);
+                    }
+                }
+
+            }
             room.getPersons().remove(personId);
         }
     }
@@ -176,6 +204,17 @@ public class SpringDelegationService {
             } else {
                 person.setTeam(2);
             }
+        }
+    }
+
+    public void onReady(Person person, int roomId, boolean ready) {
+        Room room = gameContext.getRoom(roomId);
+        boolean isRoomReady = room.isEverybodyReady();
+        person.setReady(ready);
+        roomService.onPersonReady(room);
+        if(!isRoomReady && room.isEverybodyReady()) {
+            personService.resetPersonsOnRoomReady(room);
+            locationService.resetLocationsOnRoomReady(room);
         }
     }
 }

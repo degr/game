@@ -167,7 +167,11 @@ public class ZoneService extends AbstractService<Zone, ZoneDao> {
     }
 
     public HashMap<Integer, List<AbstractZone>> findZonesforMaps(List<Integer> mapIds) {
-        HashMap<Integer, List<AbstractZone>> out = new HashMap<>(mapIds.size());
+        int size = mapIds.size();
+        HashMap<Integer, List<AbstractZone>> out = new HashMap<>(size);
+        if(size == 0) {
+            return out;
+        }
 
         List<Zone> zones = dao.findAllZonesForMaps(mapIds);
         List<Integer> integ = zones.stream()

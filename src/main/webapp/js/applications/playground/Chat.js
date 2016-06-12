@@ -88,8 +88,17 @@ var Chat = {
     },
     update: function(personId, message) {
         var screen = Chat.screen;
-        if(PlayGround.entities[personId]) {
-            var writer = Dom.el('span', 'writer', PlayGround.entities[personId].name + " : ");
+        var name;
+        if(personId) {
+            var person = PlayGround.entities[personId];
+            if(person) {
+                name = person.name + " : ";
+            }
+        } else {
+            name = Dom.el('span', "system", 'SYSTEM : ');
+        }
+        if(name) {
+            var writer = Dom.el('span', 'writer', name);
             var messageHolder = Dom.el('span', 'message', message);
             var comment = Dom.el('div', 'comment', [writer, messageHolder]);
             screen.appendChild(comment);

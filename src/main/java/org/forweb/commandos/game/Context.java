@@ -27,22 +27,12 @@ public class Context {
     public LinkedHashMap<Integer, Room> getRooms() {
         return rooms;
     }
-    private ConcurrentHashMap<Integer, Session> sessionStorage = new ConcurrentHashMap<>();
-    
     private Context() {
         rooms = new LinkedHashMap<>();
     }
 
 
 
-    
-    public ConcurrentHashMap<Integer, Session> getSessionStorage() {
-        return sessionStorage;
-    }
-
-    public Session getSession(int id) {
-        return sessionStorage.get(id);
-    }
 
     public Integer addRoom(Room room) {
         Integer candidate = 0;

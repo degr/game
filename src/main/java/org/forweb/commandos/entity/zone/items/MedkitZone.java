@@ -1,6 +1,7 @@
 package org.forweb.commandos.entity.zone.items;
 
 import org.forweb.commandos.entity.Person;
+import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.zone.AbstractItem;
 
 public class MedkitZone extends AbstractItem {
@@ -11,7 +12,7 @@ public class MedkitZone extends AbstractItem {
     }
 
     @Override
-    public void onEnter(Person person) {
+    public void onEnter(Person person, Room room) {
         int life = person.getLife();
         if (life < 100) {
             life += 25;
