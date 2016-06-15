@@ -4,10 +4,12 @@ import org.forweb.commandos.controller.PersonWebSocketEndpoint;
 import org.forweb.commandos.entity.Direction;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
-import org.forweb.commandos.entity.weapon.AbstractWeapon;
-import org.forweb.commandos.entity.weapon.Knife;
-import org.forweb.commandos.entity.weapon.Pistol;
+import org.forweb.commandos.entity.weapon.*;
+import org.forweb.commandos.entity.zone.AbstractZone;
+import org.forweb.commandos.entity.zone.interactive.FlagBlueTemp;
+import org.forweb.commandos.entity.zone.interactive.FlagRedTemp;
 import org.forweb.commandos.entity.zone.interactive.Respawn;
+import org.forweb.commandos.entity.zone.items.*;
 import org.forweb.commandos.game.Context;
 import org.forweb.commandos.service.person.MovementService;
 import org.forweb.commandos.service.person.TurnService;
@@ -44,8 +46,41 @@ public class PersonService {
     }
 
     public synchronized void kill(Person person, Room room) {
+        AbstractWeapon weapon = person.getWeapon();
+        WeaponZone candidate = null;
+        int topx = (int)person.getX() - PersonWebSocketEndpoint.PERSON_RADIUS;
+        int topY = (int)person.getY() - PersonWebSocketEndpoint.PERSON_RADIUS;
+        List<AbstractZone> zones = room.getMap().getZones();
+        if(weapon.getCurrentClip() > 0) {
+
+            int id = zones.size();
+            if(weapon instanceof Pistol) {
+                candidate = new PistolZone(topx, topY, id);
+            } else if(weapon instanceof AssaultRifle) {
+                candidate = new AssaultZone(topx, topY, id);
+            } else if(weapon instanceof Shotgun) {
+                candidate = new ShotgunZone(topx, topY, id);
+            } else if(weapon instanceof SniperRifle) {
+                candidate = new SniperZone(topx, topY, id);
+            } else if(weapon instanceof Flamethrower) {
+                candidate = new FlameZone(topx, topY, id);
+            } else if(weapon instanceof Minigun) {
+                candidate = new MinigunZone(topx, topY, id);
+            } else if(weapon instanceof RocketLauncher) {
+                candidate = new RocketZone(topx, topY, id);
+            }
+            if(candidate != null) {
+                candidate.setTemporary(true);
+                zones.add(candidate);
+            }
+        }
+        if(person.isSelfFlag() && person.getTeam() > 0) {
+            zones.add(person.getTeam() == 1 ? new FlagRedTemp(topx, topY, zones.size()) : new FlagBlueTemp(topx, topY, zones.size()));
+        }
+        if(person.isOpponentFlag() && person.getTeam() > 0) {
+            zones.add(person.getTeam() != 1 ? new FlagRedTemp(topx, topY, zones.size()) : new FlagBlueTemp(topx, topY, zones.size()));
+        }
         resetState(person, room);
-        //responseService.sendMessage(person, "{\"type\": \"dead\"}");
     }
 
     public synchronized void reward(Person shooter, Person target, Room room) {

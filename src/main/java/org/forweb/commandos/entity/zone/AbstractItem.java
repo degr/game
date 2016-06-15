@@ -1,10 +1,11 @@
 package org.forweb.commandos.entity.zone;
 
 import org.forweb.commandos.controller.PersonWebSocketEndpoint;
+import org.forweb.commandos.entity.WebSocketResponse;
 import org.forweb.geometry.shapes.Bounds;
 
 
-public abstract class AbstractItem extends AbstractZone implements Interactive{
+public abstract class AbstractItem extends AbstractZone implements Interactive, WebSocketResponse {
 
     private boolean isAvailable;
     private long timeout;
@@ -49,5 +50,10 @@ public abstract class AbstractItem extends AbstractZone implements Interactive{
     @Override
     public void reset() {
         setAvailable(true);
+    }
+
+    @Override
+    public String doResponse() {
+        return getType() + ":" + getX() + ":" + getY() + ":" +getWidth() + ":" + getHeight();
     }
 }

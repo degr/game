@@ -7,4 +7,13 @@ public class FlagBlueTemp extends FlagBlue{
         super(leftTopX, leftTopY, id);
     }
 
+    @Override
+    public String getType() {
+        return "flag_blue_temp";
+    }
+
+    @Override
+    public boolean isTemporary() {
+        return true;
+    }
 }

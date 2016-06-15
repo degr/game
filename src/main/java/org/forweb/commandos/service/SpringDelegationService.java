@@ -1,6 +1,7 @@
 package org.forweb.commandos.service;
 
 import org.forweb.commandos.controller.PersonWebSocketEndpoint;
+import org.forweb.commandos.entity.Map;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.game.Context;
@@ -41,16 +42,34 @@ public class SpringDelegationService {
 
     public void onJoin(Session session, Integer personId, Integer roomId, String name) {
         Room room = gameContext.getRoom(roomId);
-        Person person = new Person(personId);
+        Person player = new Person(personId);
         if (room.getPersons().size() >= room.getMap().getMaxPlayers()) {
-            person.setInPool(true);
+            player.setInPool(true);
         } else {
-            person.setInPool(false);
+            player.setInPool(false);
+            if(!Map.GameType.dm.toString().equals(room.getMap().getGameType())) {
+                int blue = 0;
+                int red = 0;
+                for(Person person :  room.getPersons().values()) {
+                    if(person.getTeam() == 1) {
+                        red++;
+                    } else {
+                        blue ++;
+                    }
+                }
+                if(red > blue) {
+                    player.setTeam(2);
+                } else if (blue > red) {
+                    player.setTeam(1);
+                } else {
+                    player.setTeam(new Random().nextInt(2) + 1);
+                }
+            }
         }
         room.getSessionStorage().put(personId, session);
-        person.setName(name);
-        personService.resetState(person, gameContext.getRoom(roomId));
-        room.getPersons().put(person.getId(), person);
+        player.setName(name);
+        personService.resetState(player, gameContext.getRoom(roomId));
+        room.getPersons().put(player.getId(), player);
     }
 
     public void onTextMessage(String message, int roomId, Integer personId) {
@@ -123,7 +142,8 @@ public class SpringDelegationService {
                                         responseService.mapItems(room.getMap().getZones()),
                                         room.getMessages(),
                                         room.isEverybodyReady() ? room.getEndTime() - System.currentTimeMillis() : 0,
-                                        room.isEverybodyReady()
+                                        room.isEverybodyReady(),
+                                        responseService.mapTempZones(room.getMap().getZones())
                                 ),
                                 room
                         );

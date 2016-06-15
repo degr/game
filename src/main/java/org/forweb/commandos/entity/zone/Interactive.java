@@ -9,4 +9,5 @@ public interface Interactive {
     boolean isAvailable();
     void reset();
     Integer getId();
+    boolean isTemporary();
 }

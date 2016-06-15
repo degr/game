@@ -14,4 +14,9 @@ public class HelmZone extends AbstractItem {
     public void onEnter(Person person, Room rom) {
         ArmorZone.onEnter(person, 50);
     }
+
+    @Override
+    public boolean isTemporary() {
+        return false;
+    }
 }

@@ -14,6 +14,11 @@ public abstract class AbstractFlag extends AbstractZone implements Interactive {
 
     private boolean isAvailable = true;
 
+    @Override
+    public boolean isTemporary() {
+        return false;
+    }
+
     public AbstractFlag(String type, int leftTopX, int leftTopY, int id) {
         super(type, new Bounds(
                 leftTopX,

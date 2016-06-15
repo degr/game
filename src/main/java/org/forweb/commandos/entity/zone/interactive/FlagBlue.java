@@ -12,5 +12,4 @@ public class FlagBlue extends AbstractFlag{
     public int getTeam() {
         return 2;
     }
-
 }

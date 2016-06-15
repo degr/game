@@ -19,14 +19,21 @@ public class Update {
     private List<String> persons;
     private List<String> projectiles;
     private List<String> messages;
+    private List<String> tempZones;
 
-    public Update(List<String> personDto, List<String> projectiles, List<Integer> itemDtos, List<String> messages, long time, boolean gameStarted) {
+    public Update(List<String> personDto, List<String> projectiles, List<Integer> itemDtos, List<String> messages, long time, boolean gameStarted, List<String> tempZones) {
         this.persons = personDto;
         this.projectiles = projectiles;
         this.items = itemDtos;
         this.messages = messages;
         this.time = time;
         started = gameStarted ? 1 : 0;
+        this.tempZones = tempZones;
+    }
+
+
+    public List<String> getTempZones() {
+        return tempZones;
     }
 
     public String getType() {

@@ -29,4 +29,9 @@ public class ArmorZone extends AbstractItem {
     public void onEnter(Person person, Room room) {
         ArmorZone.onEnter(person, 100);
     }
+
+    @Override
+    public boolean isTemporary() {
+        return false;
+    }
 }

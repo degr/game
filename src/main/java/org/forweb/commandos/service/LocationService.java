@@ -29,12 +29,13 @@ public class LocationService {
     Respawn getRespawn(Room room, Person person, List<Integer> respawnIds) {
         List<Respawn> list = new ArrayList<>();
         room.getMap().getZones().stream()
-                .filter(zone -> zone instanceof Respawn).forEach(zone -> {
-            Respawn candidate = (Respawn) zone;
-            if (!room.isEverybodyReady() || candidate.getTeam() == person.getTeam() || candidate.getTeam() == 0) {
-                list.add(candidate);
-            }
-        });
+                .filter(zone -> zone instanceof Respawn)
+                .forEach(zone -> {
+                        Respawn candidate = (Respawn) zone;
+                        if (!room.isEverybodyReady() || candidate.getTeam() == person.getTeam() || candidate.getTeam() == 0) {
+                            list.add(candidate);
+                        }
+                });
         if (list.size() == 0) {
             throw new RuntimeException("Map was not properly instantiated for this type of game");
         } else if (list.size() == 1) {
@@ -126,6 +127,16 @@ public class LocationService {
         if (itemsToPick != null) {
             for (Interactive item : itemsToPick) {
                 itemService.onGetItem(item, player, room);
+                if(item.isTemporary()) {
+                    List<AbstractZone> zones = room.getMap().getZones();
+                    int length = zones.size();
+                    for(int i = length - 1; i >= 0; i--) {
+                        if(zones.get(i) == item) {
+                            zones.remove(i);
+                            break;
+                        }
+                    }
+                }
             }
         }
         return PointService.EMPTY;

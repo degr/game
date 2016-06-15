@@ -6,6 +6,8 @@ import org.forweb.commandos.entity.weapon.AbstractWeapon;
 import org.forweb.commandos.entity.zone.AbstractItem;
 
 public abstract class WeaponZone extends AbstractItem{
+    private boolean isTemporary = false;
+
     public WeaponZone(int topX, int topY, String itemName, int id) {
         super(topX, topY, itemName, id);
     }
@@ -35,4 +37,12 @@ public abstract class WeaponZone extends AbstractItem{
         player.getWeaponList().add(weapon);
     }
 
+    @Override
+    public boolean isTemporary() {
+        return isTemporary;
+    }
+
+    public void setTemporary(boolean temporary) {
+        this.isTemporary = temporary;
+    }
 }

@@ -25,6 +25,10 @@ public abstract class AbstractZone {
     private boolean isStaticSize;
     private String customSprite;
 
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public boolean isShootable() {
         return isShootable;
     }

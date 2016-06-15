@@ -242,6 +242,12 @@ var PlayGround = {
         var now = (new Date()).getTime();
         PlayGround.projectiles = [];
         var playShootgun = false;
+        if(packet.tempZones && packet.tempZones.length) {
+            for(var i = 0; i < packet.tempZones.length; i++) {
+                var zone = ZoneActions.decode(packet.tempZones[i]);
+                ZoneActions.drawZone(zone);
+            }
+        }
         for(var i = 0; i < packet.projectiles.length; i++) {
             var p = ProjectilesActions.decode(packet.projectiles[i]);
             if(p.type === 'shot') {

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.forweb.commandos.entity.OwnerFacade;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
+import org.forweb.commandos.entity.WebSocketResponse;
 import org.forweb.commandos.entity.ammo.Projectile;
 import org.forweb.commandos.entity.ammo.Shot;
 import org.forweb.commandos.entity.ammo.SubShot;
@@ -171,6 +172,20 @@ public class ResponseService {
                 if (item.isAvailable()) {
                     out.add(item.getId());
                 }
+            }
+        }
+        return out;
+    }
+
+    public List<String> mapTempZones(List<AbstractZone> zones) {
+        List<String> out = null;
+        for(AbstractZone zone : zones) {
+            if(zone instanceof WebSocketResponse) {
+                WebSocketResponse response = (WebSocketResponse) zone;
+                if(out == null) {
+                    out = new ArrayList<>();
+                }
+                out.add(response.doResponse());
             }
         }
         return out;

@@ -26,4 +26,9 @@ public class MedkitZone extends AbstractItem {
         setAvailable(false);
         setTimeout(System.currentTimeMillis() + getTime());
     }
+
+    @Override
+    public boolean isTemporary() {
+        return false;
+    }
 }

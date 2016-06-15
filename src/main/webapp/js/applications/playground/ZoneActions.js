@@ -45,6 +45,7 @@ var ZoneActions = {
                 context.fillRect(zone.x, zone.y, zone.width, zone.height);
                 break;
             case 'flag_blue':
+            case 'flag_blue_temp':
                 context.fillStyle = 'rgb(54, 159, 236)';
                 context.fillRect(zone.x, zone.y, zone.width, zone.height);
                 if(zone.available) {
@@ -52,6 +53,7 @@ var ZoneActions = {
                 }
                 break;
             case 'flag_red':
+            case 'flag_red_temp':
                 context.fillStyle = 'rgb(210, 63, 63)';
                 context.fillRect(zone.x, zone.y, zone.width, zone.height);
                 if(zone.available) {
@@ -79,13 +81,11 @@ var ZoneActions = {
                     ZoneActions.images[zone.tileId] = image;
                 }
                 try {
-
                     if(zone.tileset) {
                         context.drawImage(ZoneActions.images[zone.tileId], zone.shiftX, zone.shiftY, zone.width, zone.height, zone.x, zone.y, zone.width, zone.height);
                     } else {
                         context.drawImage(ZoneActions.images[zone.tileId], zone.x, zone.y, zone.width, zone.height);
                     }
-
                 } catch (e) {
                     context.drawImage(ZoneActions.images.wall, zone.x, zone.y, zone.width, zone.height);
                 }
@@ -98,6 +98,16 @@ var ZoneActions = {
                 context.strokeText(zone.type, zone.x + 3, zone.y + 20, zone.width - 6);
         }
         //
+    },
+    decode: function(str) {
+        var data = str.split(':');
+        return {
+            type: data[0],
+            x: data[1],
+            y: data[2],
+            width: data[3],
+            height: data[4],
+        }
     },
     drawImage: function(zone) {
         var context = PlayGround.context;
