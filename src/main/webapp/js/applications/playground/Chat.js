@@ -6,6 +6,7 @@ var Chat = {
     active: null,
     isHidden: false,
     binds: {},
+    wasMoved: false,
     init: function () {
         window.addEventListener('keyup', Chat.onChatKeyup, false);
         try {
@@ -30,6 +31,22 @@ var Chat = {
         };
         Chat.screen = Dom.el('div', 'console');
         Chat.container = Dom.el('div', 'chat', [Chat.screen, Chat.textarea]);
+        var onmouseover = function(e) {
+            if(!Chat.active) {
+                e.preventDefault();
+                console.log('bbbb');
+                if(Chat.wasMoved) {
+                    Chat.container.style.left = '66px';
+                } else {
+                    Chat.container.style.left = '600px';
+                }
+                Chat.wasMoved = !Chat.wasMoved;
+            } else {
+                console.log('aaaa');
+            }
+        }
+        Chat.screen.onmouseover = onmouseover; 
+        //Chat.container.onmouseover = onmouseover; 
     },
     save: function() {
         localStorage.setItem('chat', JSON.stringify(Chat.binds));

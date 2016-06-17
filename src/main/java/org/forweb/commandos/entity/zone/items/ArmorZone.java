@@ -14,7 +14,7 @@ public class ArmorZone extends AbstractItem {
     }
 
 
-    public static void onEnter(Person person, int armor) {
+    public static boolean onEnter(Person person, int armor) {
         int armor1 = person.getArmor();
         if (armor1 < 150) {
             armor1 += armor;
@@ -22,12 +22,18 @@ public class ArmorZone extends AbstractItem {
                 armor1 = 150;
             }
             person.setArmor(armor1);
+            return true;
+        } else {
+            return false;
         }
     }
 
     @Override
     public void onEnter(Person person, Room room) {
-        ArmorZone.onEnter(person, 100);
+        if(ArmorZone.onEnter(person, 100)) {
+            this.setAvailable(false);
+            super.setTimeout(System.currentTimeMillis() + getTime());
+        }
     }
 
     @Override

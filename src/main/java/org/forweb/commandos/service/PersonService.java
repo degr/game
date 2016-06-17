@@ -54,7 +54,7 @@ public class PersonService {
         List<AbstractZone> zones = room.getMap().getZones();
         if(weapon.getCurrentClip() > 0) {
 
-            int id = zones.size();
+            int id = room.getNewWeaponId();
             if(weapon instanceof Pistol) {
                 candidate = new PistolZone(topx, topY, id);
             } else if(weapon instanceof AssaultRifle) {

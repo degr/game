@@ -12,7 +12,10 @@ public class HelmZone extends AbstractItem {
 
     @Override
     public void onEnter(Person person, Room rom) {
-        ArmorZone.onEnter(person, 50);
+        if(ArmorZone.onEnter(person, 50)) {
+            this.setAvailable(false);
+            super.setTimeout(System.currentTimeMillis() + getTime());
+        }
     }
 
     @Override

@@ -25,7 +25,7 @@ public class Room {
     private ConcurrentHashMap<Integer, Person> persons;
     private ConcurrentHashMap<Integer, Projectile> projectiles;
     private int totalPlayers;
-
+    private int tempWeaponId = 0;
     private GameMap map;
     private long endTime;
 
@@ -194,5 +194,17 @@ public class Room {
                 }
             }
         }
+    }
+
+    public int getNewWeaponId() {
+        if(tempWeaponId == 0) {
+            for (AbstractZone zone : getMap().getZones()) {
+                if(zone.getId() != null && zone.getId() > tempWeaponId) {
+                    tempWeaponId = zone.getId();
+                }
+            }
+        }
+        tempWeaponId++;
+        return tempWeaponId;
     }
 }
