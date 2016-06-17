@@ -206,22 +206,16 @@ PersonActions.drawPerson = function(person) {
     if(person.team > 0) {
         var image = person.team == 1 ? PersonActions.bulletRed : PersonActions.bulletBlue;
         context.drawImage(image, person.x -25, person.y-25, 8, 8);
-        if(person.opponentFlag) {
-            var opponentFlag = person.team == 1 ? PersonActions.flagBlue : PersonActions.flagRed;
-            context.drawImage(opponentFlag, person.x +25, person.y+25, 12, 12)
-        }
-        if(person.selfFlag) {
-            var selfFlag = person.team == 2 ? PersonActions.flagBlue : PersonActions.flagRed;
-            context.drawImage(selfFlag, person.x +31, person.y+25, 12, 12)
-        }
     }
     context.save();
     context.beginPath();
     context.translate(x,y);
     context.rotate((angle - 90) * Math.PI / 180);
-    if(person.gun != 'knife' && person.gun != 'pistol') {
+    if(person.gun == 'pistol') {
+        context.drawImage(ZoneActions.images[person.gun], -10, -14)
+    } else if(person.gun != 'knife') {
         context.drawImage(ZoneActions.images[person.gun], -6, -14)
-    } 
+    }
 
     context.restore();
 
@@ -234,12 +228,38 @@ PersonActions.drawPerson = function(person) {
     if(person.reload) {
         context.drawImage(PersonActions.reload, + PlayGround.radius + 4,  - PlayGround.radius);
     }
-    context.rotate(angle * Math.PI/180);
+    var rotated = false;
+    if(person.team > 0) {
+        var flagSize = 20;
+        var flagShiftY = -35;
+        var rotateAngle = 135;
+        if(person.opponentFlag) {
+            context.rotate((angle + rotateAngle) * Math.PI/180);
+            rotated = true;
+            var opponentFlag = person.team == 1 ? PersonActions.flagBlue : PersonActions.flagRed;
+            context.drawImage(opponentFlag, 0, flagShiftY, flagSize, flagSize)
+        }
+        if(person.selfFlag) {
+            if(!rotated) {
+                rotated = true;
+                context.rotate((angle + rotateAngle) * Math.PI/180);
+            }
+            var selfFlag = person.team == 2 ? PersonActions.flagBlue : PersonActions.flagRed;
+            context.drawImage(selfFlag, 14, flagShiftY + 10, flagSize, flagSize)
+        }
+        if(rotated) {
+            context.rotate((-rotateAngle) * Math.PI/180);
+        }
+    }
+    if(!rotated) {
+        context.rotate(angle * Math.PI / 180);
+    }
+
     if(PlayGround.drawBounds) {
         context.arc(0, 0, PlayGround.radius, 0, 2 * Math.PI, false);
     }
     context.stroke();
-    if(person.gun == 'knife' || person.gun == 'pistol') {
+    if(person.gun == 'knife') {
         context.drawImage(PersonActions.personOld, - PlayGround.radius - 8,  - PlayGround.radius - 3, 56, 56);
     } else {
         context.drawImage(person.image, - PlayGround.radius - 8,  - PlayGround.radius - 3, 56, 56);

@@ -20,8 +20,8 @@ public class Update {
     private List<String> projectiles;
     private List<String> messages;
     private List<String> tempZones;
-
-    public Update(List<String> personDto, List<String> projectiles, List<Integer> itemDtos, List<String> messages, long time, boolean gameStarted, List<String> tempZones) {
+    private String score;
+    public Update(List<String> personDto, List<String> projectiles, List<Integer> itemDtos, List<String> messages, long time, boolean gameStarted, List<String> tempZones, String score) {
         this.persons = personDto;
         this.projectiles = projectiles;
         this.items = itemDtos;
@@ -29,6 +29,7 @@ public class Update {
         this.time = time;
         started = gameStarted ? 1 : 0;
         this.tempZones = tempZones;
+        this.score = score;
     }
 
 
@@ -71,6 +72,11 @@ public class Update {
 
     public List<String> getMessages() {
         return messages;
+    }
+
+
+    public String getScore() {
+        return score;
     }
 
 }

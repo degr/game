@@ -1,7 +1,9 @@
 package org.forweb.commandos.entity.zone.interactive;
 
 
-public class FlagBlueTemp extends FlagBlue{
+import org.forweb.commandos.entity.WebSocketResponse;
+
+public class FlagBlueTemp extends FlagBlue implements WebSocketResponse {
 
     public FlagBlueTemp(int leftTopX, int leftTopY, int id) {
         super(leftTopX, leftTopY, id);
@@ -15,5 +17,10 @@ public class FlagBlueTemp extends FlagBlue{
     @Override
     public boolean isTemporary() {
         return true;
+    }
+
+    @Override
+    public String doResponse() {
+        return getType() + ":" + getX() +":" + getY() + ":" + getWidth() + ":" + getHeight();
     }
 }

@@ -10,7 +10,6 @@ import org.forweb.commandos.entity.ammo.Projectile;
 import org.forweb.commandos.entity.ammo.Shot;
 import org.forweb.commandos.entity.ammo.SubShot;
 import org.forweb.commandos.entity.weapon.AbstractWeapon;
-import org.forweb.commandos.entity.zone.AbstractItem;
 import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.entity.zone.Interactive;
 import org.forweb.commandos.game.Context;
@@ -98,6 +97,7 @@ public class ResponseService {
     public void sendStats(List<Stats> stats, Room room) {
         GameStats out = new GameStats();
         out.setStats(stats);
+        out.setTeamStats(room.getTeam1Score(), room.getTeam2Score());
         String message = prepareJson(out);
         for (Person person : room.getPersons().values()) {
             try {
@@ -180,12 +180,18 @@ public class ResponseService {
     public List<String> mapTempZones(List<AbstractZone> zones) {
         List<String> out = null;
         for(AbstractZone zone : zones) {
-            if(zone instanceof WebSocketResponse) {
-                WebSocketResponse response = (WebSocketResponse) zone;
-                if(out == null) {
-                    out = new ArrayList<>();
+            if(zone instanceof Interactive) {
+                if(((Interactive) zone).isTemporary()) {
+                    if(zone instanceof WebSocketResponse) {
+                        WebSocketResponse response = (WebSocketResponse) zone;
+                        if (out == null) {
+                            out = new ArrayList<>();
+                        }
+                        out.add(response.doResponse());
+                    } else {
+                        throw new RuntimeException("Temporary zone can't be sended to client : " + zone.getType());
+                    }
                 }
-                out.add(response.doResponse());
             }
         }
         return out;

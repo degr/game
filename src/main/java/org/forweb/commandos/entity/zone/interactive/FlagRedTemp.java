@@ -1,6 +1,8 @@
 package org.forweb.commandos.entity.zone.interactive;
 
-public class FlagRedTemp extends FlagRed{
+import org.forweb.commandos.entity.WebSocketResponse;
+
+public class FlagRedTemp extends FlagRed implements WebSocketResponse{
 
     public FlagRedTemp(int leftTopX, int leftTopY, int id) {
         super(leftTopX, leftTopY, id);
@@ -14,5 +16,10 @@ public class FlagRedTemp extends FlagRed{
     @Override
     public boolean isTemporary() {
         return true;
+    }
+
+    @Override
+    public String doResponse() {
+        return getType() + ":" + getX() +":" + getY() + ":" + getWidth() + ":" + getHeight();
     }
 }

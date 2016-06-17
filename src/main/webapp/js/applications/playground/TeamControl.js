@@ -2,11 +2,12 @@ var TeamControl = {
     container: null,
     isShown: false,
     teamHolder: null,
+    readyCheckbox: null,
     init: function () {
+        var ready = TeamControl.buildReadyCheckbox();
         var teamRed = TeamControl.buildTeamSwitch('red', 1);
         var teamBlue = TeamControl.buildTeamSwitch('blue', 2);
         TeamControl.teamHolder = Dom.el('div', TeamControl.isTeamGame() ? '' : 'hidden', [teamRed, teamBlue]);
-        var ready = TeamControl.buildReadyCheckbox();
         TeamControl.container = Dom.el('div', 'team-control', [TeamControl.teamHolder, ready]);
     },
     hide: function() {
@@ -35,6 +36,7 @@ var TeamControl = {
         var id = 'team_'+teamName;
         var radio = Dom.el('input', {type: 'radio', id: id, name: 'team_choose', value: value});
         radio.onclick = function() {
+            TeamControl.readyCheckbox.checked = false;
             PlayGround.socket.send('team:' + value);
         };
         var label = Dom.el('label', {'for': id}, [radio, teamName]);
@@ -60,6 +62,7 @@ var TeamControl = {
                 checkbox.checked = false;
             }
         };
+        TeamControl.readyCheckbox = checkbox;
         var label = Dom.el('label', {'for': id}, [checkbox, 'Ready to play']);
         return Dom.el('div', 'form-control', label);
     },

@@ -3,6 +3,9 @@ package org.forweb.commandos.controller;
 import org.forweb.commandos.dto.RoomForJoinDto;
 import org.forweb.commandos.entity.GameMap;
 import org.forweb.commandos.entity.Room;
+import org.forweb.commandos.entity.zone.AbstractZone;
+import org.forweb.commandos.entity.zone.Interactive;
+import org.forweb.commandos.entity.zone.Zone;
 import org.forweb.commandos.game.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,7 +50,23 @@ public class RoomsController {
                 item.setName(room.getName());
                 item.setPersonsCount(room.getPersons().size());
                 item.setTotalSpace(room.getMap().getMaxPlayers());
-                item.setMap(map);
+                GameMap mapOut = new GameMap();
+                mapOut.setId(map.getId());
+                mapOut.setX(map.getX());
+                mapOut.setY(map.getY());
+                mapOut.setName(map.getName());
+                mapOut.setMaxPlayers(map.getMaxPlayers());
+                mapOut.setRating(map.getRating());
+                mapOut.setGameType(map.getGameType());
+                mapOut.setZones(map.getZones().stream().filter(v -> {
+                    if(v instanceof Interactive) {
+                        return !((Interactive) v).isTemporary();
+                    } else {
+                        return true;
+                    }
+                }).collect(Collectors.toList()));
+
+                item.setMap(mapOut);
                 out.add(item);
             }
             i++;

@@ -44,13 +44,21 @@ public abstract class AbstractFlag extends AbstractZone implements Interactive {
                     }
                 } else {
                     if(isAvailable()) {
-                        if(person.isOpponentFlag()) {
-                            person.setOpponentFlag(false);
-                            room.updateFlag(getTeam());
-                            if(getTeam() == 1) {
-                                room.setTeam1Score(room.getTeam1Score() + 1);
-                            } else {
-                                room.setTeam2Score(room.getTeam2Score() + 1);
+                        if(isTemporary()) {
+                            person.setSelfFlag(true);
+                            this.isAvailable = false;
+                        } else {
+                            if (person.isOpponentFlag()) {
+                                person.setOpponentFlag(false);
+                                room.updateFlag(getTeam());
+                                if (getTeam() == 1) {
+                                    room.setTeam1Score(room.getTeam1Score() + 1);
+                                } else {
+                                    room.setTeam2Score(room.getTeam2Score() + 1);
+                                }
+                                if(room.getTeam1Score() >= 5 || room.getTeam2Score() >= 5) {
+                                    room.setShowStats(true);
+                                }
                             }
                         }
                     } else {

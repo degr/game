@@ -355,6 +355,14 @@ a.tab-name.active {
     color: white;
     font-size: 19px;
 }
+.score-overview .red-team{
+    color: red;
+    font-weight: bold;
+}
+.score-overview .blue-team{
+    color: cornflowerblue;
+    font-weight: bold;
+}
 .score-overview td, .score-overview th{
     padding: 3px 10px;
     text-align: center;

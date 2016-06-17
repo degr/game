@@ -20,7 +20,7 @@ var ZoneActions = {
         ZoneActions.images.sniper = new Image();
         ZoneActions.images.sniper.src = 'images/map/sniper.png';
         ZoneActions.images.pistol = new Image();
-        ZoneActions.images.pistol.src = 'images/map/pistol.jpg';
+        ZoneActions.images.pistol.src = 'images/map/pistol.png';
         ZoneActions.images.wall = new Image();
         ZoneActions.images.wall.src = 'images/map/wall.jpg';
         ZoneActions.images.flag_blue = new Image();
@@ -37,29 +37,30 @@ var ZoneActions = {
                 context.fillRect(zone.x, zone.y, zone.width, zone.height);
                 break;
             case 'respawn_blue':
-                context.fillStyle = 'rgba(54, 159, 236, 0.71)';
+                context.fillStyle = 'rgba(54, 159, 236, 0.41)';
                 context.fillRect(zone.x, zone.y, zone.width, zone.height);
                 break;
             case 'respawn_red':
-                context.fillStyle = 'rgba(210, 63, 63, 0.71)';
+                context.fillStyle = 'rgba(210, 63, 63, 0.41)';
                 context.fillRect(zone.x, zone.y, zone.width, zone.height);
                 break;
             case 'flag_blue':
-            case 'flag_blue_temp':
                 context.fillStyle = 'rgb(54, 159, 236)';
                 context.fillRect(zone.x, zone.y, zone.width, zone.height);
+            case 'flag_blue_temp':
                 if(zone.available) {
                     context.drawImage(ZoneActions.images.flag_blue, zone.x, zone.y);
                 }
                 break;
             case 'flag_red':
-            case 'flag_red_temp':
                 context.fillStyle = 'rgb(210, 63, 63)';
                 context.fillRect(zone.x, zone.y, zone.width, zone.height);
+            case 'flag_red_temp':
                 if(zone.available) {
                     context.drawImage(ZoneActions.images.flag_red, zone.x, zone.y);
                 }
                 break;
+            case "pistol":
             case "shotgun":
             case "assault":
             case "sniper":
@@ -103,10 +104,10 @@ var ZoneActions = {
         var data = str.split(':');
         return {
             type: data[0],
-            x: data[1],
-            y: data[2],
-            width: data[3],
-            height: data[4],
+            x: parseInt(data[1]),
+            y: parseInt(data[2]),
+            width: parseInt(data[3]),
+            height: parseInt(data[4])
         }
     },
     drawImage: function(zone) {

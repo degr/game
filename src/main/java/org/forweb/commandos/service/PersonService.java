@@ -2,6 +2,7 @@ package org.forweb.commandos.service;
 
 import org.forweb.commandos.controller.PersonWebSocketEndpoint;
 import org.forweb.commandos.entity.Direction;
+import org.forweb.commandos.entity.Map;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.weapon.*;
@@ -88,10 +89,12 @@ public class PersonService {
             int factor = shooter == target || shooter.getTeam() > 0 && target.getTeam() == shooter.getTeam() ? -1 : 1;
             shooter.setScore(shooter.getScore() + factor);
             if (shooter.getTeam() > 0) {
-                if (shooter.getTeam() == 1) {
-                    room.setTeam1Score(room.getTeam1Score() + factor);
-                } else {
-                    room.setTeam2Score(room.getTeam2Score() + factor);
+                if(Map.GameType.tdm.toString().equals(room.getMap().getGameType())) {
+                    if (shooter.getTeam() == 1) {
+                        room.setTeam1Score(room.getTeam1Score() + factor);
+                    } else {
+                        room.setTeam2Score(room.getTeam2Score() + factor);
+                    }
                 }
             }
         }

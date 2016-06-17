@@ -185,7 +185,7 @@ var PlayGround = {
         PlayGround.gameStarted = false;
         PersonTracker.stop();
         GameStats.show();
-        GameStats.update(data.stats);
+        GameStats.update(data.stats, parseInt(data.team1Score), parseInt(data.team2Score));
         PlayGround.socket.close();
     },
     decryptOwner: function(owner) {
@@ -205,6 +205,9 @@ var PlayGround = {
             if(PlayGround.owner.id != oldOwnerId) {
                 PlayGround.updateCanvas(PlayGround.map);
             }
+        }
+        if(packet.score) {
+            ScoreOverview.updateTeamScore(packet.score);
         }
         Weapons.update(PlayGround.owner);
         LifeAndArmor.update(PlayGround.owner.life, PlayGround.owner.armor);
@@ -230,6 +233,14 @@ var PlayGround = {
                 }
             }
         }
+        PlayGround.tempZones = [];
+        if(packet.tempZones && packet.tempZones.length) {
+            for(var i = 0; i < packet.tempZones.length; i++) {
+                var zone = ZoneActions.decode(packet.tempZones[i]);
+                zone.available = true;
+                PlayGround.tempZones.push(zone);
+            }
+        }
         var personIds = [];
         for (var i = 0; i < packet.persons.length; i++) {
             personIds.push(PersonActions.mapPersonFromResponse(packet.persons[i]));
@@ -242,12 +253,6 @@ var PlayGround = {
         var now = (new Date()).getTime();
         PlayGround.projectiles = [];
         var playShootgun = false;
-        if(packet.tempZones && packet.tempZones.length) {
-            for(var i = 0; i < packet.tempZones.length; i++) {
-                var zone = ZoneActions.decode(packet.tempZones[i]);
-                ZoneActions.drawZone(zone);
-            }
-        }
         for(var i = 0; i < packet.projectiles.length; i++) {
             var p = ProjectilesActions.decode(packet.projectiles[i]);
             if(p.type === 'shot') {
@@ -302,6 +307,11 @@ var PlayGround = {
         if (PlayGround.map.zones != null) {
             for (var zoneId in PlayGround.map.zones) {
                 ZoneActions.drawZone(PlayGround.map.zones[zoneId]);
+            }
+        }
+        if (PlayGround.tempZones && PlayGround.tempZones.length) {
+            for (var tempZoneId = 0; tempZoneId < PlayGround.tempZones.length; tempZoneId++) {
+                ZoneActions.drawZone(PlayGround.tempZones[tempZoneId]);
             }
         }
         for (var id in PlayGround.entities) {

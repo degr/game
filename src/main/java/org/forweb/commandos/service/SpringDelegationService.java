@@ -47,7 +47,7 @@ public class SpringDelegationService {
             player.setInPool(true);
         } else {
             player.setInPool(false);
-            if(!Map.GameType.dm.toString().equals(room.getMap().getGameType())) {
+            if(!Map.GameType.dm.toString().equals(room.getMap().getGameType()) && room.isEverybodyReady()) {
                 int blue = 0;
                 int red = 0;
                 for(Person person :  room.getPersons().values()) {
@@ -143,7 +143,8 @@ public class SpringDelegationService {
                                         room.getMessages(),
                                         room.isEverybodyReady() ? room.getEndTime() - System.currentTimeMillis() : 0,
                                         room.isEverybodyReady(),
-                                        responseService.mapTempZones(room.getMap().getZones())
+                                        responseService.mapTempZones(room.getMap().getZones()),
+                                        room.getTeam1Score() + ":" + room.getTeam2Score()
                                 ),
                                 room
                         );
@@ -169,17 +170,17 @@ public class SpringDelegationService {
             if(person != null) {
                 if(person.getTeam() == 1) {
                     if(person.isOpponentFlag()) {
-                        room.updateFlag(2);
+                        room.updateFlag(1);
                     }
                     if(person.isSelfFlag()) {
-                        room.updateFlag(1);
+                        room.updateFlag(2);
                     }
                 } else if(person.getTeam() == 2) {
                     if(person.isOpponentFlag()) {
-                        room.updateFlag(1);
+                        room.updateFlag(2);
                     }
                     if(person.isSelfFlag()) {
-                        room.updateFlag(2);
+                        room.updateFlag(1);
                     }
                 } else {
                     //it must never happen

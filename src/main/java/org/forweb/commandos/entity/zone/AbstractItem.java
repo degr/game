@@ -1,6 +1,7 @@
 package org.forweb.commandos.entity.zone;
 
 import org.forweb.commandos.controller.PersonWebSocketEndpoint;
+import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.WebSocketResponse;
 import org.forweb.geometry.shapes.Bounds;
 

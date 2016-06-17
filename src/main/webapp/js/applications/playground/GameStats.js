@@ -16,11 +16,15 @@ var GameStats = {
         Dom.addClass(GameStats.container, 'hidden');
         GameStats.isShown = false;
     },
-    update: function (stats) {
+    update: function (stats, team1Score, team2Score) {
         GameStats.statistics.innerHTML = '';
         var content = [];
         for(var i = 0; i < stats.length; i++) {
             GameStats.statistics.appendChild(Dom.el('div', null, decodeURIComponent(stats[i].person) + " " + stats[i].frags));
+        }
+        if(team1Score >= 0 || team2Score >= 0) {
+            GameStats.statistics.appendChild(Dom.el('div', null, "Red score: " + team1Score));
+            GameStats.statistics.appendChild(Dom.el('div', null, "Blue score: " + team2Score));
         }
     }
 };
