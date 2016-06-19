@@ -84,7 +84,32 @@ var KeyboardSetup = {
             'knife', 'pistol', 'shotgun', 'assault', 'sniper', 'flamethrower',
             'minigun', 'rocket']);
         out.push(KeyboardSetup.buildNoReload());
+        out.push(KeyboardSetup.buildLaserSightControl());
         return out;
+    },
+    buildLaserSightControl: function() {
+        var laserSight = localStorage.getItem('laserSight');
+        if(laserSight) {
+            PlayGround.laserSight = parseInt(laserSight);
+        }
+        
+        var buildButton = function(value, label) {
+            var id = 'laser_sight_' + value;
+            var button = Dom.el('input', {type: 'radio', name: 'laser_sight', id: id});
+            if(PlayGround.laserSight == value) {
+                button.checked = true;
+            }
+            button.onclick = function() {
+                PlayGround.laserSight = value;
+                localStorage.setItem('laserSight', value);
+            };
+            return Dom.el('div', null, Dom.el('label', {'for': id}, [button, label]));
+        };
+        return Dom.el('div', null, [
+            buildButton(0, 'No laser sight'),
+            buildButton(1, 'Laser sight only on sniper rifle'),
+            buildButton(2, 'Laser sight on all weapons')
+        ])
     },
     buildNoReload: function() {
         var checkbox = Dom.el('input', {type: 'checkbox', id: 'no_passive_reload',title: 'Next weapon on empty ammo'});
@@ -111,8 +136,48 @@ var KeyboardSetup = {
             KeyboardSetup.buildDrawBounds(),
             KeyboardSetup.buildShowNames(),
             KeyboardSetup.buildChatToggler(),
-            KeyboardSetup.buildScoreButton()
+            KeyboardSetup.buildScoreButton(),
+            KeyboardSetup.buildMuteButton(),
+            KeyboardSetup.buildHightLightButton()
         ];
+    },
+    buildHightLightButton: function() {
+        var highLight = localStorage.getItem('highlightOwner');
+        if(highLight) {
+            PlayGround.highlightOwner = highLight == '1';
+        }
+        var checkbox = Dom.el('input', {type: 'checkbox', id: 'highlight_checkbox'});
+        if(PlayGround.highlightOwner) {
+            checkbox.checked = true;
+        }
+        checkbox.onclick = function() {
+            PlayGround.highlightOwner = checkbox.checked;
+            if(SoundUtils.mute) {
+                localStorage.setItem('highlightOwner', '1');
+            } else {
+                localStorage.removeItem('highlightOwner');
+            }
+        };
+        return Dom.el('div', null, Dom.el('label', {'for': 'highlight_checkbox'}, [checkbox, 'Highligh person']));
+    },
+    buildMuteButton: function() {
+        var mute = localStorage.getItem('mute');
+        if(mute == '1') {
+            SoundUtils.mute = true;
+        }
+        var checkbox = Dom.el('input', {type: 'checkbox', id: 'mute_checkbox'});
+        if(SoundUtils.mute) {
+            checkbox.checked = true;
+        }
+        checkbox.onclick = function() {
+            SoundUtils.mute = checkbox.checked;
+            if(SoundUtils.mute) {
+                localStorage.setItem('mute', '1');
+            } else {
+                localStorage.removeItem('mute');
+            }
+        };
+        return Dom.el('div', null, Dom.el('label', {'for': 'mute_checkbox'}, [checkbox, 'Mute (no sound)']));
     },
     buildScoreButton: function () {
         return KeyboardSetup.createInput('score');

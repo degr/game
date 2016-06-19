@@ -196,6 +196,14 @@ public class Room {
         }
     }
 
+    public Map.GameType getGameType() {
+        if(getMap().getGameType() == null) {
+            return Map.GameType.dm;
+        } else {
+            return Map.GameType.valueOf(getMap().getGameType());
+        }
+    }
+
     public int getNewWeaponId() {
         if(tempWeaponId == 0) {
             for (AbstractZone zone : getMap().getZones()) {

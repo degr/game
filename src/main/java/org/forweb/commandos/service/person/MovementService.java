@@ -5,6 +5,7 @@ import org.forweb.commandos.entity.Direction;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.weapon.Minigun;
+import org.forweb.commandos.entity.weapon.RocketLauncher;
 import org.forweb.commandos.service.LocationService;
 import org.forweb.geometry.shapes.Point;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,11 @@ public class MovementService {
     public void onMove(Person person, Room room){
 
         Direction direction = person.getDirection();
-        double factor = 1;
+        double factor = 1.4;
         if(person.getWeapon() instanceof Minigun) {
             factor *= 0.6;
+        } else if(person.getWeapon() instanceof RocketLauncher) {
+            factor *= 0.8;
         }
         if (direction != null) {
             switch (direction) {

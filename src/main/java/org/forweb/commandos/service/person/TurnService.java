@@ -1,6 +1,7 @@
 package org.forweb.commandos.service.person;
 
 import org.forweb.commandos.entity.Person;
+import org.forweb.commandos.entity.weapon.Minigun;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,7 +13,7 @@ public class TurnService {
         float speed;
         if(selected == current) {
             return;
-        } else if(Math.max(selected, current) - Math.min(selected, current) < 5) {
+        } else if((Math.max(selected, current) - Math.min(selected, current) < 5) || person.getWeapon() instanceof Minigun) {
             speed = 1f;
         } else {
             speed = 2f;

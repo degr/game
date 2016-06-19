@@ -2,7 +2,9 @@ package org.forweb.commandos.entity;
 
 import org.forweb.commandos.controller.PersonWebSocketEndpoint;
 import org.forweb.commandos.entity.weapon.AbstractWeapon;
+import org.forweb.commandos.service.projectile.Stoppable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Person implements WebSocketResponse {
@@ -27,6 +29,7 @@ public class Person implements WebSocketResponse {
     private boolean opponentFlag;
     private boolean selfFlag;
     private boolean ready;
+    private List<Stoppable> listeners = new ArrayList<>();
 
     public List<AbstractWeapon> getWeaponList() {
         return weaponList;
@@ -58,7 +61,6 @@ public class Person implements WebSocketResponse {
     public void setDirection(Direction direction) {
         this.direction = direction;
     }
-
 
     public Integer getLife() {
         return life;
@@ -248,5 +250,13 @@ public class Person implements WebSocketResponse {
 
     public boolean isReady() {
         return ready;
+    }
+
+    public void addListener(Stoppable thread) {
+        this.listeners.add(thread);
+    }
+
+    public List<Stoppable> getListeners() {
+        return listeners;
     }
 }

@@ -211,15 +211,30 @@ PersonActions.drawPerson = function(person) {
     context.beginPath();
     context.translate(x,y);
     context.rotate((angle - 90) * Math.PI / 180);
+    
+    if(PlayGround.owner && PlayGround.owner.id && PlayGround.owner.id == person.id) {
+        if ((PlayGround.laserSight == 2 && person.gun != 'knife') || (PlayGround.laserSight == 1 && person.gun == 'sniper')) {
+            context.moveTo(0, 0);
+            context.strokeStyle = "rgba(0, 255, 24, 0.6)";
+            context.lineTo(500, 0);
+            context.stroke();
+        }
+
+        if (PlayGround.highlightOwner) {
+            var grdSize = 20;
+            var grd = context.createRadialGradient(0, 0, 3, 0, 0, grdSize);
+            grd.addColorStop(0, "#FEFF22");
+            grd.addColorStop(1, "transparent");
+            context.fillStyle = grd;
+            context.fillRect(-grdSize, -grdSize, grdSize*2, grdSize*2);
+        }
+    }
     if(person.gun == 'pistol') {
         context.drawImage(ZoneActions.images[person.gun], -10, -14)
     } else if(person.gun != 'knife') {
         context.drawImage(ZoneActions.images[person.gun], -6, -14)
     }
-
     context.restore();
-
-
 
     context.save();
     context.beginPath();

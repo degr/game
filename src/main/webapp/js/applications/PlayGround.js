@@ -29,6 +29,8 @@ var PlayGround = {
     explosionRadius: 40,//different on 20 with server
     instantBullets: {},
     readyToPlay: false,
+    laserSight: 1,
+    highlightOwner: true,
     
     init: function () {
         PersonActions.init();
@@ -42,7 +44,8 @@ var PlayGround = {
         Score.init();
         ScoreOverview.init();
         TeamControl.init();
-
+        
+        
         setInterval(function(){
             if(PlayGround.gameStarted) {
                 var now = (new Date()).getTime() - 100;

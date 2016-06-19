@@ -6,7 +6,7 @@ import org.forweb.commandos.entity.ammo.Projectile;
 
 public class Pistol extends AbstractWeapon<Bullet> {
     public Pistol() {
-        this.setShotTimeout(1000);
+        this.setShotTimeout(500);
         this.setReloadTimeout(2000);
         this.setSpread(5);
 

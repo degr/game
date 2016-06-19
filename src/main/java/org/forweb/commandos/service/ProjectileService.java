@@ -7,6 +7,7 @@ import org.forweb.commandos.entity.ammo.*;
 import org.forweb.commandos.entity.weapon.*;
 import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.game.Context;
+import org.forweb.commandos.service.projectile.ExplosionThread;
 import org.forweb.geometry.services.CircleService;
 import org.forweb.geometry.services.LineService;
 import org.forweb.geometry.services.PointService;
@@ -30,6 +31,8 @@ public class ProjectileService {
 
     @Autowired
     private PersonService personService;
+    @Autowired
+    private LocationService locationService;
 
     private static final Random random = new Random();
 
@@ -175,12 +178,19 @@ public class ProjectileService {
                 );
                 if (damageFactor > -1) {
                     double damage = explosion.getDamage() + damageFactor * explosion.getDamageFactor();
+                    shiftPersonAfterExplosion(person, explosion, room);
+
                     onDamage(shooter, (int)damage, person, room);
                 }
             }
             room.getProjectiles().remove(rocketBatchId);
         }
     }
+
+    public void shiftPersonAfterExplosion(Person person, Explosion explosion, Room room) {
+        (new ExplosionThread(person, explosion, locationService, room)).start();
+    }
+
 
     private void updatePosition(Projectile projectile) {
         double distance = projectile.getRadius() * Context.TICK_DELAY / projectile.getLifeTime();

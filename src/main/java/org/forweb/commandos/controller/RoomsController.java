@@ -46,7 +46,7 @@ public class RoomsController {
                 GameMap map = room.getMap();
                 RoomForJoinDto item = new RoomForJoinDto();
                 item.setId(room.getId());
-                item.setDescription("Room " + room.getName() + "\n Map: " + room.getMap().getName() + "\n Game mode: " + room.getMap().getGameType());
+                item.setDescription("Room " + room.getName() + "\n Map: " + room.getMap().getName() + "\n Game mode: " + room.getGameType());
                 item.setName(room.getName());
                 item.setPersonsCount(room.getPersons().size());
                 item.setTotalSpace(room.getMap().getMaxPlayers());

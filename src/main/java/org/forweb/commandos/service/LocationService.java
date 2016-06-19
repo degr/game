@@ -102,7 +102,7 @@ public class LocationService {
         }
     }
 
-    private Point[] calculateCollistions(Person player, Room room, double xShift, double yShift) {
+    public Point[] calculateCollistions(Person player, Room room, double xShift, double yShift) {
         Circle playerCircle = new Circle(
                 player.getX() + xShift,
                 player.getY() + yShift,

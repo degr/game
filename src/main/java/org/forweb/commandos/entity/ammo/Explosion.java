@@ -26,6 +26,6 @@ public class Explosion extends Projectile{
     }
 
     public int getDamageFactor() {
-        return 90;
+        return 100;
     }
 }

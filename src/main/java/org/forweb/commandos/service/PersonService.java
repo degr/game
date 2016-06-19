@@ -14,6 +14,7 @@ import org.forweb.commandos.entity.zone.items.*;
 import org.forweb.commandos.game.Context;
 import org.forweb.commandos.service.person.MovementService;
 import org.forweb.commandos.service.person.TurnService;
+import org.forweb.commandos.service.projectile.Stoppable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class PersonService {
@@ -128,6 +130,14 @@ public class PersonService {
         person.setOpponentFlag(false);
         person.setSelfFlag(false);
         person.setReload(false);
+        List<Stoppable> listeners = person.getListeners();
+        for(int i = listeners.size() - 1; i >= 0; i--) {
+            Stoppable stoppable = listeners.get(i);
+            if(!stoppable.isStopped()) {
+                stoppable.stopExecution();
+            }
+            listeners.remove(i);
+        }
     }
 
 
@@ -147,9 +157,41 @@ public class PersonService {
 
     public void resetPersonsOnRoomReady(Room room) {
         List<Integer> ids = new ArrayList<>();
+        int blue = 0;
+        int red = 0;
         for(Person person : room.getPersons().values()) {
-            resetState(person, room, ids);
+            if(person.getTeam() == 1) {
+                red++;
+            } else if(person.getTeam() == 2) {
+                blue++;
+            }
+        }
+        if(!Map.GameType.dm.equals(room.getGameType())) {
+            for (Person person : room.getPersons().values()) {
+                if (person.getTeam() == 0) {
+                    if(blue < red) {
+                        person.setTeam(2);
+                        blue++;
+                    } else if(red < blue){
+                        person.setTeam(1);
+                        red++;
+                    } else {
+                        Random r = new Random();
+                        int flag = r.nextInt(2);
+                        if(flag == 0) {
+                            person.setTeam(1);
+                            red++;
+                        } else {
+                            person.setTeam(2);
+                            blue++;
+                        }
+                    }
+                }
+            }
+        }
+        for (Person person : room.getPersons().values()) {
             person.setScore(0);
+            resetState(person, room, ids);
         }
     }
 }
