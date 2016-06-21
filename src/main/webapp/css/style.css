@@ -137,7 +137,18 @@ body, html {
     height: 600px;
     overflow: auto;
 }
-.editor .panel {
+.room-list-chat .gray{
+    color: gray;
+}
+.room-list-chat{
+    right: 0;
+    top: 0;
+    width: 468px;
+    height: 468px;
+    overflow: auto;
+}
+
+.panel {
     border: 1px solid;
     padding: 10px;
     background: #D2C9E4;

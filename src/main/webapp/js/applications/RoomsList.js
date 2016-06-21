@@ -12,8 +12,16 @@ var RoomsList = {
         if(!RoomsList.mapsLoaded) {
             RoomsList.openPage(RoomsList.pageNumber);
         }
+        RoomsChat.setActive(true);
     },
+    beforeClose: function() {
+        RoomsChat.setActive(false);
+    },
+    
     init: function() {
+        RoomsChat.init();
+        
+        
         var controlPanel = new Pagination(RoomsList.openPage, RoomsList.pageNumber);
         var createGame = Dom.el('input', {type:'button', value: 'Create room'});
         createGame.onclick = function(){Dispatcher.placeApplication('MapList')};
@@ -21,7 +29,11 @@ var RoomsList = {
         RoomsList.container = Dom.el(
             'div',
             {'class': 'games-list'},
-            [Dom.el('h1', null, 'Select game to play'), createGame, controlPanel.container, RoomsList.content]
+            [
+                Dom.el('h1', null, 'Select game to play'), 
+                createGame, controlPanel.container,
+                RoomsChat.container,
+                RoomsList.content]
         );
     },
     openPage: function(page) {

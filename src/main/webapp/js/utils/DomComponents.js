@@ -27,12 +27,12 @@ var DomComponents = {
         element.style.opacity = null;
         element.style.left =  (transportable.mouseX - transportable.offsetX) + 'px';
         element.style.top =  (transportable.mouseY - transportable.offsetY) + 'px';
+        console.log(transportable);
         transportable.dragStart = false;
     },
     handleDrop: function (e) {
-        console.log('handle drop');
         if (e.stopPropagation) {
-            e.stopPropagation(); // stops the browser from redirecting.
+            e.stopPropagation();
         }
         return false;
     },
