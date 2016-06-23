@@ -2,6 +2,7 @@ package org.forweb.commandos.entity;
 
 import org.forweb.commandos.controller.PersonWebSocketEndpoint;
 import org.forweb.commandos.entity.weapon.AbstractWeapon;
+import org.forweb.commandos.response.Status;
 import org.forweb.commandos.service.projectile.Stoppable;
 
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ public class Person implements WebSocketResponse {
     private long reloadCooldown = 0;
     private boolean isReload;
     private int armor;
+    private Status status = Status.alive;
 
     public Person(int id) {
         this.id = id;
@@ -189,7 +191,15 @@ public class Person implements WebSocketResponse {
                 getScore() + ":" +
                 (getTeam() != 0 ? getTeam() : "") + ":" +
                 (isOpponentFlag() ? "1" : "0") + ":" +
-                (isSelfFlag() ? "1" : "0");
+                (isSelfFlag() ? "1" : "0") + ":" +
+                getStatus().toString();
+    }
+
+    public Status getStatus(){
+        return status;
+    }
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public void setSelectedAngle(int selectedAngle) {

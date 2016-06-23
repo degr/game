@@ -145,9 +145,18 @@ body, html {
     top: 0;
     width: 468px;
     height: 468px;
+}
+.room-list-chat .messages {
+    height: 400px;
     overflow: auto;
 }
-
+.room-list-chat textarea {
+    width: 100%;
+    display: block;
+    min-height: 46px;
+    padding: 0;
+    margin: 0;
+}
 .panel {
     border: 1px solid;
     padding: 10px;

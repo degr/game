@@ -6,6 +6,7 @@ import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.game.Context;
 import org.forweb.commandos.response.Leave;
+import org.forweb.commandos.response.Status;
 import org.forweb.commandos.response.Update;
 import org.forweb.commandos.response.dto.Stats;
 import org.forweb.commandos.service.person.TurnService;
@@ -47,6 +48,7 @@ public class SpringDelegationService {
             player.setInPool(true);
         } else {
             player.setInPool(false);
+            room.getMessages().add("0:" + name + " just now joined game");
             if(!Map.GameType.dm.toString().equals(room.getMap().getGameType()) && room.isEverybodyReady()) {
                 int blue = 0;
                 int red = 0;
@@ -95,6 +97,11 @@ public class SpringDelegationService {
 
         if (room.isEverybodyReady() && room.getEndTime() - System.currentTimeMillis() < 0) {
             room.setShowStats(true);
+            room.setEverybodyReady(false);
+            for(Person person : room.getPersons().values()) {
+                person.setStatus(Status.stats);
+                person.setReady(false);
+            }
         }
 
         Collection<Person> persons = room.getPersons().values();
@@ -102,25 +109,12 @@ public class SpringDelegationService {
             if (persons.size() == 0) {
                 gameContext.getRooms().remove(room.getId());
                 room.getGameTimer().cancel();
-            } else {
-                responseService.sendStats(
-                        persons.stream()
-                                .map(v -> {
-                                    Stats stats = new Stats();
-                                    stats.setFrags(v.getScore());
-                                    stats.setPerson(v.getName());
-                                    return stats;
-                                })
-                                .sorted((v1, v2) -> v1.getFrags() - v2.getFrags())
-                                .collect(Collectors.toList()),
-                        room
-                );
             }
-        } else {
-            personService.handlePersons(persons, room);
-            projectilesService.onProjectileLifecycle(room.getProjectiles(), room);
-            mapService.onItemsLifecycle(room.getMap().getZones());
+
         }
+        personService.handlePersons(persons, room);
+        projectilesService.onProjectileLifecycle(room.getProjectiles(), room);
+        mapService.onItemsLifecycle(room.getMap().getZones());
     }
 
     private void startTimer(Room room) {
@@ -221,8 +215,10 @@ public class SpringDelegationService {
         Room room = gameContext.getRoom(roomId);
         if (room.isCoOp()) {
             if (team == 1) {
+                room.getMessages().add("0:" + person.getName() + " join to RED team");
                 person.setTeam(1);
             } else {
+                room.getMessages().add("0:" + person.getName() + " join to BLUE team");
                 person.setTeam(2);
             }
         }
@@ -233,9 +229,31 @@ public class SpringDelegationService {
         boolean isRoomReady = room.isEverybodyReady();
         person.setReady(ready);
         roomService.onPersonReady(room);
-        if(!isRoomReady && room.isEverybodyReady()) {
-            personService.resetPersonsOnRoomReady(room);
-            locationService.resetLocationsOnRoomReady(room);
+        if(!isRoomReady){
+            if(room.isEverybodyReady()) {
+                personService.resetPersonsOnRoomReady(room);
+                locationService.resetLocationsOnRoomReady(room);
+                room.getMessages().add("0:Game started just now");
+            } else {
+                String message = ready ? " is ready to kill. How about you?" : " not ready";
+                room.getMessages().add("0:" + person.getName() + message);
+            }
         }
+    }
+
+    public void onRestart(Person person, Room room) {
+        person.setStatus(Status.alive);
+        personService.resetState(person, room);
+        person.setScore(0);
+
+        for(Person person1 : room.getPersons().values()) {
+            if(Status.stats.equals(person1.getStatus())) {
+                return;
+            }
+        }
+        room.setShowStats(false);
+        room.setTeam1Score(0);
+        room.setTeam2Score(0);
+
     }
 }

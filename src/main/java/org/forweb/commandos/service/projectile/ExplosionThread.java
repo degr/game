@@ -47,15 +47,21 @@ public class ExplosionThread extends Thread implements Stoppable{
         double realDistance = maxDistance * factor;
         double yShift = 0;
         double xShift = 0;
+        System.out.println(
+                explosion.getxStart()+","+ explosion.getyStart()+","+ person.getX()+","+ person.getY() +","+angle
+        );
+        System.out.println("=======");
         while (!stopped && !(xBlocked && yBlocked) && currentShift < realDistance) {
             if (!xBlocked) {
-                xShift = Math.cos(angle) * currentShift;
+                xShift = -1* Math.cos(angle) * currentShift;
+                System.out.println("xShift: " + xShift);
                 if (locationService.calculateCollistions(person, room, xShift, 0) != PointService.EMPTY) {
                     xBlocked = true;
                 }
             }
             if (!yBlocked) {
-                yShift = Math.sin(angle) * currentShift;
+                yShift = -1* Math.sin(angle) * currentShift;
+                System.out.println("yShift: " + yShift);
                 if (locationService.calculateCollistions(person, room, 0, yShift) != PointService.EMPTY) {
                     yBlocked = true;
                 }

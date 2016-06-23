@@ -21,6 +21,6 @@ public class Rocket extends LinkedAmmo {
 
     @Override
     public int getDamage() {
-        return 70;
+        return 7;
     }
 }

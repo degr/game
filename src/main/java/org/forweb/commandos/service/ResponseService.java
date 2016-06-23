@@ -14,6 +14,7 @@ import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.entity.zone.Interactive;
 import org.forweb.commandos.game.Context;
 import org.forweb.commandos.response.GameStats;
+import org.forweb.commandos.response.Status;
 import org.forweb.commandos.response.Update;
 import org.forweb.commandos.response.dto.OwnerDto;
 import org.forweb.commandos.response.dto.Stats;
@@ -59,12 +60,19 @@ public class ResponseService {
     }
 
     public void broadcast(Update update, Room room) {
-
+        String statsMessage = null;
         /*boolean dumpToFile = false;*/
         for (Person person : room.getPersons().values()) {
             try {
-                update.setOwner(mapOwner(person));
-                String message = prepareJson(update);
+                if(Status.stats.equals(person.getStatus())) {
+                    if(statsMessage == null) {
+                        statsMessage = prepareStats(room);
+                    }
+                    sendMessage(room, person, statsMessage);
+                } else {
+                    update.setOwner(mapOwner(person));
+                    String message = prepareJson(update);
+                    sendMessage(room, person, message);
 
                 /*if (!dumpToFile) {
                     dumpToFile = true;
@@ -76,7 +84,7 @@ public class ResponseService {
                         e.printStackTrace();
                     }
                 }*/
-                sendMessage(room, person, message);
+                }
             } catch (IllegalStateException ise) {
                 // An ISE can occur if an attempt is made to write to a
                 // WebSocket connection after it has been closed. The
@@ -94,17 +102,21 @@ public class ResponseService {
         room.setMessages(new ArrayList<>());
     }
 
-    public void sendStats(List<Stats> stats, Room room) {
+    public String prepareStats(Room room) {
+        List<Stats> stats = room.getPersons().values().stream()
+                .map(v -> {
+                    Stats stat = new Stats();
+                    stat.setFrags(v.getScore());
+                    stat.setPerson(v.getName());
+                    return stat;
+                })
+                .sorted((v1, v2) -> v2.getFrags() - v1.getFrags())
+                .collect(Collectors.toList());
+
         GameStats out = new GameStats();
         out.setStats(stats);
         out.setTeamStats(room.getTeam1Score(), room.getTeam2Score());
-        String message = prepareJson(out);
-        for (Person person : room.getPersons().values()) {
-            try {
-                sendMessage(room, person, message);
-            } catch (IllegalStateException ise) {
-            }
-        }
+        return prepareJson(out);
     }
 
 

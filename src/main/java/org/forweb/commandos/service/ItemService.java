@@ -7,6 +7,7 @@ import org.forweb.commandos.entity.zone.interactive.FlagBlue;
 import org.forweb.commandos.entity.zone.interactive.FlagBlueTemp;
 import org.forweb.commandos.entity.zone.interactive.FlagRed;
 import org.forweb.commandos.entity.zone.interactive.FlagRedTemp;
+import org.forweb.commandos.entity.zone.items.MinigunZone;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,6 +16,9 @@ class ItemService {
     void onGetItem(Interactive item, Person player, Room room) {
 
         if (item.isAvailable()) {
+            if(item instanceof MinigunZone) {
+                room.getMessages().add("0:Somebody have big gun!");
+            }
             item.onEnter(player, room);
         } else if (item instanceof FlagBlue) {
             FlagBlue flag = (FlagBlue) item;

@@ -24,6 +24,7 @@ public class RoomService {
 
     public Room createRoom(Integer mapId, String roomName) {
         Room room = new Room();
+        room.getPersonIds().incrementAndGet();/*to make 0 - system*/
         try {
             room.setName(java.net.URLDecoder.decode(roomName, "UTF-8"));
         } catch (UnsupportedEncodingException e) {

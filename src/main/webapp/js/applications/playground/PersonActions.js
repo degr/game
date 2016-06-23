@@ -291,35 +291,24 @@ PersonActions.drawPerson = function(person) {
 
 PersonActions.mapPersonFromResponse = function (str) {
     var data = str.split(":");
-    var personDto = {
-        id: parseInt(data[0]),
-        name: decodeURIComponent(data[1]),
-        reload: data[2] == 1,
-        gun: data[3],
-        x: parseInt(data[4]),
-        y: parseInt(data[5]),
-        angle: parseInt(data[6]),
-        score: parseInt(data[7]),
-        team: data[8] ? parseInt(data[8]) : 0,
-        opponentFlag: parseInt(data[9]) == 1,
-        selfFlag: parseInt(data[10]) == 1
-    };
-    var id = personDto.id;
+    var id = parseInt(data[0]);
     if (!PlayGround.entities[id]) {
-        PlayGround.addPerson(personDto);
+        PlayGround.addPerson(id);
     }
-
     var p = PlayGround.entities[id];
-    p.x = personDto.x;
-    p.y = personDto.y;
-    p.angle = personDto.angle;
-    p.reload = personDto.reload;
-    p.gun = personDto.gun;
-    p.score = personDto.score;
-    p.team = personDto.team;
-    p.opponentFlag = personDto.opponentFlag;
-    p.selfFlag = personDto.selfFlag;
-
+    p.name = decodeURIComponent(data[1]);
+    p.reload = data[2] == 1;
+    p.gun = data[3];
+    p.x = parseInt(data[4]);
+    p.y = parseInt(data[5]);
+    p.angle = parseInt(data[6]);
+    p.score = parseInt(data[7]);
+    p.team = data[8] ? parseInt(data[8]) : 0;
+    p.opponentFlag = parseInt(data[9]) == 1;
+    p.selfFlag = parseInt(data[10]) == 1;
+    p.status = PersonActions.getStatus(parseInt(data[11]));
+    
+    
     if(PlayGround.owner.id == id) {
         PersonActions.updateMouseDirectionByXy(
             PlayGround.xMouse,
@@ -330,6 +319,17 @@ PersonActions.mapPersonFromResponse = function (str) {
     }
     return p.id;
 };
+
+PersonActions.getStatus = function(key) {
+    switch (key) {
+        case 2: return 'shooted';
+        case 3: return 'fried';
+        case 4: return 'exploded';
+        case 5: return 'cutted';
+        case 6: return 'stats';
+        default: return 'alive';
+    }
+}
 PersonActions.personOld = new Image();
 PersonActions.personOld.src = 'images/soldier1.png';
 PersonActions.reload = new Image();

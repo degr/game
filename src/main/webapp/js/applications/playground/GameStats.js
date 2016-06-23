@@ -5,7 +5,15 @@ var GameStats = {
     init: function() {
         var title = Dom.el('h3', null, 'THE END');
         GameStats.statistics = Dom.el('div');
-        var description = Dom.el('p', null, 'Please refresh browser to start');
+        var ready = Dom.el('input', {type: 'button', value: 'restart'});
+        ready.onclick = function() {
+            PlayGround.gameStarted = true;
+            PersonTracker.start();
+            GameStats.hide();
+            TeamControl.readyCheckbox.checked = false;
+            PlayGround.socket.send('restart');
+        };
+        var description = Dom.el('p', null, ['Please refresh browser to start new game, or press ', ready]);
         GameStats.container = Dom.el('div', 'game-stats hidden', [title, GameStats.statistics, description]);
     },
     show: function() {

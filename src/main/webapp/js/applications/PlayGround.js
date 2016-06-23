@@ -188,8 +188,8 @@ var PlayGround = {
         PlayGround.gameStarted = false;
         PersonTracker.stop();
         GameStats.show();
+        TeamControl.show()
         GameStats.update(data.stats, parseInt(data.team1Score), parseInt(data.team2Score));
-        PlayGround.socket.close();
     },
     decryptOwner: function(owner) {
         var data = owner.owner.split(":");
@@ -221,7 +221,7 @@ var PlayGround = {
         }
         for(var i = 0; i < packet.messages.length; i++) {
             var message = packet.messages[i];
-            var id = message.substring(0, message.indexOf(":"));
+            var id = parseInt(message.substring(0, message.indexOf(":")));
             var subject = message.substring(message.indexOf(':') + 1);
             Chat.update(id, subject);
         }
@@ -273,8 +273,8 @@ var PlayGround = {
             }
         }
     },
-    addPerson: function(person) {
-        PlayGround.entities[person.id] = new Person(person)
+    addPerson: function(id) {
+        PlayGround.entities[id] = new Person(id)
     },
     removePerson: function(id) {
         delete PlayGround.entities[id];

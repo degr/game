@@ -4,18 +4,25 @@ var RoomsChat = {
     screen: null,
     isActive: false,
     messages: [],
+    wasScrolled: false,
+    scrollActive: false,
     setActive: function(active) {
         RoomsChat.isActive = active;
     },
     init: function() {
-        RoomsChat.screen = Dom.el('div');
+        RoomsChat.screen = Dom.el('div', 'messages');
+        screen.onscroll = function() {
+            if(!RoomsChat.scrollActive) {
+                RoomsChat.wasScrolled = true
+            } else {
+                RoomsChat.scrollActive = false;
+            }
+        }
         RoomsChat.textarea = Dom.el('textarea');
         RoomsChat.textarea.onkeyup = function(e){RoomsChat.onKeyUp(e)};
         var button = Dom.el('input', {type: "submit", value: 'Send message (256 chars max)'});
         var terminal = Dom.el('form', {'class': 'terminal'}, [
-            
             RoomsChat.textarea,
-            Dom.el('br'),
             button
         ]);
         terminal.onsubmit = function(e) {
@@ -67,7 +74,10 @@ var RoomsChat = {
                         Dom.el('span', 'gray', time + " " +message.sender + " : "), message.message]))
                 }
             }
-            RoomsChat.screen.scrollTop = RoomsChat.screen.scrollHeight;
+            if(!RoomsChat.wasScrolled) {
+                RoomsChat.scrollActive = true;
+                RoomsChat.screen.scrollTop = RoomsChat.screen.scrollHeight;
+            }
         }
     }
 }

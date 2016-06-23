@@ -1,8 +1,10 @@
 package org.forweb.commandos.controller;
 
+import javafx.beans.binding.Bindings;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.game.Context;
+import org.forweb.commandos.response.Status;
 import org.forweb.commandos.service.SpringDelegationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.server.standard.SpringConfigurator;
@@ -26,6 +28,7 @@ public class PersonWebSocketEndpoint {
     private static final String MESSAGE_READY = "ready";
     private static final String MESSAGE_TEAM = "team";
     private static final String MESSAGE_NO_PASSIVE_RELOAD = "noPassiveReload";
+    private static final String MESSAGE_RESTART = "restart";
 
     public static final int PERSON_RADIUS = 20;
     public static final int ROCKET_RADIUS = 8;
@@ -62,9 +65,16 @@ public class PersonWebSocketEndpoint {
             springDelegationService.onTextMessage(message, roomId, id);
             return;
         }
-        String[] parts = message.split(":");
         if (personInPull()) {
             return;
+        }
+        String[] parts = message.split(":");
+        Room room = gameContext.getRoom(roomId);
+        if(room != null && room.isShowStats()) {
+            if(MESSAGE_RESTART.equals(parts[0])) {
+                springDelegationService.onRestart(person, room);
+                return;
+            }
         }
 
         switch ((parts[0])) {

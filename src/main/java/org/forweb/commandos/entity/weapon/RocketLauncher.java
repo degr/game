@@ -10,10 +10,10 @@ public class RocketLauncher extends AbstractWeapon<Rocket> {
         this.setShotTimeout(1000);
         setSpread(7);
 
-        this.setMaxClip(5);
-        this.setClipSize(1);
-        this.setCurrentClip(1);
-        this.setTotalClip(3);
+        this.setMaxClip(50);
+        this.setClipSize(10);
+        this.setCurrentClip(10);
+        this.setTotalClip(30);
     }
 
     @Override
