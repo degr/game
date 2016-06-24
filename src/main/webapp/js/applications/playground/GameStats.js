@@ -12,6 +12,7 @@ var GameStats = {
             GameStats.hide();
             TeamControl.readyCheckbox.checked = false;
             PlayGround.socket.send('restart');
+            PlayGround.blood = [];
         };
         var description = Dom.el('p', null, ['Please refresh browser to start new game, or press ', ready]);
         GameStats.container = Dom.el('div', 'game-stats hidden', [title, GameStats.statistics, description]);

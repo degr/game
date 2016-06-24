@@ -1,6 +1,7 @@
 package org.forweb.commandos.service;
 
 import org.forweb.commandos.controller.PersonWebSocketEndpoint;
+import org.forweb.commandos.entity.Blood;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.ammo.*;
@@ -11,10 +12,10 @@ import org.forweb.commandos.service.projectile.ExplosionThread;
 import org.forweb.geometry.services.CircleService;
 import org.forweb.geometry.services.LineService;
 import org.forweb.geometry.services.PointService;
+import org.forweb.geometry.shapes.Bounds;
 import org.forweb.geometry.shapes.Circle;
 import org.forweb.geometry.shapes.Line;
 import org.forweb.geometry.shapes.Point;
-import org.forweb.geometry.shapes.Bounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,8 +53,8 @@ public class ProjectileService {
     }
 
     private void checkForImpacts(Room room, Projectile projectile, Integer batchId) {
-        if(projectile instanceof Flame) {
-            onFlameLifecycle(room, (Flame)projectile, batchId);
+        if (projectile instanceof Flame) {
+            onFlameLifecycle(room, (Flame) projectile, batchId);
         } else if (projectile instanceof Rocket) {
             onRocketLifecycle(room, (Rocket) projectile, batchId);
         }
@@ -61,18 +62,18 @@ public class ProjectileService {
     }
 
     private void onFlameLifecycle(Room room, Flame flame, Integer flameBathcId) {
-        if(!flame.isStoped()) {
+        if (!flame.isStoped()) {
             updatePosition(flame);
         }
 
-        if(!flame.isStoped()) {
+        if (!flame.isStoped()) {
             if (flame.getxStart() <= 0 || flame.getxStart() >= room.getMap().getX() ||
                     flame.getyStart() <= 0 || flame.getyStart() >= room.getMap().getY()) {
                 flame.setStoped(true);
             }
         }
         Circle flameCircle = new Circle(flame.getxStart(), flame.getyStart(), PersonWebSocketEndpoint.FIRE_RADIUS);
-        if(!flame.isStoped()) {
+        if (!flame.isStoped()) {
             for (AbstractZone zone : room.getMap().getZones()) {
                 if (!zone.isShootable()) {
                     Point[] point = CircleService.circleBoundsIntersection(
@@ -86,8 +87,8 @@ public class ProjectileService {
                 }
             }
         }
-        for(Person person : room.getPersons().values()) {
-            if(person.getId() != flame.getPersonId()) {
+        for (Person person : room.getPersons().values()) {
+            if (person.getId() != flame.getPersonId()) {
                 Circle personCircle = new Circle(
                         person.getX(),
                         person.getY(),
@@ -97,7 +98,7 @@ public class ProjectileService {
                         flameCircle,
                         personCircle
                 );
-                if(point.length > 0) {
+                if (point.length > 0) {
                     onDamage(room.getPersons().get(flame.getPersonId()), flame.getDamage(), person, room);
                     room.getProjectiles().remove(flameBathcId);
                 }
@@ -116,11 +117,11 @@ public class ProjectileService {
                 PersonWebSocketEndpoint.ROCKET_RADIUS
         );
         Explosion explosion = null;
-        if(rocket.getxStart() <= 0 || rocket.getxStart() >= room.getMap().getX() ||
+        if (rocket.getxStart() <= 0 || rocket.getxStart() >= room.getMap().getX() ||
                 rocket.getyStart() <= 0 || rocket.getyStart() >= room.getMap().getY()) {
-            explosion = new Explosion((int)rocket.getxStart(), (int)rocket.getyStart());
+            explosion = new Explosion((int) rocket.getxStart(), (int) rocket.getyStart());
         }
-        if(explosion == null) {
+        if (explosion == null) {
             for (AbstractZone zone : room.getMap().getZones()) {
                 if (!zone.isShootable()) {
                     Point[] point = CircleService.circleBoundsIntersection(
@@ -134,9 +135,9 @@ public class ProjectileService {
                 }
             }
         }
-        if(explosion == null) {
-            for(Person person : room.getPersons().values()) {
-                if(person.getId() != rocket.getPersonId()) {
+        if (explosion == null) {
+            for (Person person : room.getPersons().values()) {
+                if (person.getId() != rocket.getPersonId()) {
                     Circle personCircle = new Circle(
                             person.getX(),
                             person.getY(),
@@ -146,21 +147,18 @@ public class ProjectileService {
                             rocketCircle,
                             personCircle
                     );
-                    if(point.length > 0) {
-                        explosion = new Explosion((int)point[0].getX(), (int) point[0].getY());
+                    if (point.length > 0) {
+                        explosion = new Explosion((int) point[0].getX(), (int) point[0].getY());
                         onDamage(room.getPersons().get(rocket.getPersonId()), rocket.getDamage(), person, room);
                         break;
                     }
                 }
             }
         }
-        if(explosion != null) {
 
-        }
-
-        if(explosion != null) {
-            explosion.setxEnd((int)explosion.getxStart());
-            explosion.setyEnd((int)explosion.getyStart());
+        if (explosion != null) {
+            explosion.setxEnd((int) explosion.getxStart());
+            explosion.setyEnd((int) explosion.getyStart());
             int id = room.getProjectilesIds().getAndIncrement();
             room.getProjectiles().put(id, explosion);
 
@@ -171,7 +169,7 @@ public class ProjectileService {
             );
             Person shooter = room.getPersons().get(rocket.getPersonId());
 
-            for(Person person : room.getPersons().values()) {
+            for (Person person : room.getPersons().values()) {
                 double damageFactor = PointService.pointBelongToCircle(
                         new Point(person.getX(), person.getY()),
                         explosionCircle
@@ -180,7 +178,7 @@ public class ProjectileService {
                     double damage = explosion.getDamage() + damageFactor * explosion.getDamageFactor();
                     shiftPersonAfterExplosion(person, explosion, room);
 
-                    onDamage(shooter, (int)damage, person, room);
+                    onDamage(shooter, (int) damage, person, room);
                 }
             }
             room.getProjectiles().remove(rocketBatchId);
@@ -223,8 +221,8 @@ public class ProjectileService {
                     zoneBounds
             );
             Point closest = isMoreClose(
-                    (int)projectile.getxStart(),
-                    (int)projectile.getyStart(),
+                    (int) projectile.getxStart(),
+                    (int) projectile.getyStart(),
                     new Point(projectile.getxEnd(), projectile.getyEnd()),
                     zoneIntersection
             );
@@ -246,7 +244,7 @@ public class ProjectileService {
             );
 
             if (shooter == person) {
-                if(intersectionPoints.length > 0) {
+                if (intersectionPoints.length > 0) {
                     projectile.setxStart((int) intersectionPoints[0].getX());
                     projectile.setyStart((int) intersectionPoints[0].getY());
                 }
@@ -255,8 +253,8 @@ public class ProjectileService {
 
 
             if (intersectionPoints != null && intersectionPoints.length > 0) {
-                Point closest = isMoreClose((int)shooter.getX(), (int)shooter.getY(), closestPoint, intersectionPoints);
-                if(closest != null) {
+                Point closest = isMoreClose((int) shooter.getX(), (int) shooter.getY(), closestPoint, intersectionPoints);
+                if (closest != null) {
                     if (projectile.isPiercing()) {
                         onDamage(shooter, projectile.getDamage(), person, room);
                     } else {
@@ -280,18 +278,18 @@ public class ProjectileService {
     private void onDamage(Person shooter, int damage, Person person, Room room) {
         int life = person.getLife();
         int armor = person.getArmor();
-        if(armor > 0) {
+        if (armor > 0) {
             int armorDamage = damage * 2 / 3;
             person.setArmor(armor - armorDamage);
             damage = damage - armorDamage;
-            if(person.getArmor() < 0) {
+            if (person.getArmor() < 0) {
                 damage -= person.getArmor();
                 person.setArmor(0);
             }
 
         }
         person.setLife(life - damage);
-
+        room.addBlood(new Blood((int) person.getX(), (int) person.getY()));
         if (person.getLife() <= 0) {
             personService.kill(person, room);
             personService.reward(shooter, person, room);
@@ -317,7 +315,6 @@ public class ProjectileService {
     }
 
 
-
     void doShot(Person person, String status, Room room) {
         boolean isFire = "1".equals(status);
         person.setIsFire(isFire);
@@ -328,9 +325,9 @@ public class ProjectileService {
         if (person.isFire()) {
             AbstractWeapon weapon = person.getWeapon();
             long now = System.currentTimeMillis();
-            if(!person.isReload() && weapon.getCurrentClip() <= 0) {
-                if(person.isNoPassiveReload()) {
-                    if(person.getShotCooldown() < now) {
+            if (!person.isReload() && weapon.getCurrentClip() <= 0) {
+                if (person.isNoPassiveReload()) {
+                    if (person.getShotCooldown() < now) {
                         AbstractWeapon newWeapon = findBestWeapon(person.getWeaponList());
                         if (newWeapon != null) {
                             person.setWeapon(newWeapon);
@@ -349,35 +346,35 @@ public class ProjectileService {
     private AbstractWeapon findBestWeapon(List<AbstractWeapon> weaponList) {
         int index = -1;
         int weight = -1;
-        for(int i = 0; i < weaponList.size(); i++) {
+        for (int i = 0; i < weaponList.size(); i++) {
             AbstractWeapon weapon = weaponList.get(i);
-            if(weapon.getCurrentClip() > 0) {
+            if (weapon.getCurrentClip() > 0) {
                 if (weapon instanceof Pistol) {
                     if (weight < 1) {
                         weight = 1;
                         index = i;
                     }
-                } else if(weapon instanceof Shotgun ) {
+                } else if (weapon instanceof Shotgun) {
                     if (weight < 2) {
                         weight = 2;
                         index = i;
                     }
-                } else if(weapon instanceof AssaultRifle) {
+                } else if (weapon instanceof AssaultRifle) {
                     if (weight < 3) {
                         weight = 3;
                         index = i;
                     }
-                } else if(weapon instanceof SniperRifle) {
+                } else if (weapon instanceof SniperRifle) {
                     if (weight < 4) {
                         weight = 4;
                         index = i;
                     }
-                } else if(weapon instanceof Flamethrower) {
+                } else if (weapon instanceof Flamethrower) {
                     if (weight < 5) {
                         weight = 5;
                         index = i;
                     }
-                } else if(weapon instanceof Minigun) {
+                } else if (weapon instanceof Minigun) {
                     if (weight < 6) {
                         weight = 6;
                         index = i;
@@ -389,21 +386,21 @@ public class ProjectileService {
     }
 
     public void doReload(Person person, long now) {
-        if(person.getWeapon().getTotalClip() > 0) {
+        if (person.getWeapon().getTotalClip() > 0) {
             person.setIsReload(true);
             person.setReloadCooldown(now + person.getWeapon().getReloadTimeout());
         }
     }
 
     public void onReload(Person person, long now) {
-        if(person.isReload() && person.getShotCooldown() < now && person.getReloadCooldown() < now ) {
+        if (person.isReload() && person.getShotCooldown() < now && person.getReloadCooldown() < now) {
             AbstractWeapon weapon = person.getWeapon();
-            if(weapon.getTotalClip() <= 0) {
+            if (weapon.getTotalClip() <= 0) {
                 return;
             }
             person.setIsReload(false);
             int clipToReload = weapon.getClipSize();
-            if(clipToReload > weapon.getTotalClip()) {
+            if (clipToReload > weapon.getTotalClip()) {
                 clipToReload = weapon.getTotalClip();
             }
             weapon.setCurrentClip(clipToReload);
@@ -420,9 +417,9 @@ public class ProjectileService {
         Projectile projectile = getCompatibleProjectile(person);
         Integer id = room.getProjectilesIds().getAndIncrement();
         projectile.setId(id);
-        if(projectile instanceof Shot) {
+        if (projectile instanceof Shot) {
             Shot shotProjectile = (Shot) projectile;
-            for(SubShot subShot : shotProjectile.getSubShots()) {
+            for (SubShot subShot : shotProjectile.getSubShots()) {
                 Integer subId = room.getProjectilesIds().getAndIncrement();
                 subShot.setId(subId);
                 onProjectileInstantiation(person, subShot, room);
@@ -436,26 +433,26 @@ public class ProjectileService {
     private void onProjectileInstantiation(Person person, Projectile projectile, Room room) {
         float angle = projectile.getAngle();
         if (angle == 90) {
-            projectile.setxEnd((int)person.getX());
+            projectile.setxEnd((int) person.getX());
             int gunLimit = (int) (projectile.getRadius() + person.getY());
             projectile.setyEnd(gunLimit > room.getMap().getY() ? room.getMap().getY() : gunLimit);
         } else if (angle == 180) {
-            projectile.setyEnd((int)person.getY());
-            int gunLimit = (int)person.getX() - (int) projectile.getRadius();
+            projectile.setyEnd((int) person.getY());
+            int gunLimit = (int) person.getX() - (int) projectile.getRadius();
             projectile.setyEnd(gunLimit > 0 ? gunLimit : 0);
         } else if (angle == 270) {
-            projectile.setxEnd((int)person.getX());
-            int gunLimit = (int)person.getY() - (int) projectile.getRadius();
+            projectile.setxEnd((int) person.getX());
+            int gunLimit = (int) person.getY() - (int) projectile.getRadius();
             projectile.setyEnd(gunLimit > 0 ? gunLimit : 0);
         } else if (angle == 0) {
-            projectile.setyEnd((int)person.getY());
-            int gunLimit = (int)person.getX() + (int) projectile.getRadius();
+            projectile.setyEnd((int) person.getY());
+            int gunLimit = (int) person.getX() + (int) projectile.getRadius();
             projectile.setyEnd(gunLimit > room.getMap().getX() ? room.getMap().getX() : gunLimit);
         } else {
             double y = projectile.getRadius() * Math.sin(angle * Math.PI / 180);
             double x = projectile.getRadius() * Math.cos(angle * Math.PI / 180);
-            projectile.setxEnd((int) x + (int)person.getX());
-            projectile.setyEnd((int) y + (int)person.getY());
+            projectile.setxEnd((int) x + (int) person.getX());
+            projectile.setyEnd((int) y + (int) person.getY());
         }
         if (projectile.isInstant()) {
             calculateInstantImpacts(person, projectile, room);
@@ -472,10 +469,8 @@ public class ProjectileService {
     }
 
 
-
-
     public void changeWeapon(Person person, Integer weaponCode) {
-        if(person.isReload()) {
+        if (person.isReload()) {
             return;
         }
         String weaponTitle = "";
@@ -505,9 +500,9 @@ public class ProjectileService {
                 weaponTitle = "rocket";
                 break;
         }
-        if(!"".equals(weaponTitle)) {
-            for(AbstractWeapon weapon : person.getWeaponList()) {
-                if(weapon.getName().equals(weaponTitle)) {
+        if (!"".equals(weaponTitle)) {
+            for (AbstractWeapon weapon : person.getWeaponList()) {
+                if (weapon.getName().equals(weaponTitle)) {
                     person.setWeapon(weapon);
                     break;
                 }

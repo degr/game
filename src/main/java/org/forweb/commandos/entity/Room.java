@@ -27,6 +27,9 @@ public class Room {
     private int totalPlayers;
     private int tempWeaponId = 0;
     private GameMap map;
+
+
+    private List<Blood> bloodList = new ArrayList<>();
     private long endTime;
 
     private boolean showStats;
@@ -214,5 +217,13 @@ public class Room {
         }
         tempWeaponId++;
         return tempWeaponId;
+    }
+
+    public void addBlood(Blood blood) {
+        bloodList.add(blood);
+    }
+
+    public List<Blood> getBloodList() {
+        return bloodList;
     }
 }

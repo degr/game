@@ -2,10 +2,7 @@ package org.forweb.commandos.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.forweb.commandos.entity.OwnerFacade;
-import org.forweb.commandos.entity.Person;
-import org.forweb.commandos.entity.Room;
-import org.forweb.commandos.entity.WebSocketResponse;
+import org.forweb.commandos.entity.*;
 import org.forweb.commandos.entity.ammo.Projectile;
 import org.forweb.commandos.entity.ammo.Shot;
 import org.forweb.commandos.entity.ammo.SubShot;
@@ -99,7 +96,8 @@ public class ResponseService {
                 room.getProjectiles().remove(entry.getKey());
             }
         }
-        room.setMessages(new ArrayList<>());
+        room.getBloodList().clear();
+        room.getMessages().clear();
     }
 
     public String prepareStats(Room room) {
@@ -205,6 +203,17 @@ public class ResponseService {
                     }
                 }
             }
+        }
+        return out;
+    }
+
+    public List<String> mapBlood(List<Blood> bloodList) {
+        if(bloodList.size() == 0) {
+            return null;
+        }
+        List<String> out = new ArrayList<>();
+        for(Blood blood : bloodList) {
+            out.add(blood.doResponse());
         }
         return out;
     }

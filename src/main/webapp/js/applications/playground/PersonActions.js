@@ -231,8 +231,8 @@ PersonActions.drawPerson = function(person) {
     }
     if(person.gun == 'pistol') {
         context.drawImage(ZoneActions.images[person.gun], -10, -14)
-    } else if(person.gun != 'knife') {
-        context.drawImage(ZoneActions.images[person.gun], -6, -14)
+    } else {
+        context.drawImage(ZoneActions.images[person.gun], -6, -14, 32, 32)
     }
     context.restore();
 
@@ -274,12 +274,7 @@ PersonActions.drawPerson = function(person) {
         context.arc(0, 0, PlayGround.radius, 0, 2 * Math.PI, false);
     }
     context.stroke();
-    if(person.gun == 'knife') {
-        context.drawImage(PersonActions.personOld, - PlayGround.radius - 8,  - PlayGround.radius - 3, 56, 56);
-    } else {
-        context.drawImage(person.image, - PlayGround.radius - 8,  - PlayGround.radius - 3, 56, 56);
-    }
-
+    context.drawImage(person.image, - PlayGround.radius - 8,  - PlayGround.radius - 3, 56, 56);
     context.restore();
     
     

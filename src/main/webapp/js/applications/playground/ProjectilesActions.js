@@ -91,14 +91,22 @@ ProjectilesActions.drawRocket = function(projectile) {
 };
 
 ProjectilesActions.drawBlade = function(projectile) {
-    var context = PlayGround.context;
+    /*var context = PlayGround.context;
     context.save();
     context.beginPath();
-    context.strokeStyle = 'blue';
-    context.moveTo(projectile.x1, projectile.y1);
-    context.lineTo(projectile.x2, projectile.y2);
-    context.stroke();
-    context.restore();
+    context.translate(projectile.x1, projectile.y1);
+    var random = Math.floor(Math.random() * 12)+ 8;
+    random = 0;
+    var randomDirection = Math.floor(Math.random() * 10);
+    if(randomDirection > 5) {
+        random *= -1;
+    }
+    
+    var shiftX = -10;
+    var shiftY = -15;
+    context.rotate((projectile.angle + random) * Math.PI / 180);
+    context.drawImage(ZoneActions.images.knife, 50, 0, 50, 100, shiftX, shiftY, 20, 32);
+    context.restore();*/
 };
 ProjectilesActions.decode = function(str) {
     var data = str.split(':');

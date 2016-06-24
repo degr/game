@@ -1,5 +1,7 @@
 package org.forweb.commandos.service.projectile;
 
+import org.forweb.commandos.controller.PersonWebSocketEndpoint;
+import org.forweb.commandos.entity.GameMap;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.ammo.Explosion;
@@ -7,12 +9,16 @@ import org.forweb.commandos.service.LocationService;
 import org.forweb.geometry.services.LineService;
 import org.forweb.geometry.services.PointService;
 
+import java.util.ArrayList;
+
+import static sun.audio.AudioPlayer.player;
+
 public class ExplosionThread extends Thread implements Stoppable{
-    Person person;
-    Explosion explosion;
-    Room room;
-    LocationService locationService;
-    boolean stopped = false;
+    private Person person;
+    private Explosion explosion;
+    private Room room;
+    private LocationService locationService;
+    private boolean stopped = false;
     public ExplosionThread(Person person, Explosion explosion, LocationService locationService, Room room) {
         this.person = person;
         this.explosion = explosion;
@@ -47,23 +53,38 @@ public class ExplosionThread extends Thread implements Stoppable{
         double realDistance = maxDistance * factor;
         double yShift = 0;
         double xShift = 0;
-        System.out.println(
-                explosion.getxStart()+","+ explosion.getyStart()+","+ person.getX()+","+ person.getY() +","+angle
-        );
-        System.out.println("=======");
+        double cos = Math.cos(angle * Math.PI / 180);
+        double sin = Math.sin(angle * Math.PI / 180);
         while (!stopped && !(xBlocked && yBlocked) && currentShift < realDistance) {
+
             if (!xBlocked) {
-                xShift = -1* Math.cos(angle) * currentShift;
-                System.out.println("xShift: " + xShift);
-                if (locationService.calculateCollistions(person, room, xShift, 0) != PointService.EMPTY) {
+                double delta = cos * currentShift;
+                double newPosition = delta - (person.getX() - xCurrent);
+                double currentPostion = person.getX() + newPosition;
+                if(
+                        currentPostion <= PersonWebSocketEndpoint.PERSON_RADIUS ||
+                        currentPostion >= room.getMap().getX() - PersonWebSocketEndpoint.PERSON_RADIUS ||
+                        locationService.calculateCollistions(person, room, newPosition, 0) != PointService.EMPTY
+                ) {
                     xBlocked = true;
+                }
+                if(!xBlocked) {
+                    xShift = delta;
                 }
             }
             if (!yBlocked) {
-                yShift = -1* Math.sin(angle) * currentShift;
-                System.out.println("yShift: " + yShift);
-                if (locationService.calculateCollistions(person, room, 0, yShift) != PointService.EMPTY) {
+                double delta = sin * currentShift;
+                double newPosition = delta - (person.getY() - yCurrent);
+                double currentPostion = person.getY() + newPosition;
+                if(
+                        currentPostion <= PersonWebSocketEndpoint.PERSON_RADIUS ||
+                        currentPostion + PersonWebSocketEndpoint.PERSON_RADIUS >= room.getMap().getY() ||
+                        locationService.calculateCollistions(person, room, 0, newPosition) != PointService.EMPTY
+                ) {
                     yBlocked = true;
+                }
+                if(!yBlocked) {
+                    yShift = delta;
                 }
             }
             person.setX(xCurrent + xShift);
@@ -95,14 +116,33 @@ public class ExplosionThread extends Thread implements Stoppable{
             }
         }
     }
-/*
+  /*  public static void test(double x1, double y1, int x2, int y2){
+        Person person = new Person(1);
+        person.setX(x1 + 300);
+        person.setY(y1+ 300);
+        Explosion explosion = new Explosion(x2+ 300, y2+ 300);
+        GameMap map = new GameMap();
+        map.setZonesDto(new ArrayList<>());
+        map.setZones(new ArrayList<>());
+        map.setX(500);
+        map.setY(500);
+        Room room = new Room();
+        room.setMap(map);
+        (new ExplosionThread(person, explosion, new LocationService(), room)).start();
+    }*/
+
+
     public static void main(String[] args) {
-        System.out.println(getAngleOn(0, 0, 50, 50));
+       // test(0, 0, 15, 15);
+        //test(0, 0, -15, 15);
+        //test(0, 0, -15, -15);
+        //test(0, 0, 15, -15);
+      /*  System.out.println(getAngleOn(0, 0, 50, 50));
         System.out.println(getAngleOn(0, 0, -50, 50));
         System.out.println(getAngleOn(0, 0, -50, -50));
-        System.out.println(getAngleOn(0, 0, 50, -50));
+        System.out.println(getAngleOn(0, 0, 50, -50));*/
 
-
+/*
         System.out.println(getAngleOn(50, 50, 100, 100));
         System.out.println(getAngleOn(50, 50, 0, 100));
         System.out.println(getAngleOn(50, 50, 0, 0));
@@ -124,6 +164,7 @@ public class ExplosionThread extends Thread implements Stoppable{
         System.out.println(getAngleOn(50, -50, 100, 0));
         System.out.println(getAngleOn(50, -50, 0, 0));
         System.out.println(getAngleOn(50, -50, 0, -100));
-        System.out.println(getAngleOn(50, -50, 100, -100));
-    }*/
+        System.out.println(getAngleOn(50, -50, 100, -100));*/
+
+    }
 }

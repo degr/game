@@ -138,7 +138,8 @@ public class SpringDelegationService {
                                         room.isEverybodyReady() ? room.getEndTime() - System.currentTimeMillis() : 0,
                                         room.isEverybodyReady(),
                                         responseService.mapTempZones(room.getMap().getZones()),
-                                        room.getTeam1Score() + ":" + room.getTeam2Score()
+                                        room.getTeam1Score() + ":" + room.getTeam2Score(),
+                                        responseService.mapBlood(room.getBloodList())
                                 ),
                                 room
                         );

@@ -31,6 +31,7 @@ var PlayGround = {
     readyToPlay: false,
     laserSight: 1,
     highlightOwner: true,
+    blood: [],
     
     init: function () {
         PersonActions.init();
@@ -55,6 +56,12 @@ var PlayGround = {
                         delete (PlayGround.instantBullets[key]);
                     }
                 }
+                for (var i = PlayGround.blood.length - 1; i >= 0; i--) {
+                    if(PlayGround.blood[i].time < now) {
+                        PlayGround.blood.splice(i, 1);
+                    }
+                }
+
             }
         }, 20);
         
@@ -253,6 +260,9 @@ var PlayGround = {
                 delete PlayGround.entities[id];
             }
         }
+        
+        BloodActions.prepareBlood(packet.blood);
+        
         var now = (new Date()).getTime();
         PlayGround.projectiles = [];
         var playShootgun = false;
@@ -265,11 +275,21 @@ var PlayGround = {
                     playShootgun = true;
                 }
             }
-            if(p.x2 || p.x2 === 0) {
-                PlayGround.instantBullets[i] = p;
-                p.created = now;
-            } else {
-                PlayGround.projectiles.push(p);
+            switch (p.type) {
+                case 'bullet':
+                case 'shot':
+                case 'slug':
+                case 'explosion':
+                    PlayGround.instantBullets[i] = p;
+                    p.created = now;
+                    break;
+                case 'blade':
+                    PlayGround.instantBullets[i] = p;
+                    p.created = now + 50;
+                    break;
+                default:
+                    PlayGround.projectiles.push(p);
+                    
             }
         }
     },
@@ -307,6 +327,12 @@ var PlayGround = {
 
     draw: function() {
         PlayGround.context.clearRect(0, 0, PlayGround.map.x, PlayGround.map.y);
+
+        if(PlayGround.blood && PlayGround.blood.length) {
+            for (var bloodId = 0; bloodId < PlayGround.blood.length; bloodId++) {
+                BloodActions.drawBlood(PlayGround.blood[bloodId]);
+            }
+        }
         if (PlayGround.map.zones != null) {
             for (var zoneId in PlayGround.map.zones) {
                 ZoneActions.drawZone(PlayGround.map.zones[zoneId]);

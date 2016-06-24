@@ -22,10 +22,10 @@ public class Explosion extends Projectile{
 
     @Override
     public int getDamage() {
-        return 4;
+        return 40;
     }
 
     public int getDamageFactor() {
-        return 10;
+        return 100;
     }
 }

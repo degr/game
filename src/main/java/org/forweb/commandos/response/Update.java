@@ -1,5 +1,6 @@
 package org.forweb.commandos.response;
 
+import org.forweb.commandos.entity.Blood;
 import org.forweb.commandos.response.dto.OwnerDto;
 
 import java.util.List;
@@ -20,8 +21,9 @@ public class Update {
     private List<String> projectiles;
     private List<String> messages;
     private List<String> tempZones;
+    private List<String> blood;
     private String score;
-    public Update(List<String> personDto, List<String> projectiles, List<Integer> itemDtos, List<String> messages, long time, boolean gameStarted, List<String> tempZones, String score) {
+    public Update(List<String> personDto, List<String> projectiles, List<Integer> itemDtos, List<String> messages, long time, boolean gameStarted, List<String> tempZones, String score, List<String> bloodList) {
         this.persons = personDto;
         this.projectiles = projectiles;
         this.items = itemDtos;
@@ -30,6 +32,7 @@ public class Update {
         started = gameStarted ? 1 : 0;
         this.tempZones = tempZones;
         this.score = score;
+        this.blood = bloodList;
     }
 
 
@@ -79,4 +82,7 @@ public class Update {
         return score;
     }
 
+    public List<String> getBlood() {
+        return blood;
+    }
 }
