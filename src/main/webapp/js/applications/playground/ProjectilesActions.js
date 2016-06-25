@@ -108,17 +108,47 @@ ProjectilesActions.drawBlade = function(projectile) {
     context.drawImage(ZoneActions.images.knife, 50, 0, 50, 100, shiftX, shiftY, 20, 32);
     context.restore();*/
 };
-ProjectilesActions.decode = function(str) {
-    var data = str.split(':');
-    return {
-        id: data[0],
-        type: data[1],
-        x1: parseInt(data[2]),
-        y1: parseInt(data[3]),
-        x2: parseInt(data[4]),
-        y2: parseInt(data[5]),
-        angle: parseInt(data[6])
+ProjectilesActions.decode = function(projectiles) {
+    var now = (new Date()).getTime();
+    var playShootgun = false;
+    for(var i = 0; i < projectiles.length; i++) {
+        var data = projectiles[i].split(':');
+        var p = {
+            id: data[0],
+            type: data[1],
+            x1: parseInt(data[2]),
+            y1: parseInt(data[3]),
+            x2: parseInt(data[4]),
+            y2: parseInt(data[5]),
+            angle: parseInt(data[6])
+        };
+        switch (p.type) {
+            case 'bullet':
+            case 'shot':
+            case 'slug':
+            case 'explosion':
+                PlayGround.instantBullets.push(p);
+                p.created = now;
+                break;
+            case 'blade':
+                PlayGround.instantBullets.push(p);
+                p.created = now + 50;
+                break;
+            default:
+                PlayGround.projectiles.push(p);
+        }
+        if(p.type === 'shot') {
+            if(playShootgun) {
+                p.soundPlayed = true;
+            } else {
+                playShootgun = true;
+            }
+        }
     }
+};
+
+ProjectilesActions.flyBullet = function(projectile, maxDistance) {
+    
 };
 ProjectilesActions.fire = new Image();
 ProjectilesActions.fire.src = 'images/map/fire.png';

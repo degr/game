@@ -12,14 +12,14 @@ var BloodActions = {
     },
     decrypt: function(blood) {
         var data = blood.split(":");
-        var randomX = Math.floor(Math.random() * 20) - 10 - 12;
-        var randomY = Math.floor(Math.random() * 20) - 10 - 12;
-        console.log(randomX, randomY);
-        var image = Math.floor(Math.random() * 3);
+        var randomShift = 22;
+        var randomX = Math.floor(Math.random() * randomShift * 2) - randomShift - 12;
+        var randomY = Math.floor(Math.random() * randomShift * 2) - randomShift - 12;
+        var image = Math.floor(Math.random() * BloodActions.blood.length);
         return {
             x: parseInt(data[0]) + randomX,
             y: parseInt(data[1]) + randomY,
-            time: (new Date()).getTime() + 60000,
+            time: (new Date()).getTime() + PlayGround.bloodTime * 1000,
             image: BloodActions.blood[image]
         }
     },

@@ -27,11 +27,12 @@ var PlayGround = {
     rocketRadius: 5,
     fireRadius: 7,
     explosionRadius: 40,//different on 20 with server
-    instantBullets: {},
+    instantBullets: [],
     readyToPlay: false,
     laserSight: 1,
     highlightOwner: true,
     blood: [],
+    bloodTime: 60,
     
     init: function () {
         PersonActions.init();
@@ -50,10 +51,10 @@ var PlayGround = {
         setInterval(function(){
             if(PlayGround.gameStarted) {
                 var now = (new Date()).getTime() - 100;
-                for (var key in PlayGround.instantBullets) {
+                for (var key = PlayGround.instantBullets.length - 1; key >= 0; key--) {
                     var bullet = PlayGround.instantBullets[key];
                     if(bullet.created < now) {
-                        delete (PlayGround.instantBullets[key]);
+                        PlayGround.instantBullets.splice(key, 1);
                     }
                 }
                 for (var i = PlayGround.blood.length - 1; i >= 0; i--) {
@@ -265,33 +266,7 @@ var PlayGround = {
         
         var now = (new Date()).getTime();
         PlayGround.projectiles = [];
-        var playShootgun = false;
-        for(var i = 0; i < packet.projectiles.length; i++) {
-            var p = ProjectilesActions.decode(packet.projectiles[i]);
-            if(p.type === 'shot') {
-                if(playShootgun) {
-                    p.soundPlayed = true;
-                } else {
-                    playShootgun = true;
-                }
-            }
-            switch (p.type) {
-                case 'bullet':
-                case 'shot':
-                case 'slug':
-                case 'explosion':
-                    PlayGround.instantBullets[i] = p;
-                    p.created = now;
-                    break;
-                case 'blade':
-                    PlayGround.instantBullets[i] = p;
-                    p.created = now + 50;
-                    break;
-                default:
-                    PlayGround.projectiles.push(p);
-                    
-            }
-        }
+        var p = ProjectilesActions.decode(packet.projectiles);
     },
     addPerson: function(id) {
         PlayGround.entities[id] = new Person(id)
@@ -352,7 +327,7 @@ var PlayGround = {
                 ProjectilesActions.draw(PlayGround.projectiles[i], fire);
             }
         }
-        for(var iKey in PlayGround.instantBullets) {
+        for(var iKey = 0; iKey < PlayGround.instantBullets.length; iKey++) {
             ProjectilesActions.draw(PlayGround.instantBullets[iKey], fire);
         }
     },
