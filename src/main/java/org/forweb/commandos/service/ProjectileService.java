@@ -437,17 +437,17 @@ public class ProjectileService {
             int gunLimit = (int) (projectile.getRadius() + person.getY());
             projectile.setyEnd(gunLimit > room.getMap().getY() ? room.getMap().getY() : gunLimit);
         } else if (angle == 180) {
-            projectile.setyEnd((int) person.getY());
+            projectile.setyEnd((int)person.getY());
             int gunLimit = (int) person.getX() - (int) projectile.getRadius();
-            projectile.setyEnd(gunLimit > 0 ? gunLimit : 0);
+            projectile.setxEnd(gunLimit > 0 ? gunLimit : 0);
         } else if (angle == 270) {
             projectile.setxEnd((int) person.getX());
             int gunLimit = (int) person.getY() - (int) projectile.getRadius();
             projectile.setyEnd(gunLimit > 0 ? gunLimit : 0);
         } else if (angle == 0) {
-            projectile.setyEnd((int) person.getY());
+            projectile.setyEnd((int)person.getY());
             int gunLimit = (int) person.getX() + (int) projectile.getRadius();
-            projectile.setyEnd(gunLimit > room.getMap().getX() ? room.getMap().getX() : gunLimit);
+            projectile.setxEnd(gunLimit > room.getMap().getX() ? room.getMap().getX() : gunLimit);
         } else {
             double y = projectile.getRadius() * Math.sin(angle * Math.PI / 180);
             double x = projectile.getRadius() * Math.cos(angle * Math.PI / 180);
