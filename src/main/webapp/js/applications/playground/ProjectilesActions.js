@@ -49,15 +49,8 @@ ProjectilesActions.draw = function(projectile, fire) {
     }
 };
 ProjectilesActions.drawBullet = function(projectile){
-    var context = PlayGround.context;
-    context.save();
-    context.beginPath();
-    //context.strokeStyle="rgba(202, 4, 4, 0.55)";
-    context.strokeStyle="rgba(251, 76, 2, 0.85)";
-    context.moveTo(projectile.x1, projectile.y1);
-    context.lineTo(projectile.x2, projectile.y2);
-    context.stroke();
-    context.restore();
+    CGraphics.drawBullet(projectile);
+    
 };
 
 ProjectilesActions.drawFlame = function(projectile) {
@@ -108,9 +101,21 @@ ProjectilesActions.drawBlade = function(projectile) {
     context.drawImage(ZoneActions.images.knife, 50, 0, 50, 100, shiftX, shiftY, 20, 32);
     context.restore();*/
 };
+
+ProjectilesActions.generateColor = function() {
+    switch (Math.floor(Math.random() * 5)) {
+        case 0: return 'white';
+        case 1: return '#D6E085';
+        case 2: return '#E0BD5D';
+        case 3: return '#E07929';
+        case 4: return '#B5E0DF';
+        default : return '#B3E077';
+    }
+};
 ProjectilesActions.decode = function(projectiles) {
     var now = (new Date()).getTime();
     var playShootgun = false;
+    var shotgunColor = null;
     for(var i = 0; i < projectiles.length; i++) {
         var data = projectiles[i].split(':');
         var p = {
@@ -120,15 +125,44 @@ ProjectilesActions.decode = function(projectiles) {
             y1: parseInt(data[3]),
             x2: parseInt(data[4]),
             y2: parseInt(data[5]),
-            angle: parseInt(data[6])
+            angle: parseInt(data[6]),
+            realDistance: null//will be calculated in CGraphics
         };
+        
         switch (p.type) {
-            case 'bullet':
-            case 'shot':
             case 'slug':
+                p.trace = 50;
+                PlayGround.instantBullets.push(p);
+                p.created = now;
+                p.color = ProjectilesActions.generateColor();
+                p.lifeTime = 500;
+                break;
+            case 'bullet':
+                PlayGround.instantBullets.push(p);
+                p.created = now;
+                p.color = ProjectilesActions.generateColor();
+                p.trace = 25;
+                p.lifeTime = 500;
+                break;
+            case 'shot':
+                p.trace = 15;
+                p.lifeTime = 300;
+                if(playShootgun) {
+                    p.soundPlayed = true;
+                } else {
+                    playShootgun = true;
+                }
+                if(shotgunColor == null) {
+                    shotgunColor = ProjectilesActions.generateColor();
+                }
+                p.color = shotgunColor;
+                PlayGround.instantBullets.push(p);
+                p.created = now;
+                break;
             case 'explosion':
                 PlayGround.instantBullets.push(p);
                 p.created = now;
+                p.lifeTime = 150;
                 break;
             case 'blade':
                 PlayGround.instantBullets.push(p);
@@ -137,19 +171,9 @@ ProjectilesActions.decode = function(projectiles) {
             default:
                 PlayGround.projectiles.push(p);
         }
-        if(p.type === 'shot') {
-            if(playShootgun) {
-                p.soundPlayed = true;
-            } else {
-                playShootgun = true;
-            }
-        }
     }
 };
 
-ProjectilesActions.flyBullet = function(projectile, maxDistance) {
-    
-};
 ProjectilesActions.fire = new Image();
 ProjectilesActions.fire.src = 'images/map/fire.png';
 

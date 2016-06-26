@@ -17,7 +17,7 @@ public class AppInitializer implements WebApplicationInitializer {
 
     static final String BASE_PACKAGE = "org.forweb.commandos";
     public static String ROOT;
-    public static Boolean DEV = true;
+    public static Boolean DEV = false;
     @Override
     public void onStartup(ServletContext container) {
         System.out.println("on startup");
@@ -25,6 +25,7 @@ public class AppInitializer implements WebApplicationInitializer {
             HibernateSupport.init("127.0.0.1:3306", "root", "", "commandos", BASE_PACKAGE + ".entity");
         } else {
             HibernateSupport.init("mysql35881-slaughter.mycloud.by", "root", "CEFnsp92495", "commandos", BASE_PACKAGE + ".entity");
+            //google HibernateSupport.init("mysql35881-slaughter.mycloud.by", "root", "nKnD6SXo", "commandos", BASE_PACKAGE + ".entity");
         }
         HibernateSupport.setDebug(DEV);
         AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();

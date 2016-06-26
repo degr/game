@@ -47,13 +47,12 @@ var PlayGround = {
         ScoreOverview.init();
         TeamControl.init();
         
-        
         setInterval(function(){
             if(PlayGround.gameStarted) {
-                var now = (new Date()).getTime() - 100;
+                var now = (new Date()).getTime();
                 for (var key = PlayGround.instantBullets.length - 1; key >= 0; key--) {
                     var bullet = PlayGround.instantBullets[key];
-                    if(bullet.created < now) {
+                    if(bullet.created < now - bullet.lifeTime) {
                         PlayGround.instantBullets.splice(key, 1);
                     }
                 }
@@ -90,6 +89,7 @@ var PlayGround = {
 
         PlayGround.rect = canvas.getBoundingClientRect();
         PlayGround.context = canvas.getContext('2d');
+        CGraphics.context = PlayGround.context;
         canvas.addEventListener('mousedown', PersonActions.startFire);
         canvas.addEventListener('mouseup', PersonActions.stopFire);
         var background = localStorage.getItem('background');
@@ -210,6 +210,10 @@ var PlayGround = {
         };
     },
     onUpdate: function(packet) {
+        if(packet.started == 1 && (TeamControl.isShown || !PlayGround.readyToPlay)) {
+            TeamControl.hide();
+            PlayGround.readyToPlay = true;
+        }
         if (packet.owner !== null ) {
             var oldOwnerId = PlayGround.owner.id; 
             PlayGround.owner = PlayGround.decryptOwner(packet.owner);
@@ -223,10 +227,6 @@ var PlayGround = {
         Weapons.update(PlayGround.owner);
         LifeAndArmor.update(PlayGround.owner.life, PlayGround.owner.armor);
         Score.update(PlayGround.owner, packet.time);
-        if(!PlayGround.readyToPlay && packet.started == 1) {
-            PlayGround.readyToPlay = true;
-            TeamControl.hide();
-        }
         for(var i = 0; i < packet.messages.length; i++) {
             var message = packet.messages[i];
             var id = parseInt(message.substring(0, message.indexOf(":")));

@@ -11,9 +11,11 @@ var TeamControl = {
         TeamControl.container = Dom.el('div', 'team-control', [TeamControl.teamHolder, ready]);
     },
     hide: function() {
+        TeamControl.isShown = false;
         Dom.addClass(TeamControl.container, 'hidden');
     },
     show: function() {
+        TeamControl.isShown = true;
         Dom.removeClass(TeamControl.container, 'hidden');
     },
     updateTeamHolder: function() {
