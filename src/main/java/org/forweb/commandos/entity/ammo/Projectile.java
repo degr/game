@@ -14,7 +14,7 @@ public abstract class Projectile implements WebSocketResponse {
     private Long creationTime = new Date().getTime();
     private long now;
     private Long lifeTime;
-    private float angle;
+    private double angle;
     private double radius;
 
     private boolean piercing = false;
@@ -25,7 +25,7 @@ public abstract class Projectile implements WebSocketResponse {
 
     public abstract int getDamage();
 
-    public Projectile(int xStart, int yStart, float angle) {
+    public Projectile(int xStart, int yStart, double angle) {
         this.setxStart(xStart);
         this.setyStart(yStart);
         this.setAngle(angle);
@@ -91,11 +91,11 @@ public abstract class Projectile implements WebSocketResponse {
         this.lifeTime = lifeTime;
     }
 
-    public void setAngle(float angle) {
+    public void setAngle(double angle) {
         this.angle = angle;
     }
 
-    public float getAngle() {
+    public double getAngle() {
         return angle;
     }
 

@@ -22,7 +22,7 @@ public class Minigun extends AbstractWeapon<Bullet> {
     }
 
     @Override
-    public Projectile getProjectile(Person person, float changedAngle) {
+    public Projectile getProjectile(Person person, double changedAngle) {
         return new Bullet((int) person.getX(), (int) person.getY(), changedAngle);
     }
 }

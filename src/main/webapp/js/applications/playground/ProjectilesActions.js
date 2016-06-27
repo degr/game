@@ -1,4 +1,23 @@
-var ProjectilesActions = {};
+var ProjectilesActions = {
+    init: function() {
+        ProjectilesActions.fire = new Image();
+        ProjectilesActions.fire.src = 'images/map/fire.png';
+
+        ProjectilesActions.rocket = new Image();
+        ProjectilesActions.rocket.src = 'images/map/rocketBullet.gif';
+
+
+        /*ProjectilesActions.explosion = new Image();
+         ProjectilesActions.explosion.src = 'images/map/explosion.png';*/
+        ProjectilesActions.explosion = [];
+        for(var i = 1; i <= 20; i++) {
+            var image = new Image();
+            image.src = 'images/map/explosion/' + i + ".png";
+            ProjectilesActions.explosion.push(image);
+        }
+
+    }
+};
 ProjectilesActions.projectileIds = {};
 ProjectilesActions.draw = function(projectile, fire) {
     switch (projectile.type) {
@@ -61,13 +80,22 @@ ProjectilesActions.drawFlame = function(projectile) {
     }
 };
 ProjectilesActions.drawExplosion = function(projectile) {
+    if(projectile.animationFrame >= ProjectilesActions.explosion.length) {
+        return;
+    }
+    var image = ProjectilesActions.explosion[projectile.animationFrame];
+    projectile.animationFrame++;
+    var radius = 60;
+    var diameter = radius * 2;
     var context = PlayGround.context;
-    context.drawImage(ProjectilesActions.explosion, projectile.x1 - 60, projectile.y1 - 60, 120, 120);
+    context.drawImage(image, projectile.x1 - radius, projectile.y1 - radius, diameter, diameter);
     if(PlayGround.drawBounds) {
         context.beginPath();
-        context.arc(projectile.x1, projectile.y1, 60, 0, 2 * Math.PI, false);
+        context.arc(projectile.x1, projectile.y1, radius, 0, 2 * Math.PI, false);
         context.stroke();
     }
+    
+    
 };
 
 ProjectilesActions.drawRocket = function(projectile) {
@@ -162,7 +190,8 @@ ProjectilesActions.decode = function(projectiles) {
             case 'explosion':
                 PlayGround.instantBullets.push(p);
                 p.created = now;
-                p.lifeTime = 150;
+                p.lifeTime = 1000;
+                p.animationFrame = 0;
                 break;
             case 'blade':
                 PlayGround.instantBullets.push(p);
@@ -173,12 +202,3 @@ ProjectilesActions.decode = function(projectiles) {
         }
     }
 };
-
-ProjectilesActions.fire = new Image();
-ProjectilesActions.fire.src = 'images/map/fire.png';
-
-ProjectilesActions.rocket = new Image();
-ProjectilesActions.rocket.src = 'images/map/rocketBullet.gif';
-
-ProjectilesActions.explosion = new Image();
-ProjectilesActions.explosion.src = 'images/map/explosion.png';

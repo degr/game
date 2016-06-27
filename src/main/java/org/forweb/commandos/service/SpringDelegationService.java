@@ -121,14 +121,13 @@ public class SpringDelegationService {
         room.setGameTimer(new Timer(PersonWebSocketEndpoint.class.getSimpleName() + " Timer " + new Random().nextDouble()));
 
         room.getGameTimer().scheduleAtFixedRate(new TimerTask() {
-            private int skip = 1;
             private int current = 0;
 
             @Override
             public void run() {
                 try {
                     tick(room);
-                    if (current >= skip) {
+                    if (current >= PersonWebSocketEndpoint.SKIP_FRAMES) {
                         responseService.broadcast(
                                 new Update(
                                         responseService.mapPersons(room.getPersons()),
@@ -148,13 +147,13 @@ public class SpringDelegationService {
                     e.printStackTrace();
                     System.out.println("Caught to prevent timer from shutting down" + e.getMessage());
                 }
-                if (current > skip) {
+                if (current > PersonWebSocketEndpoint.SKIP_FRAMES) {
                     current = 0;
                 } else {
                     current++;
                 }
             }
-        }, Context.TICK_DELAY, Context.TICK_DELAY);
+        }, PersonWebSocketEndpoint.TICK_DELAY, PersonWebSocketEndpoint.TICK_DELAY);
     }
 
 
@@ -190,7 +189,7 @@ public class SpringDelegationService {
         }
     }
 
-    public void updatePersonViewAngle(Person person, int direction) {
+    public void updatePersonViewAngle(Person person, float direction) {
         turnService.updatePersonViewAngle(person, direction);
     }
 

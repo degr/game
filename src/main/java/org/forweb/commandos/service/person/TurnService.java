@@ -8,18 +8,25 @@ import org.springframework.stereotype.Service;
 public class TurnService {
 
     public void onPersonChangeViewAngle(Person person) {
-        int selected = person.getSelectedAngle();
-        int current = (int)person.getAngle();
+        double selected =  Math.floor(10d * person.getSelectedAngle()) / 10d;
+        double current = person.getAngle();
+        if(Math.abs(selected - current) < 1.01) {
+            person.setAngle(selected);
+            return;
+        }
         float speed;
+        double shift = Math.max(selected, current) - Math.min(selected, current);
         if(selected == current) {
             return;
-        } else if((Math.max(selected, current) - Math.min(selected, current) < 5) || person.getWeapon() instanceof Minigun) {
+        } else if(shift < 2) {
             speed = 1f;
-        } else {
+        } else if(shift < 4 || person.getWeapon() instanceof Minigun){
             speed = 2f;
+        } else {
+            speed = 4f;
         }
 
-        float angle;
+        double angle;
         switch (person.getTurnDirection()) {
             case 2:
             case 1:
@@ -40,10 +47,10 @@ public class TurnService {
         person.setAngle(angle);
     }
     
-    public void updatePersonViewAngle(Person person, int angle) {
-        float pa = person.getAngle();
-        Float clockAngle = null;
-        Float antiClockAngle = null;
+    public void updatePersonViewAngle(Person person, float angle) {
+        double pa = person.getAngle();
+        Double clockAngle = null;
+        Double antiClockAngle = null;
         if(pa >= 0) {
             if(angle >= 0) {
                 if(angle > pa) {
@@ -51,7 +58,7 @@ public class TurnService {
                 } else if (angle < pa) {
                     antiClockAngle = pa - angle;
                 } else {
-                    clockAngle = 180f;
+                    clockAngle = 180d;
                 }
             } else {
                 antiClockAngle = pa + (-1 * angle);
@@ -65,7 +72,7 @@ public class TurnService {
                 } else if (angle > pa) {
                     clockAngle = (pa - angle) * -1;
                 } else {
-                    clockAngle = 180f;
+                    clockAngle = 180d;
                 }
             }
         }
@@ -83,17 +90,7 @@ public class TurnService {
         } else {
             direction = 0;
         }
-
-
-        /*switch (direction) {
-            case -2:
-            case -1:
-            case 0:
-            case 1:
-            case 2:*/
         person.setSelectedAngle(angle);
         person.setTurnDirection(direction);
-        /*}*/
-        
     }
 }

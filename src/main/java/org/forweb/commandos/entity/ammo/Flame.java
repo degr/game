@@ -8,7 +8,7 @@ public class Flame extends LinkedAmmo {
 
     private static final Random r = new Random();
 
-    public Flame(int xStart, int yStart, float angle, int personId) {
+    public Flame(int xStart, int yStart, double angle, int personId) {
         super(xStart, yStart, angle, personId);
         int speed = r.nextInt(3);
         if(speed == 0) {

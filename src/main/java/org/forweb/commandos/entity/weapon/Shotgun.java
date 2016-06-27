@@ -15,7 +15,7 @@ public class Shotgun extends AbstractWeapon<Shot> {
     public Shotgun() {
         this.setShotTimeout(500);
         this.setReloadTimeout(2000);
-        setSpread(15);
+        setSpread(0);
         this.setBulletsPerShot(10);
 
 
@@ -31,12 +31,16 @@ public class Shotgun extends AbstractWeapon<Shot> {
     }
 
     @Override
-    public Projectile getProjectile(Person person, float angle) {
+    public Projectile getProjectile(Person person, double angle) {
         int subShotsCount = getBulletsPerShot();
         Shot out = new Shot((int)person.getX(), (int)person.getY(), person.getAngle());
+        double spread = 15d;
+        double shift = spread / getBulletsPerShot();
+        double initialAngle = angle - spread / 2;
         List<SubShot> list = new ArrayList<>(subShotsCount);
         for(int i = 0; i < subShotsCount; i++) {
-            list.add(new SubShot((int)person.getX(), (int)person.getY(), ProjectileService.changeProjectileAngle(person)));
+            list.add(new SubShot((int)person.getX(), (int)person.getY(), initialAngle));
+            initialAngle += shift;
         }
         out.setSubShots(list);
         return out;

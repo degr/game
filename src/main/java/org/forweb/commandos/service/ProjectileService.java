@@ -99,7 +99,11 @@ public class ProjectileService {
                         personCircle
                 );
                 if (point.length > 0) {
-                    onDamage(room.getPersons().get(flame.getPersonId()), flame.getDamage(), person, room);
+                    Person shooter = room.getPersons().get(flame.getPersonId());
+                    boolean isKilled = onDamage(shooter, flame.getDamage(), person, room);
+                    if(isKilled) {
+                        room.getMessages().add("0:" + person.getName() + " look like fried potato");
+                    }
                     room.getProjectiles().remove(flameBathcId);
                 }
             }
@@ -149,7 +153,11 @@ public class ProjectileService {
                     );
                     if (point.length > 0) {
                         explosion = new Explosion((int) point[0].getX(), (int) point[0].getY());
-                        onDamage(room.getPersons().get(rocket.getPersonId()), rocket.getDamage(), person, room);
+                        Person shooter = room.getPersons().get(rocket.getPersonId());
+                        boolean isKilled = onDamage(shooter, rocket.getDamage(), person, room);
+                        if(isKilled) {
+                            room.getMessages().add("0:" + shooter.getName() + " explode " + person.getName());
+                        }
                         break;
                     }
                 }
@@ -177,8 +185,10 @@ public class ProjectileService {
                 if (damageFactor > -1) {
                     double damage = explosion.getDamage() + damageFactor * explosion.getDamageFactor();
                     shiftPersonAfterExplosion(person, explosion, room);
-
-                    onDamage(shooter, (int) damage, person, room);
+                    boolean isKilled = onDamage(shooter, (int) damage, person, room);
+                    if(isKilled) {
+                        room.getMessages().add("0:" + person.getName() + " was ripped by " + shooter.getName() + " explosion ");
+                    }
                 }
             }
             room.getProjectiles().remove(rocketBatchId);
@@ -191,7 +201,7 @@ public class ProjectileService {
 
 
     private void updatePosition(Projectile projectile) {
-        double distance = projectile.getRadius() * Context.TICK_DELAY / projectile.getLifeTime();
+        double distance = projectile.getRadius() * PersonWebSocketEndpoint.TICK_DELAY / projectile.getLifeTime();
         double angle = projectile.getAngle() * Math.PI / 180;
         double y = distance * Math.sin(angle);
         double x = distance * Math.cos(angle);
@@ -256,7 +266,10 @@ public class ProjectileService {
                 Point closest = isMoreClose((int) shooter.getX(), (int) shooter.getY(), closestPoint, intersectionPoints);
                 if (closest != null) {
                     if (projectile.isPiercing()) {
-                        onDamage(shooter, projectile.getDamage(), person, room);
+                        boolean isKilled = onDamage(shooter, projectile.getDamage(), person, room);
+                        if(isKilled) {
+                            room.getMessages().add("0:" + shooter.getName() + " accurately shot " + person.getName());
+                        }
                     } else {
                         closestPoint = closest;
                         closestPerson = person;
@@ -267,7 +280,16 @@ public class ProjectileService {
 
 
         if (closestPerson != null) {
-            onDamage(shooter, projectile.getDamage(), closestPerson, room);
+            boolean isKilled = onDamage(shooter, projectile.getDamage(), closestPerson, room);
+            if(isKilled) {
+                if(projectile instanceof KnifeAmmo) {
+                    room.getMessages().add("0:" + shooter.getName() + " cut into pieces  " + closestPerson.getName());
+                } else if(projectile instanceof SubShot) {
+                    room.getMessages().add("0:" + shooter.getName() + " shot " + closestPerson.getName() + " as a dog");
+                } else {
+                    room.getMessages().add("0:" + shooter.getName() + " kill " + closestPerson.getName());
+                }
+            }
         }
         if (closestPoint != null) {
             projectile.setxEnd((int) closestPoint.getX());
@@ -275,7 +297,7 @@ public class ProjectileService {
         }
     }
 
-    private void onDamage(Person shooter, int damage, Person person, Room room) {
+    private boolean onDamage(Person shooter, int damage, Person person, Room room) {
         int life = person.getLife();
         int armor = person.getArmor();
         if (armor > 0) {
@@ -293,6 +315,9 @@ public class ProjectileService {
         if (person.getLife() <= 0) {
             personService.kill(person, room);
             personService.reward(shooter, person, room);
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -431,7 +456,7 @@ public class ProjectileService {
     }
 
     private void onProjectileInstantiation(Person person, Projectile projectile, Room room) {
-        float angle = projectile.getAngle();
+        double angle = projectile.getAngle();
         if (angle == 90) {
             projectile.setxEnd((int) person.getX());
             int gunLimit = (int) (projectile.getRadius() + person.getY());
@@ -459,7 +484,7 @@ public class ProjectileService {
         }
     }
 
-    public static float changeProjectileAngle(Person person) {
+    public static double changeProjectileAngle(Person person) {
         float spread = person.getWeapon().getSpread();
         return person.getAngle() + random.nextFloat() * (spread * 2) - spread;
     }

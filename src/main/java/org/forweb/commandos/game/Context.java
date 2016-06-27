@@ -18,7 +18,6 @@ public class Context {
 
     private LinkedHashMap<Integer, Room> rooms;
 
-    public static final long TICK_DELAY = 10;
 
 
     public Room getRoom(int key) {

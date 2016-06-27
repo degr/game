@@ -16,9 +16,6 @@ class ItemService {
     void onGetItem(Interactive item, Person player, Room room) {
 
         if (item.isAvailable()) {
-            if(item instanceof MinigunZone) {
-                room.getMessages().add("0:Somebody have big gun!");
-            }
             item.onEnter(player, room);
         } else if (item instanceof FlagBlue) {
             FlagBlue flag = (FlagBlue) item;

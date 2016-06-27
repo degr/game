@@ -11,6 +11,8 @@ import org.forweb.geometry.shapes.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static org.forweb.commandos.controller.PersonWebSocketEndpoint.MOVEMENT_SPEED;
+
 @Service
 public class MovementService {
 
@@ -21,7 +23,7 @@ public class MovementService {
     public void onMove(Person person, Room room){
 
         Direction direction = person.getDirection();
-        double factor = 1.4;
+        double factor = MOVEMENT_SPEED;
         if(person.getWeapon() instanceof Minigun) {
             factor *= 0.6;
         } else if(person.getWeapon() instanceof RocketLauncher) {

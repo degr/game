@@ -16,14 +16,14 @@ public class Person implements WebSocketResponse {
     private Direction direction;
     private double x;
     private double y;
-    private float angle;
+    private double angle;
     private int turnDirection;
     private Integer life = PersonWebSocketEndpoint.LIFE_AT_START;
     private AbstractWeapon weapon;
     private int score;
     private boolean inPool = true;
     private String name;
-    private int selectedAngle;
+    private double selectedAngle;
 
     private Integer lastRespawnId = 0;
     private boolean noPassiveReload;
@@ -96,11 +96,11 @@ public class Person implements WebSocketResponse {
         this.y = y;
     }
 
-    public float getAngle() {
+    public double getAngle() {
         return angle;
     }
 
-    public void setAngle(float angle) {
+    public void setAngle(double angle) {
         this.angle = angle;
     }
 
@@ -187,7 +187,7 @@ public class Person implements WebSocketResponse {
                 getWeapon().getName() + ":" +
                 ((int) getX()) + ":" +
                 ((int) getY()) + ":" +
-                ((int) getAngle()) + ":" +
+                (Math.floor(getAngle() * 10d) / 10d) + ":" +
                 getScore() + ":" +
                 (getTeam() != 0 ? getTeam() : "") + ":" +
                 (isOpponentFlag() ? "1" : "0") + ":" +
@@ -202,11 +202,11 @@ public class Person implements WebSocketResponse {
         this.status = status;
     }
 
-    public void setSelectedAngle(int selectedAngle) {
+    public void setSelectedAngle(double selectedAngle) {
         this.selectedAngle = selectedAngle;
     }
 
-    public int getSelectedAngle() {
+    public double getSelectedAngle() {
         return selectedAngle;
     }
 

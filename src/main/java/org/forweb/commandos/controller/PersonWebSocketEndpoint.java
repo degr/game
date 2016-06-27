@@ -1,14 +1,13 @@
 package org.forweb.commandos.controller;
 
-import javafx.beans.binding.Bindings;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.game.Context;
-import org.forweb.commandos.response.Status;
 import org.forweb.commandos.service.SpringDelegationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.server.standard.SpringConfigurator;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.EOFException;
@@ -34,6 +33,10 @@ public class PersonWebSocketEndpoint {
     public static final int ROCKET_RADIUS = 8;
     public static final int FIRE_RADIUS = 8;
     public static final Integer LIFE_AT_START = 100;
+
+    public static final long TICK_DELAY = 20;
+    public static final double MOVEMENT_SPEED = 4;
+    public static final int SKIP_FRAMES = 0;
 
     @Autowired
     private SpringDelegationService springDelegationService;
@@ -70,8 +73,8 @@ public class PersonWebSocketEndpoint {
         }
         String[] parts = message.split(":");
         Room room = gameContext.getRoom(roomId);
-        if(room != null && room.isShowStats()) {
-            if(MESSAGE_RESTART.equals(parts[0])) {
+        if (room != null && room.isShowStats()) {
+            if (MESSAGE_RESTART.equals(parts[0])) {
                 springDelegationService.onRestart(person, room);
                 return;
             }
@@ -79,7 +82,7 @@ public class PersonWebSocketEndpoint {
 
         switch ((parts[0])) {
             case MESSAGE_ANGLE:
-                springDelegationService.updatePersonViewAngle(getPerson(), Integer.parseInt(parts[1]));
+                springDelegationService.updatePersonViewAngle(getPerson(), Float.parseFloat(parts[1]));
                 break;
             case MESSAGE_DIRECTION:
                 springDelegationService.handleDirection(getPerson(), parts[1]);
@@ -140,8 +143,9 @@ public class PersonWebSocketEndpoint {
         return person != null && person.isInPool();
     }
 
-    private void initPersonId(int roomId){
-        this.id = gameContext.getRoom(roomId).getPersonIds().getAndIncrement();;
+    private void initPersonId(int roomId) {
+        this.id = gameContext.getRoom(roomId).getPersonIds().getAndIncrement();
+        ;
     }
 
 
@@ -167,9 +171,9 @@ public class PersonWebSocketEndpoint {
     }
 
     private Person getPerson() {
-        if(person == null) {
+        if (person == null) {
             Room room = gameContext.getRoom(roomId);
-            if(room != null) {
+            if (room != null) {
                 person = room.getPersons().get(id);
             }
         }

@@ -17,15 +17,15 @@ public class AppInitializer implements WebApplicationInitializer {
 
     static final String BASE_PACKAGE = "org.forweb.commandos";
     public static String ROOT;
-    public static Boolean DEV = false;
+    public static Boolean DEV = true;
     @Override
     public void onStartup(ServletContext container) {
         System.out.println("on startup");
         if(DEV) {
             HibernateSupport.init("127.0.0.1:3306", "root", "", "commandos", BASE_PACKAGE + ".entity");
         } else {
-            HibernateSupport.init("mysql35881-slaughter.mycloud.by", "root", "CEFnsp92495", "commandos", BASE_PACKAGE + ".entity");
-            //google HibernateSupport.init("mysql35881-slaughter.mycloud.by", "root", "nKnD6SXo", "commandos", BASE_PACKAGE + ".entity");
+            //HibernateSupport.init("mysql35881-slaughter.mycloud.by", "root", "CEFnsp92495", "commandos", BASE_PACKAGE + ".entity");
+            HibernateSupport.init("localhost", "root", "oHGAn6YW", "commandos", BASE_PACKAGE + ".entity");
         }
         HibernateSupport.setDebug(DEV);
         AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
@@ -35,7 +35,7 @@ public class AppInitializer implements WebApplicationInitializer {
         container.addListener(new ContextLoaderListener(rootContext));
         container.addListener(new RequestContextListener());
     }
-
+//
     private void addServlet(Servlet servlet, String servletName, String mapping, ServletContext container) {
         ServletRegistration.Dynamic dynamic = container.addServlet(servletName, servlet);
         dynamic.setLoadOnStartup(1);

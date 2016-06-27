@@ -1,7 +1,7 @@
 package org.forweb.commandos.entity.ammo;
 
 public class SniperBullet extends Projectile {
-    public SniperBullet(int xStart, int yStart, float angle) {
+    public SniperBullet(int xStart, int yStart, double angle) {
         super(xStart, yStart, angle);
         this.setLifeTime(100L);
         setPiercing(true);

@@ -112,7 +112,7 @@ var Chat = {
                 name = person.name + " : ";
             }
         } else {
-            name = Dom.el('span', "system", 'SYSTEM : ');
+            name = Dom.el('span', "system", 'sys : ');
         }
         if(name) {
             var writer = Dom.el('span', 'writer', name);

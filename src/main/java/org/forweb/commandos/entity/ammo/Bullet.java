@@ -1,7 +1,7 @@
 package org.forweb.commandos.entity.ammo;
 
 public class Bullet extends Projectile{
-    public Bullet(int xStart, int yStart, float angle) {
+    public Bullet(int xStart, int yStart, double angle) {
         super(xStart, yStart, angle);
         this.setLifeTime(150L);
         this.setRadius(450);

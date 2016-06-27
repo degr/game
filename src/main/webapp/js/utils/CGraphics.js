@@ -97,5 +97,17 @@ var CGraphics = {
         context.fillRect(posX - rad, posY - rad, rad * 2, rad * 2);*/
         
         context.restore();
+    },
+    
+    animateImages: function(images, time, callback) {
+        var timeChunk = time / images.length;
+        var i = 0;
+        var interval = setInterval(function() {
+            callback(images[i]);
+            i++;
+            if(i >= images.length) {
+                clearInterval(interval);
+            }
+        }, timeChunk)
     }
 };

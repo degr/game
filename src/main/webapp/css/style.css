@@ -323,9 +323,9 @@ body, html {
     left: 66px;
     top: 0;
     width: 468px;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid;
-    border-top: none;
+    /*background: rgba(0,0,0,0.3);*/
+   /* border: 1px solid;*/
+   /* border-top: none;*/
 }
 .playground .chat .system {
     color: red;

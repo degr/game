@@ -166,7 +166,7 @@ PersonActions.updateMouseDirectionByXy = function(x, y, person, offset) {
         person.y,
         x - offset.left + window.scrollX,
         y - offset.top + window.scrollY
-    ));
+    ) * 10) / 10;
 
     if(angle < 0) {
         angle = 360 + angle;
@@ -296,7 +296,7 @@ PersonActions.mapPersonFromResponse = function (str) {
     p.gun = data[3];
     p.x = parseInt(data[4]);
     p.y = parseInt(data[5]);
-    p.angle = parseInt(data[6]);
+    p.angle = parseFloat(data[6]);
     p.score = parseInt(data[7]);
     p.team = data[8] ? parseInt(data[8]) : 0;
     p.opponentFlag = parseInt(data[9]) == 1;

@@ -22,7 +22,7 @@ public class Flamethrower extends AbstractWeapon<Flame> {
     }
 
     @Override
-    public Projectile getProjectile(Person person, float changedAngle) {
+    public Projectile getProjectile(Person person, double changedAngle) {
         return new Flame((int)person.getX(),(int) person.getY(), changedAngle, person.getId());
     }
 }

@@ -3,7 +3,7 @@ package org.forweb.commandos.entity.ammo;
 import java.util.List;
 
 public class Shot extends Projectile {
-    public Shot(int xStart, int yStart, float angle) {
+    public Shot(int xStart, int yStart, double angle) {
         super(xStart, yStart, angle);
         this.setLifeTime(150L);
         this.setRadius(300);

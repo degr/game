@@ -36,6 +36,7 @@ var PlayGround = {
     
     init: function () {
         PersonActions.init();
+        ProjectilesActions.init();
         PersonTracker.init();
         ZoneActions.init();
         Weapons.init();
@@ -157,7 +158,7 @@ var PlayGround = {
     connect: function (onConnectMessage) {
         PlayGround.gameStarted = true;
         PlayGround.socket = WebSocketUtils.getSocket(
-            '/commandos',
+            'commandos',
             function onOpen() {
                 PlayGround.socket.send(onConnectMessage);
                 PlayGround.startGameLoop();
@@ -339,10 +340,10 @@ var PlayGround = {
         }
     },
 
-    updatePersonViewAngle: function(direction) {
-        if(PlayGround.viewAngleDirection !== direction) {
-            PlayGround.viewAngleDirection = direction;
-            PlayGround.socket.send('angle:' + direction);
+    updatePersonViewAngle: function(angle) {
+        if(PlayGround.viewAngleDirection !== angle) {
+            PlayGround.viewAngleDirection = angle;
+            PlayGround.socket.send('angle:' + angle);
         }
     }
 };

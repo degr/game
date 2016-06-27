@@ -33,7 +33,7 @@ public abstract class AbstractWeapon<T extends Projectile> implements WebSocketR
 
 
     public abstract String getName();
-    public abstract Projectile getProjectile(Person person, float changedAngle);
+    public abstract Projectile getProjectile(Person person, double changedAngle);
 
     public int getReloadTimeout() {
         return reloadTimeout;
