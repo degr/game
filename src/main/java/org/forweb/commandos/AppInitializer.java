@@ -24,8 +24,8 @@ public class AppInitializer implements WebApplicationInitializer {
         if(DEV) {
             HibernateSupport.init("127.0.0.1:3306", "root", "", "commandos", BASE_PACKAGE + ".entity");
         } else {
-            //HibernateSupport.init("mysql35881-slaughter.mycloud.by", "root", "CEFnsp92495", "commandos", BASE_PACKAGE + ".entity");
-            HibernateSupport.init("localhost", "root", "oHGAn6YW", "commandos", BASE_PACKAGE + ".entity");
+            HibernateSupport.init("mysql35881-slaughter.mycloud.by", "root", "CEFnsp92495", "commandos", BASE_PACKAGE + ".entity");
+            //HibernateSupport.init("localhost", "root", "oHGAn6YW", "commandos", BASE_PACKAGE + ".entity");
         }
         HibernateSupport.setDebug(DEV);
         AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();

@@ -1,21 +1,28 @@
 var ProjectilesActions = {
     init: function() {
-        ProjectilesActions.fire = new Image();
-        ProjectilesActions.fire.src = 'images/map/fire.png';
-
         ProjectilesActions.rocket = new Image();
         ProjectilesActions.rocket.src = 'images/map/rocketBullet.gif';
-
+        var image, i;
 
         /*ProjectilesActions.explosion = new Image();
          ProjectilesActions.explosion.src = 'images/map/explosion.png';*/
         ProjectilesActions.explosion = [];
-        for(var i = 1; i <= 20; i++) {
-            var image = new Image();
+        for(i = 1; i <= 20; i++) {
+            image = new Image();
             image.src = 'images/map/explosion/' + i + ".png";
             ProjectilesActions.explosion.push(image);
         }
-
+        ProjectilesActions.flame = [[], []];
+        for(i = 0; i <= 16; i++) {
+            image = new Image();
+            image.src = 'images/map/fire/0/' + i + ".png";
+            ProjectilesActions.flame[0].push(image);
+        }
+        for(i = 0; i <= 17; i++) {
+            image = new Image();
+            image.src = 'images/map/fire/1/' + i + ".png";
+            ProjectilesActions.flame[1].push(image);
+        }
     }
 };
 ProjectilesActions.projectileIds = {};
@@ -74,7 +81,13 @@ ProjectilesActions.drawBullet = function(projectile){
 
 ProjectilesActions.drawFlame = function(projectile) {
     var context = PlayGround.context;
-    context.drawImage(ProjectilesActions.fire, projectile.x1 - 9, projectile.y1 - 9);
+    var frameSet = ProjectilesActions.flame[projectile.frameSet];
+    if(projectile.animationFrame >= frameSet.length) {
+        projectile.animationFrame = 0;
+    }
+    var radius = 12;
+    var diameter = radius * 2;
+    context.drawImage(frameSet[projectile.animationFrame], projectile.x1 - 12, projectile.y1 - 12, diameter, diameter);
     if(PlayGround.drawBounds) {
         context.arc(projectile.x1, projectile.y1, 9, 0, 2 * Math.PI, false);
     }
@@ -144,6 +157,10 @@ ProjectilesActions.decode = function(projectiles) {
     var now = (new Date()).getTime();
     var playShootgun = false;
     var shotgunColor = null;
+    var existingFire = [];
+    for(var fireKey in PlayGround.fireBullets) {
+        existingFire.push(PlayGround.fireBullets[fireKey].id);
+    }
     for(var i = 0; i < projectiles.length; i++) {
         var data = projectiles[i].split(':');
         var p = {
@@ -163,18 +180,21 @@ ProjectilesActions.decode = function(projectiles) {
                 PlayGround.instantBullets.push(p);
                 p.created = now;
                 p.color = ProjectilesActions.generateColor();
-                p.lifeTime = 500;
+                p.lifeTime = 300;
+                p.maxDistance = 700;
                 break;
             case 'bullet':
                 PlayGround.instantBullets.push(p);
                 p.created = now;
                 p.color = ProjectilesActions.generateColor();
                 p.trace = 25;
-                p.lifeTime = 500;
+                p.lifeTime = 300;
+                p.maxDistance = 450;
                 break;
             case 'shot':
                 p.trace = 15;
-                p.lifeTime = 300;
+                p.lifeTime = 200;
+                p.maxDistance = 300;
                 if(playShootgun) {
                     p.soundPlayed = true;
                 } else {
@@ -197,8 +217,24 @@ ProjectilesActions.decode = function(projectiles) {
                 PlayGround.instantBullets.push(p);
                 p.created = now + 50;
                 break;
+            case 'flame':
+                var old = PlayGround.fireBullets[p.id];
+                if(old) {
+                    existingFire.splice(existingFire.indexOf(p.id), 1);
+                    p.animationFrame = old.animationFrame + 1;
+                    p.frameSet = old.frameSet
+                } else {
+                    p.frameSet = Math.floor(Math.random() * ProjectilesActions.flame.length);
+                    p.animationFrame = 0;
+                }
+                PlayGround.fireBullets[p.id] = p;
+                PlayGround.projectiles.push(p);
+                break;
             default:
                 PlayGround.projectiles.push(p);
         }
+    }
+    for(var i = 0; i < existingFire.length; i++) {
+        delete PlayGround.fireBullets[i];
     }
 };

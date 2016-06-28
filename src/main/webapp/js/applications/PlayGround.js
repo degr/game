@@ -28,6 +28,7 @@ var PlayGround = {
     fireRadius: 7,
     explosionRadius: 40,//different on 20 with server
     instantBullets: [],
+    fireBullets: {},
     readyToPlay: false,
     laserSight: 1,
     highlightOwner: true,
@@ -267,7 +268,7 @@ var PlayGround = {
         
         var now = (new Date()).getTime();
         PlayGround.projectiles = [];
-        var p = ProjectilesActions.decode(packet.projectiles);
+        ProjectilesActions.decode(packet.projectiles);
     },
     addPerson: function(id) {
         PlayGround.entities[id] = new Person(id)
