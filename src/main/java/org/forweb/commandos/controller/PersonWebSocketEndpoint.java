@@ -3,6 +3,7 @@ package org.forweb.commandos.controller;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.game.Context;
+import org.forweb.commandos.service.CmdService;
 import org.forweb.commandos.service.SpringDelegationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.server.standard.SpringConfigurator;
@@ -28,6 +29,7 @@ public class PersonWebSocketEndpoint {
     private static final String MESSAGE_TEAM = "team";
     private static final String MESSAGE_NO_PASSIVE_RELOAD = "noPassiveReload";
     private static final String MESSAGE_RESTART = "restart";
+    private static final String MESSAGE_CMD = "restart";
 
     public static final int PERSON_RADIUS = 20;
     public static final int ROCKET_RADIUS = 8;
@@ -48,6 +50,8 @@ public class PersonWebSocketEndpoint {
     private int roomId;
     private Person person;
     private Session session;
+    @Autowired
+    private CmdService cmdService;
 
     @OnOpen
     public void onOpen(Session session) {
@@ -104,6 +108,9 @@ public class PersonWebSocketEndpoint {
                 break;
             case MESSAGE_TEAM:
                 springDelegationService.onChangeTeam(getPerson(), roomId, Integer.parseInt(parts[1]));
+                break;
+            case MESSAGE_CMD:
+                cmdService.onCmd(getPerson(), roomId, parts);
                 break;
             case MESSAGE_CREATE:
                 String roomName;
