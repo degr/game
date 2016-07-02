@@ -121,7 +121,7 @@ public class MapService extends AbstractService<Map, MapDao> {
         return save(map);
     }
 
-    GameMap loadMap(Integer mapId) {
+    public GameMap loadMap(Integer mapId) {
         List<GameMap> maps = loadMaps(null, null, null, mapId);
         if (maps.size() > 0) {
             return maps.get(0);
@@ -205,5 +205,17 @@ public class MapService extends AbstractService<Map, MapDao> {
         } else {
             return null;
         }
+    }
+
+    public List<String> loadMapNames(Map.GameType gameType) {
+        return dao.loadMapNames(gameType);
+    }
+
+    public List<String> loadMapNames() {
+        return dao.loadMapNames();
+    }
+
+    public Map findMapByName(String title) {
+        return dao.findMapByName(title);
     }
 }

@@ -34,6 +34,8 @@ var PlayGround = {
     highlightOwner: true,
     blood: [],
     bloodTime: 60,
+    windowInactive: false,
+    newPlayerInterval: null,
     
     init: function () {
         PersonActions.init();
@@ -101,6 +103,18 @@ var PlayGround = {
         window.addEventListener('keyup', PersonActions.stopMovement, false);
         window.addEventListener('mousemove', PersonActions.updateMouseDirection);
         window.addEventListener('resize', function(){PlayGround.updateCanvas(PlayGround.map)});
+        window.addEventListener('focus', function(){
+            if(PlayGround.newPlayerInterval !== null) {
+                clearInterval(PlayGround.newPlayerInterval);
+                PlayGround.newPlayerInterval = null;
+            }
+            PlayGround.windowInactive = false;
+            window.document.getElementsByTagName('title')[0].innerHTML ='Kill Them All'
+        });
+        window.addEventListener('blur', function(){
+            PlayGround.windowInactive = true;
+            console.log('bb')
+        });
         PlayGround.canvas = canvas;
     },
     createGame: function (name, map) {
@@ -198,7 +212,7 @@ var PlayGround = {
         PlayGround.gameStarted = false;
         PersonTracker.stop();
         GameStats.show();
-        TeamControl.show()
+        TeamControl.show();
         GameStats.update(data.stats, parseInt(data.team1Score), parseInt(data.team2Score));
     },
     decryptOwner: function(owner) {
@@ -212,9 +226,15 @@ var PlayGround = {
         };
     },
     onUpdate: function(packet) {
+        if(packet.map) {
+            PlayGround.updateCanvas(packet.map)
+        }
         if(packet.started == 1 && (TeamControl.isShown || !PlayGround.readyToPlay)) {
             TeamControl.hide();
             PlayGround.readyToPlay = true;
+        } else if(!packet.started && (!TeamControl.isShown)) {
+            PlayGround.readyToPlay = false;
+            TeamControl.show();
         }
         if (packet.owner !== null ) {
             var oldOwnerId = PlayGround.owner.id; 

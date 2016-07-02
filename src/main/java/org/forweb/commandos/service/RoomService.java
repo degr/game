@@ -32,16 +32,31 @@ public class RoomService {
         }
         room.setDescription(room.getName());
         GameMap map = mapService.loadMap(mapId);
-        room.setMap(map);
-        if(map.getGameType() != null && !"dm".equals(map.getGameType())) {
-            room.setCoOp(true);
-        }
         room.setPersons(new ConcurrentHashMap<>(map.getMaxPlayers()));
-        room.setProjectiles(new ConcurrentHashMap<>());
+        setMapToRoom(room, map);
+
+
         room.setTotalPlayers(0);
         Integer roomId = gameContext.addRoom(room);
         room.setId(roomId);
         return room;
+    }
+
+    public static void setMapToRoom(Room room, GameMap map) {
+        room.setMap(map);
+        room.setEverybodyReady(false);
+        room.setShowStats(false);
+        if(map.getGameType() != null && !"dm".equals(map.getGameType())) {
+            room.setCoOp(true);
+        }
+        room.setProjectiles(new ConcurrentHashMap<>());
+        room.setTeam1Score(0);
+        room.setTeam2Score(0);
+        for(Person person : room.getPersons().values()) {
+            person.setScore(0);
+            person.setReady(false);
+            PersonService.resetState(person, room);
+        }
     }
 
     public void onPersonReady(Room room){

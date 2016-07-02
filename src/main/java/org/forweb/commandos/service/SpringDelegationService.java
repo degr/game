@@ -4,6 +4,7 @@ import org.forweb.commandos.controller.PersonWebSocketEndpoint;
 import org.forweb.commandos.entity.Map;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
+import org.forweb.commandos.entity.Vote;
 import org.forweb.commandos.game.Context;
 import org.forweb.commandos.response.Leave;
 import org.forweb.commandos.response.Status;
@@ -44,9 +45,10 @@ public class SpringDelegationService {
     public void onJoin(Session session, Integer personId, Integer roomId, String name) {
         Room room = gameContext.getRoom(roomId);
         Person player = new Person(personId);
-        if (room.getPersons().size() >= room.getMap().getMaxPlayers()) {
+        if (room.getPersons().size() >= room.getMaxPlayers()) {
             player.setInPool(true);
         } else {
+            room.setTotalPlayers(room.getTotalPlayers() + 1);
             player.setInPool(false);
             room.getMessages().add("0:" + name + " just now joined game");
             if(!Map.GameType.dm.toString().equals(room.getMap().getGameType()) && room.isEverybodyReady()) {
@@ -70,7 +72,7 @@ public class SpringDelegationService {
         }
         room.getSessionStorage().put(personId, session);
         player.setName(name);
-        personService.resetState(player, gameContext.getRoom(roomId));
+        PersonService.resetState(player, gameContext.getRoom(roomId));
         room.getPersons().put(player.getId(), player);
     }
 
@@ -115,6 +117,21 @@ public class SpringDelegationService {
         personService.handlePersons(persons, room);
         projectilesService.onProjectileLifecycle(room.getProjectiles(), room);
         mapService.onItemsLifecycle(room.getMap().getZones());
+        Vote vote = room.getVote();
+        if(vote != null) {
+            if(vote.isOld()) {
+                room.setVote(null);
+                room.getMessages().add("0:Vote time remain.");
+            } else {
+                if(vote.isReady(room)) {
+                    vote.process(room);
+                    room.getMessages().add("0:Vote applied");
+                    room.setVote(null);
+                } else {
+                    room.getVote().onRemind(room);
+                }
+            }
+        }
     }
 
     private void startTimer(Room room) {
@@ -138,10 +155,14 @@ public class SpringDelegationService {
                                         room.isEverybodyReady(),
                                         responseService.mapTempZones(room.getMap().getZones()),
                                         room.getTeam1Score() + ":" + room.getTeam2Score(),
-                                        responseService.mapBlood(room.getBloodList())
+                                        responseService.mapBlood(room.getBloodList()),
+                                        (room.isDumpMap() ? room.getMap() : null)
                                 ),
                                 room
                         );
+                        if(room.isDumpMap()) {
+                            room.setDumpMap(false);
+                        }
                     }
                 } catch (RuntimeException e) {
                     e.printStackTrace();
@@ -161,6 +182,10 @@ public class SpringDelegationService {
         Room room = gameContext.getRoom(roomId);
         if (room != null) {
             Person person = room.getPersons().get(personId);
+            room.setTotalPlayers(room.getTotalPlayers() - 1);
+            if(room.getVote() != null) {
+                room.getVote().removeVote(personId);
+            }
             if(person != null) {
                 if(person.getTeam() == 1) {
                     if(person.isOpponentFlag()) {
@@ -243,7 +268,7 @@ public class SpringDelegationService {
 
     public void onRestart(Person person, Room room) {
         person.setStatus(Status.alive);
-        personService.resetState(person, room);
+        PersonService.resetState(person, room);
         person.setScore(0);
 
         for(Person person1 : room.getPersons().values()) {

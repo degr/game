@@ -1,3 +1,4 @@
+
 body.no-overflow {
     overflow: hidden;
 }
@@ -6,6 +7,7 @@ body.no-overflow {
     height: 480px;
     background: url(../images/map/sand.png);
     display: block;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
 }
 
 #appstore {
@@ -392,9 +394,14 @@ a.tab-name.active {
 }
 .team-control {
     position: fixed;
-    top: 0;
-    left: 540px;
-    background: white;
+    top: -15px;
+    padding-top: 15px;
+    left: 50%;
+    background: #FF8888;
     border: 1px solid black;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
     border-top: none;
+    width: 120px;
+    margin-left: -60px;
 }

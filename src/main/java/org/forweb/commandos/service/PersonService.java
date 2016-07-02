@@ -104,16 +104,16 @@ public class PersonService {
 
 
 
-    public void resetState(Person person, Room room) {
+    public static void resetState(Person person, Room room) {
         resetState(person, room, null);
     }
-    public void resetState(Person person, Room room, List<Integer> respawnIds) {
+    public static void resetState(Person person, Room room, List<Integer> respawnIds) {
         if(person.isInPool()){
             return;
         }
         person.setDirection(Direction.NONE);
         person.setLife(PersonWebSocketEndpoint.LIFE_AT_START);
-        Respawn respawn = locationService.getRespawn(room, person, respawnIds);
+        Respawn respawn = LocationService.getRespawn(room, person, respawnIds);
         if (respawn == null) {
             throw new RuntimeException("No respawn points on map");
         } else {

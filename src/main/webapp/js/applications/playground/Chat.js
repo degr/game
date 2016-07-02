@@ -31,22 +31,21 @@ var Chat = {
         };
         Chat.screen = Dom.el('div', 'console');
         Chat.container = Dom.el('div', 'chat', [Chat.screen, Chat.textarea]);
-        var onmouseover = function(e) {
-            if(!Chat.active) {
+        Chat.screen.onmouseover = function (e) {
+            if (!Chat.active) {
                 e.preventDefault();
-                console.log('bbbb');
-                if(Chat.wasMoved) {
+                if (Chat.wasMoved) {
                     Chat.container.style.left = '66px';
+                    Chat.container.style.right = 'auto';
                 } else {
-                    Chat.container.style.left = '600px';
+                    Chat.container.style.left = 'auto';
+                    Chat.container.style.right = '66px';
                 }
                 Chat.wasMoved = !Chat.wasMoved;
             } else {
                 console.log('aaaa');
             }
-        }
-        Chat.screen.onmouseover = onmouseover; 
-        //Chat.container.onmouseover = onmouseover; 
+        };
     },
     save: function() {
         localStorage.setItem('chat', JSON.stringify(Chat.binds));
@@ -116,7 +115,7 @@ var Chat = {
         }
         if(name) {
             var writer = Dom.el('span', 'writer', name);
-            var messageHolder = Dom.el('span', 'message', message);
+            var messageHolder = Dom.el('span', 'message', decodeURIComponent(message));
             var comment = Dom.el('div', 'comment', [writer, messageHolder]);
             screen.appendChild(comment);
             screen.scrollTop =  Chat.screen.scrollHeight;

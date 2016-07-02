@@ -102,14 +102,12 @@ public class ProjectileService {
                     Person shooter = room.getPersons().get(flame.getPersonId());
                     boolean isKilled = onDamage(shooter, flame.getDamage(), person, room);
                     if(isKilled) {
-                        room.getMessages().add("0:" + person.getName() + " look like fried potato");
+                        room.getMessages().add("0:" + shooter.getName() + " fried " + person.getName());
                     }
                     room.getProjectiles().remove(flameBathcId);
                 }
             }
-
         }
-
     }
 
     private void onRocketLifecycle(Room room, Rocket rocket, Integer rocketBatchId) {
@@ -242,7 +240,8 @@ public class ProjectileService {
                 projectile.setyEnd((int) closest.getY());
             }
         }
-
+        Integer shooterStartX = null;
+        Integer shooterStartY = null;
         for (Person person : room.getPersons().values()) {
             Point linePointB = new Point((double) projectile.getxEnd(), (double) projectile.getyEnd());
             Point[] intersectionPoints = LineService.lineIntersectCircle(
@@ -255,8 +254,8 @@ public class ProjectileService {
 
             if (shooter == person) {
                 if (intersectionPoints.length > 0) {
-                    projectile.setxStart((int) intersectionPoints[0].getX());
-                    projectile.setyStart((int) intersectionPoints[0].getY());
+                    shooterStartX = (int) intersectionPoints[0].getX();
+                    shooterStartY = (int) intersectionPoints[0].getY();
                 }
                 continue;
             }
@@ -276,6 +275,12 @@ public class ProjectileService {
                     }
                 }
             }
+        }
+        if(shooterStartX != null) {
+            projectile.setxStart(shooterStartX);
+        }
+        if(shooterStartY != null) {
+            projectile.setyStart(shooterStartY);
         }
 
 

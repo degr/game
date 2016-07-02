@@ -27,7 +27,7 @@ public class Room {
     private int totalPlayers;
     private int tempWeaponId = 0;
     private GameMap map;
-
+    private Integer maxPlayers;
 
     private List<Blood> bloodList = new ArrayList<>();
     private long endTime;
@@ -41,6 +41,8 @@ public class Room {
 
 
     private ConcurrentHashMap<Integer, Session> sessionStorage = new ConcurrentHashMap<>();
+    private Vote vote;
+    private boolean dumpMap;
 
     public ConcurrentHashMap<Integer, Session> getSessionStorage() {
         return sessionStorage;
@@ -225,5 +227,33 @@ public class Room {
 
     public List<Blood> getBloodList() {
         return bloodList;
+    }
+
+    public Vote getVote() {
+        return vote;
+    }
+
+    public void setVote(Vote vote) {
+        this.vote = vote;
+    }
+
+    public int getMaxPlayers() {
+        if(maxPlayers == null) {
+            return getMap().getMaxPlayers();
+        } else {
+            return maxPlayers;
+        }
+    }
+
+    public void setMaxPlayers(Integer max) {
+        this.maxPlayers = max;
+    }
+
+    public void setDumpMap(boolean dumpMap) {
+        this.dumpMap = dumpMap;
+    }
+
+    public boolean isDumpMap() {
+        return dumpMap;
     }
 }

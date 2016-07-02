@@ -9,6 +9,13 @@ var TeamControl = {
         var teamBlue = TeamControl.buildTeamSwitch('blue', 2);
         TeamControl.teamHolder = Dom.el('div', TeamControl.isTeamGame() ? '' : 'hidden', [teamRed, teamBlue]);
         TeamControl.container = Dom.el('div', 'team-control', [TeamControl.teamHolder, ready]);
+        setInterval(function(){
+            if(TeamControl.isShown) {
+                Dom.animate(TeamControl.container, {paddingTop: 60}, 2000, 10, 
+                    function(){Dom.animate(TeamControl.container, {paddingTop: 20}, 600)}
+                );
+            }
+        }, 10000)
     },
     hide: function() {
         TeamControl.isShown = false;

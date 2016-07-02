@@ -1,6 +1,6 @@
 package org.forweb.commandos.response;
 
-import org.forweb.commandos.entity.Blood;
+import org.forweb.commandos.entity.GameMap;
 import org.forweb.commandos.response.dto.OwnerDto;
 
 import java.util.List;
@@ -9,11 +9,6 @@ public class Update {
 
     private final String type = "update";
     private long time;
-
-    public int getStarted() {
-        return started;
-    }
-
     private int started;
     private OwnerDto owner;
     private List<Integer> items;
@@ -23,7 +18,11 @@ public class Update {
     private List<String> tempZones;
     private List<String> blood;
     private String score;
-    public Update(List<String> personDto, List<String> projectiles, List<Integer> itemDtos, List<String> messages, long time, boolean gameStarted, List<String> tempZones, String score, List<String> bloodList) {
+    private GameMap map;
+    public Update(List<String> personDto, List<String> projectiles, List<Integer> itemDtos, List<String> messages,
+                  long time, boolean gameStarted, List<String> tempZones, String score, List<String> bloodList,
+                  GameMap map
+    ) {
         this.persons = personDto;
         this.projectiles = projectiles;
         this.items = itemDtos;
@@ -33,8 +32,12 @@ public class Update {
         this.tempZones = tempZones;
         this.score = score;
         this.blood = bloodList;
+        this.map = map;
     }
 
+    public GameMap getMap() {
+        return map;
+    }
 
     public List<String> getTempZones() {
         return tempZones;
@@ -44,6 +47,9 @@ public class Update {
         return type;
     }
 
+    public int getStarted() {
+        return started;
+    }
 
     public List<String> getProjectiles() {
         return projectiles;

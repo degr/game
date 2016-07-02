@@ -90,5 +90,32 @@ var Dom = {
             }
             return {top: top, left: left}
         }
+    },
+    animate: function(el, values, time, frame, clb) {
+        if(!frame)frame = 10;
+        for(var style in values) {
+            var from = el.style[style];
+            if(!from && from !== 0) {
+                from = getComputedStyle(el)[style];
+            }
+            if(!from) {
+                el.style[style] = 0;
+                from = 0;
+            } else {
+                from = parseInt(from);
+            }
+            var to = values[style];
+            (function (style, from, step) {
+                el.style[style] = from + 'px';
+                var interval = setInterval(function () {
+                    from += step;
+                    el.style[style] = from + 'px';
+                }, frame);
+                setTimeout(function () {
+                    clearInterval(interval);
+                    if(clb)clb();
+                }, time)
+            })(style, from, (to - from) * frame / time);
+        }
     }
 };

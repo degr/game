@@ -279,7 +279,8 @@ PersonActions.drawPerson = function(person) {
     
     
     if(PlayGround.showNames) {
-        context.strokeText(person.name, x - 10, y + 27);
+        context.textAlign = 'center';
+        context.strokeText(person.name, x, y + 27);
     }
 
 };
@@ -287,11 +288,22 @@ PersonActions.drawPerson = function(person) {
 PersonActions.mapPersonFromResponse = function (str) {
     var data = str.split(":");
     var id = parseInt(data[0]);
+    var name = decodeURIComponent(data[1]);
     if (!PlayGround.entities[id]) {
         PlayGround.addPerson(id);
+        if(PlayGround.windowInactive && PlayGround.newPlayerInterval == null) {
+            PlayGround.newPlayerInterval = (function(name){
+                var nSwitch = false;
+                var title = window.document.getElementsByTagName('title')[0];
+                return setInterval(function() {
+                    nSwitch = !nSwitch;
+                    title.innerHTML = nSwitch ? '*** NEW PLAYER ***' : name;
+                }, 2000);
+            })(name);
+        }
     }
     var p = PlayGround.entities[id];
-    p.name = decodeURIComponent(data[1]);
+    p.name = name
     p.reload = data[2] == 1;
     p.gun = data[3];
     p.x = parseInt(data[4]);

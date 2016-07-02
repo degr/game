@@ -59,6 +59,12 @@ var RoomsList = {
         var descriptionLink = Dom.el('a', {'href':'#'});
         var clb = function(e){
             e.preventDefault();
+            if(room.personsCount == room.totalSpace) {
+                if(!confirm("This room is full. You can join as spectator only. Continue?")) {
+                    return;
+                }
+                Chat.update(0, "You joined as SPECTATOR");
+            }
             Dispatcher.placeApplication('PlayGround');
             PlayGround.joinGame(room.map, room.id);
         };

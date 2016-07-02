@@ -58,13 +58,18 @@ var KeyboardSetup = {
         return Dom.el('div', 'form-control', chatToggler);
     },
     buildShowNames: function() {
-        var showNames = Dom.el('input', {type: 'button', value: PlayGround.showNames ? 'Hide names' : 'Show names'});
-        showNames.onclick = function() {
+        var showNames = localStorage.getItem('showNames');
+        if(showNames) {
+            PlayGround.showNames = !!parseInt(showNames);
+        }
+        var showNamesEl = Dom.el('input', {type: 'button', value: PlayGround.showNames ? 'Hide names' : 'Show names'});
+        showNamesEl.onclick = function() {
             PlayGround.showNames = !PlayGround.showNames;
-            showNames.value = PlayGround.showNames ? 'Hide names' : 'Show names';
+            showNamesEl.value = PlayGround.showNames ? 'Hide names' : 'Show names';
+            localStorage.setItem('showNames', PlayGround.showNames ? 1 : 0)
         };
 
-        return Dom.el('div', 'form-control', showNames);
+        return Dom.el('div', 'form-control', showNamesEl);
     },
     onEscapeButton: function(e) {
         if(KeyboardSetup.isActive && e.keyCode === 27) {

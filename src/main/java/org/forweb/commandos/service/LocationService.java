@@ -26,7 +26,7 @@ public class LocationService {
 
     private static final Random random = new Random();
 
-    Respawn getRespawn(Room room, Person person, List<Integer> respawnIds) {
+    static Respawn getRespawn(Room room, Person person, List<Integer> respawnIds) {
         List<Respawn> list = new ArrayList<>();
         room.getMap().getZones().stream()
                 .filter(zone -> zone instanceof Respawn)
@@ -143,10 +143,16 @@ public class LocationService {
     }
 
     public void resetLocationsOnRoomReady(Room room) {
-        for(AbstractZone zone : room.getMap().getZones()) {
+        List<AbstractZone> zones = room.getMap().getZones();
+        for(int i = zones.size() - 1; i >= 0; i--){
+            AbstractZone zone = zones.get(i);
             if(zone instanceof Interactive) {
                 Interactive interactive = (Interactive)zone;
-                interactive.reset();
+                if(interactive.isTemporary()) {
+                    zones.remove(i);
+                } else {
+                    interactive.reset();
+                }
             }
         }
     }

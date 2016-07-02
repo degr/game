@@ -48,8 +48,8 @@ public class RoomsController {
                 item.setId(room.getId());
                 item.setDescription("Room " + room.getName() + "\n Map: " + room.getMap().getName() + "\n Game mode: " + room.getGameType());
                 item.setName(room.getName());
-                item.setPersonsCount(room.getPersons().size());
-                item.setTotalSpace(room.getMap().getMaxPlayers());
+                item.setPersonsCount(room.getTotalPlayers());
+                item.setTotalSpace(room.getMaxPlayers());
                 GameMap mapOut = new GameMap();
                 mapOut.setId(map.getId());
                 mapOut.setX(map.getX());
