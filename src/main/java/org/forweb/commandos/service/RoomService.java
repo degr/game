@@ -33,7 +33,7 @@ public class RoomService {
         room.setDescription(room.getName());
         GameMap map = mapService.loadMap(mapId);
         room.setPersons(new ConcurrentHashMap<>(map.getMaxPlayers()));
-        setMapToRoom(room, map);
+        setMapToRoom(room, map, true);
 
 
         room.setTotalPlayers(0);
@@ -42,7 +42,7 @@ public class RoomService {
         return room;
     }
 
-    public static void setMapToRoom(Room room, GameMap map) {
+    public static void setMapToRoom(Room room, GameMap map, boolean noResetState) {
         room.setMap(map);
         room.setEverybodyReady(false);
         room.setShowStats(false);
@@ -55,7 +55,9 @@ public class RoomService {
         for(Person person : room.getPersons().values()) {
             person.setScore(0);
             person.setReady(false);
-            PersonService.resetState(person, room);
+            if(!noResetState) {
+                PersonService.resetState(person, room);
+            }
         }
     }
 

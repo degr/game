@@ -8,6 +8,7 @@ var GameStats = {
         var ready = Dom.el('input', {type: 'button', value: 'restart'});
         ready.onclick = function() {
             PlayGround.gameStarted = true;
+            PlayGround.statsShown = false;
             PersonTracker.start();
             GameStats.hide();
             TeamControl.readyCheckbox.checked = false;

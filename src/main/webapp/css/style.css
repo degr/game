@@ -325,9 +325,15 @@ body, html {
     left: 66px;
     top: 0;
     width: 468px;
-    /*background: rgba(0,0,0,0.3);*/
-   /* border: 1px solid;*/
-   /* border-top: none;*/
+}
+
+.playground .chat, .playground .chat * {
+
+    -moz-user-select: initial;
+    -khtml-user-select: initial;
+    -webkit-user-select: initial;
+    -ms-user-select: initial;
+    user-select: initial;
 }
 .playground .chat .system {
     color: red;

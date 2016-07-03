@@ -31,19 +31,26 @@ var Chat = {
         };
         Chat.screen = Dom.el('div', 'console');
         Chat.container = Dom.el('div', 'chat', [Chat.screen, Chat.textarea]);
+        var onClick = function(e){
+            //e.preventDefault();
+            e.stopPropagation();
+            e.preventBubble = true;
+        };
+        var container = Chat.container;
+        container.onclick = onClick;
+        container.onmousedown = onClick;
+        container.onmouseup = onClick;
         Chat.screen.onmouseover = function (e) {
             if (!Chat.active) {
                 e.preventDefault();
                 if (Chat.wasMoved) {
-                    Chat.container.style.left = '66px';
-                    Chat.container.style.right = 'auto';
+                    container.style.left = '66px';
+                    container.style.right = 'auto';
                 } else {
-                    Chat.container.style.left = 'auto';
-                    Chat.container.style.right = '66px';
+                    container.style.left = 'auto';
+                    container.style.right = '66px';
                 }
                 Chat.wasMoved = !Chat.wasMoved;
-            } else {
-                console.log('aaaa');
             }
         };
     },

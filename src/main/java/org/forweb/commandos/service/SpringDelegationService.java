@@ -267,18 +267,8 @@ public class SpringDelegationService {
     }
 
     public void onRestart(Person person, Room room) {
-        person.setStatus(Status.alive);
+        RoomService.setMapToRoom(room, room.getMap(), true);
         PersonService.resetState(person, room);
-        person.setScore(0);
-
-        for(Person person1 : room.getPersons().values()) {
-            if(Status.stats.equals(person1.getStatus())) {
-                return;
-            }
-        }
-        room.setShowStats(false);
-        room.setTeam1Score(0);
-        room.setTeam2Score(0);
-
+        person.setStatus(Status.alive);
     }
 }

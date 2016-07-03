@@ -213,12 +213,29 @@ var KeyboardSetup = {
     },
     buildBackgounds: function() {
         var buttons = ["Background: "];
-        var buildButton = function(i) {
-            var out = Dom.el('input', {type: 'button', value: i});
-            out.onclick = function() {
-                var background = 'url(images/map/background/'+i+'.png)';
+        var back = localStorage.getItem('background');
+        var setBackground = function(i) {
+            try {
+                var background = 'url(images/map/background/' + i + '.png)';
                 localStorage.setItem('background', background);
                 PlayGround.canvas.style.backgroundImage = background;
+                document.body.style.background = background;
+                localStorage.setItem('background', i);
+            } catch (e){
+                alert("Problem with background instantiation. After game starts, open config, select menu HUD and choose background.");
+            }
+        };
+        if(!back) {
+            back = 1;
+        }
+        if(back) {
+            back = parseInt(back);
+            setBackground(back);
+        }
+        var buildButton = function(i) {
+            var out = Dom.el('input', {type: 'button', value: i});
+            out.onclick = function(){
+                setBackground(i)
             };
             return out;
         };

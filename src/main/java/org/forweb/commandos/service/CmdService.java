@@ -22,7 +22,8 @@ public class CmdService {
 
     public void onCmd(Person person, int roomId, String[] args) {
         Room room = gameContext.getRoom(roomId);
-        switch (args[1]) {
+        String key = args.length > 1 ? args[1] : "help";
+        switch (key) {
             case "help":
             case "man":
             case "f1":

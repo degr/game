@@ -3,6 +3,7 @@ package org.forweb.commandos.controller;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.game.Context;
+import org.forweb.commandos.response.Status;
 import org.forweb.commandos.service.CmdService;
 import org.forweb.commandos.service.SpringDelegationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,12 +80,7 @@ public class PersonWebSocketEndpoint {
         }
         String[] parts = message.split(":");
         Room room = gameContext.getRoom(roomId);
-        if (room != null && room.isShowStats()) {
-            if (MESSAGE_RESTART.equals(parts[0])) {
-                springDelegationService.onRestart(person, room);
-                return;
-            }
-        }
+
 
         switch ((parts[0])) {
             case MESSAGE_ANGLE:
@@ -110,6 +106,11 @@ public class PersonWebSocketEndpoint {
                 break;
             case MESSAGE_TEAM:
                 springDelegationService.onChangeTeam(getPerson(), roomId, Integer.parseInt(parts[1]));
+                break;
+            case MESSAGE_RESTART:
+                if (room != null && getPerson() != null && getPerson().getStatus().equals(Status.stats)) {
+                    springDelegationService.onRestart(person, room);
+                }
                 break;
             case MESSAGE_CREATE:
                 String roomName;

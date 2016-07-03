@@ -18,7 +18,7 @@ public class RestartVote extends Vote {
 
     @Override
     public void process(Room room) {
-        RoomService.setMapToRoom(room, room.getMap());
+        RoomService.setMapToRoom(room, room.getMap(), false);
         room.getMessages().add("0:Room restarted");
     }
 }

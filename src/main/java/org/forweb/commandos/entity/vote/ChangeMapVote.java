@@ -18,7 +18,7 @@ public class ChangeMapVote extends Vote {
 
     @Override
     public void process(Room room) {
-        RoomService.setMapToRoom(room, map);
+        RoomService.setMapToRoom(room, map, false);
         room.setDumpMap(true);
     }
 }

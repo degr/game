@@ -36,24 +36,22 @@ public class LocationService {
                             list.add(candidate);
                         }
                 });
-        if (list.size() == 0) {
-            throw new RuntimeException("Map was not properly instantiated for this type of game");
-        } else if (list.size() == 1) {
+        if(list.size() == 1) {
             return list.get(0);
         } else {
             if(respawnIds == null) {
-                while (true) {
+                Respawn lastSpawn = null;
+                while (list.size() > 0) {
                     int index = random.nextInt(list.size());
                     Respawn out = list.get(index);
                     if (!out.getId().equals(person.getLastRespawnId())) {
                         return out;
                     } else {
-                        list.remove(index);
-                        if (list.size() == 0) {
-                            //it can't happen
-                            throw new RuntimeException("lol");
-                        }
+                        lastSpawn = list.remove(index);
                     }
+                }
+                if(lastSpawn != null) {
+                    list.add(lastSpawn);
                 }
             } else {
                 respawn: for(Respawn respawn : list) {
@@ -65,9 +63,10 @@ public class LocationService {
                     respawnIds.add(respawn.getId());
                     return respawn;
                 }
-                return null;
             }
         }
+        int index = random.nextInt(list.size());
+        return list.get(index);
     }
 
     public Point[] canGoEast(Person player, Room room, double distance) {

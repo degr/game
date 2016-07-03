@@ -36,8 +36,11 @@ var PlayGround = {
     bloodTime: 60,
     windowInactive: false,
     newPlayerInterval: null,
-    
+    statsShown: false,
     init: function () {
+        var canvas = Dom.el('canvas', {width: 640, height: 480, id: 'playground'});
+        PlayGround.canvas = canvas;
+        
         PersonActions.init();
         ProjectilesActions.init();
         PersonTracker.init();
@@ -72,7 +75,6 @@ var PlayGround = {
         var openKeyboard = Dom.el('a', {'href': "#", 'class': 'icon-keyboard'});
         openKeyboard.onclick = function(e){e.preventDefault();KeyboardSetup.show()};
         
-        var canvas = Dom.el('canvas', {width: 640, height: 480, id: 'playground'});
         PlayGround.container = Dom.el(
             'div',
             {'class': 'playground'},
@@ -113,9 +115,7 @@ var PlayGround = {
         });
         window.addEventListener('blur', function(){
             PlayGround.windowInactive = true;
-            console.log('bb')
         });
-        PlayGround.canvas = canvas;
     },
     createGame: function (name, map) {
         PlayGround.updateCanvas(map);
@@ -194,7 +194,11 @@ var PlayGround = {
                         PlayGround.removePerson(data.id);
                         break;
                     case 'stats':
-                        PlayGround.onStats(data);
+                        if(!PlayGround.statsShown) {
+                            TeamControl.readyCheckbox.checked = false;
+                            PlayGround.statsShown = true;
+                            PlayGround.onStats(data);
+                        }
                         break;
                 }
             },
