@@ -25,12 +25,16 @@ var RoomsList = {
         var controlPanel = new Pagination(RoomsList.openPage, RoomsList.pageNumber);
         var createGame = Dom.el('input', {type:'button', value: 'Create room'});
         createGame.onclick = function(){Dispatcher.placeApplication('MapList')};
+        var info = [
+            Dom.el('div', null, 'ASDW for movement, 1-7 for weapon switch, mouse click for shoot'),
+            Dom.el('div', null, 'Customize your controls in game, right-bottom corner, gear icon')];
         RoomsList.content = Dom.el('ul', {'class': 'games'});
         RoomsList.container = Dom.el(
             'div',
             {'class': 'games-list'},
             [
-                Dom.el('h1', null, 'Select game to play'), 
+                Dom.el('h1', null, 'Select game to play'),
+                info,
                 createGame, controlPanel.container,
                 RoomsChat.container,
                 RoomsList.content]

@@ -32,7 +32,7 @@ var KeyboardSetup = {
         tabs.addTab('Movement', KeyboardSetup.buildMovementSettings());
         tabs.addTab('Fire', KeyboardSetup.buildFireSettings());
         tabs.addTab('HUD', KeyboardSetup.buildHudSettings());
-        tabs.addTab('Chat', KeyboardSetup.buildChatSettings());
+        tabs.addTab('Chat', Dom.el('div', 'chat-controls', KeyboardSetup.buildChatSettings()));
         
         var esc = Dom.el('input', {type: 'button', value: 'Close'});
         esc.onclick = KeyboardSetup.hide;
@@ -77,8 +77,8 @@ var KeyboardSetup = {
         }
     },
     buildChatSettings: function() {
-        var binds = ['bind1', 'bind2', 'bind3', 'bind4', 'bind5', 'bind6', 'bind7', 'bind8', 'bind9'];
         var out = KeyboardSetup.buildGenericSettings(['chat']);
+        var binds = ['bind1', 'bind2', 'bind3', 'bind4', 'bind5', 'bind6', 'bind7', 'bind8', 'bind9'];
         for(var i = 0; i < binds.length; i++) {
             out.push(KeyboardSetup.createChatInput(binds[i]));
         }

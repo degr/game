@@ -1,6 +1,21 @@
-
+body, html {
+    font: 13.3333px Arial;
+}
 body.no-overflow {
     overflow: hidden;
+}
+a {
+    color: #337ab7;
+    text-decoration: none;
+}
+a:focus, a:hover {
+    color: #23527c;
+    text-decoration: underline;
+}
+a:focus {
+    outline: thin dotted;
+    outline: 5px auto -webkit-focus-ring-color;
+    outline-offset: -2px;
 }
 #playground {
     width: 640px;
@@ -20,12 +35,19 @@ ul.games {
 }
 
 ul.games li {
+    height: 321px;
+}
+.map-list .maps li, ul.games li {
     width: 234px;
     float: left;
-    height: 321px;
-    overflow: hidden;
+    overflow: auto;
+    border: 1px solid #333;
+    background: white;
+    border-radius: 4px;
+    margin-right: 10px;
+    padding: 10px;
+    list-style: none;
 }
-
 ul.games li p {
     overflow: auto;
     height: 75px;
@@ -75,11 +97,10 @@ body, html {
     border-collapse: collapse;
 }
 .map-list .maps li{
-    float: left;
-    list-style: none;
-    margin: 10px 20px;
     height: 255px;
 }
+
+
 .editor td {
     width: 10px;
     height: 10px;
@@ -149,7 +170,7 @@ body, html {
     height: 468px;
 }
 .room-list-chat .messages {
-    height: 400px;
+    height: 388px;
     overflow: auto;
 }
 .room-list-chat textarea {
@@ -269,6 +290,9 @@ body, html {
     font-size: 17px;
     font-weight: bold;
     width: 90px;
+    background: white;
+    padding: 3px 0 0 5px;
+    border-top-left-radius: 5px;
 }
 .life-and-armor .label {
     float: left;
@@ -294,9 +318,9 @@ body, html {
 .playground .icon-keyboard {
     position: fixed;
     right: 100px;
-    bottom: 10px;
-    width: 18px;
-    height: 18px;
+    bottom: 2px;
+    width: 32px;
+    height: 32px;
     background: url(../images/gear.png) no-repeat;
 }
 
@@ -314,11 +338,26 @@ body, html {
     box-sizing: border-box;
     top: 30px;
 }
+.keyboard-setup {
+    height: 80%;
+    overflow: auto;
+}
+.chat-controls .form-control label{
+    min-width: 20%;
+    width: 20%;
+}
+.chat-controls .form-control input{
+    width: 30%;
+}
 .playground .score {
     position: fixed;
-    right: 150px;
+    right: 138px;
     bottom: 0;
     width: 80px;
+    background: white;
+    padding: 3px 3px 0 5px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
 }
 .playground .chat {
     position: fixed;
@@ -411,3 +450,42 @@ a.tab-name.active {
     width: 120px;
     margin-left: -60px;
 }
+input, textarea{
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+input[button], input[submit], button {
+    color: #333;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border-radius: 4px;
+}
+

@@ -52,11 +52,11 @@ var Dom = {
         if(content) {
             if(typeof content === 'string' || typeof content === 'number') {
                 o.appendChild(document.createTextNode(content + ""));
-            } else if(content.length) {
+            } else if(content.length && content.push && content.pop) {
                 for(var i = 0;i<content.length;i++) {
                     var child = content[i];
                     if(child) {
-                        o.appendChild(typeof child === 'string' ? document.createTextNode(child) : child)
+                        Dom.append(o, child);
                     }
                 }
             } else {
