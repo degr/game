@@ -239,7 +239,7 @@ var KeyboardSetup = {
             };
             return out;
         };
-        for(var i = 1; i < 9; i++) {
+        for(var i = 1; i < 8; i++) {
            buttons.push(buildButton(i));
         }
         return Dom.el('div', 'form-control', buttons);

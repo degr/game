@@ -1,5 +1,6 @@
 var ZoneActions = {
     images: {},
+    wallPattern: null,
     init: function() {
         ZoneActions.images.armor = new Image();
         ZoneActions.images.armor.src = 'images/map/armor.png';
@@ -24,11 +25,15 @@ var ZoneActions = {
         ZoneActions.images.pistol = new Image();
         ZoneActions.images.pistol.src = 'images/map/pistol.png';
         ZoneActions.images.wall = new Image();
-        ZoneActions.images.wall.src = 'images/map/wall.jpg';
+        ZoneActions.images.wall.onload = function() {
+            ZoneActions.wallPattern = PlayGround.context.createPattern(ZoneActions.images.wall, 'repeat'); // Create a pattern with this image, and set it to "repeat".
+        };
+        ZoneActions.images.wall.src = 'images/map/wall.png';
         ZoneActions.images.flag_blue = new Image();
         ZoneActions.images.flag_blue.src = 'images/teams/flag_blue.png';
         ZoneActions.images.flag_red = new Image();
         ZoneActions.images.flag_red.src = 'images/teams/flag_red.png';
+
     },
     drawZone: function(zone) {
         var context = PlayGround.context;
@@ -75,7 +80,8 @@ var ZoneActions = {
                 ZoneActions.drawImage(zone);
                 break;
             case 'wall':
-                context.drawImage(ZoneActions.images.wall, zone.x, zone.y, zone.width, zone.height);
+                context.fillStyle = ZoneActions.wallPattern;
+                context.fillRect(zone.x, zone.y, zone.width, zone.height);
                 break;
             case 'tiled':
                 if(!ZoneActions.images[zone.tileId]) {
@@ -90,7 +96,8 @@ var ZoneActions = {
                         context.drawImage(ZoneActions.images[zone.tileId], zone.x, zone.y, zone.width, zone.height);
                     }
                 } catch (e) {
-                    context.drawImage(ZoneActions.images.wall, zone.x, zone.y, zone.width, zone.height);
+                    context.fillStyle = ZoneActions.wallPattern;
+                    context.fillRect(zone.x, zone.y, zone.width, zone.height);
                 }
 
                 break;
@@ -115,7 +122,7 @@ var ZoneActions = {
     drawImage: function(zone) {
         var context = PlayGround.context;
         if(zone.available) {
-            var size = 48;
+            var size = 40;
             var shift = (size - 40) / 2;
             context.drawImage(ZoneActions.images[zone.type], zone.x - shift, zone.y - shift, size, size);
         }
