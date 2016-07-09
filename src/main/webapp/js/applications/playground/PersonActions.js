@@ -7,6 +7,15 @@ var PersonActions = {
     directionY: null,
     noPassiveReload: false
 };
+PersonActions.run = [];
+(function() {
+    for (var i = 0; i < 20; i++) {
+        var image = new Image();
+        image.src = 'images/person/run/' + i + ".png";
+        PersonActions.run.push(image);
+    }
+})();
+
 PersonActions.updatePassiveReload = function(value) {
     localStorage.setItem('no_passive_reload', value);
     PersonActions.noPassiveReload = value;
@@ -15,7 +24,7 @@ PersonActions.updatePassiveReload = function(value) {
 PersonActions.init = function() {
     var noPassivereload = localStorage.getItem('no_passive_reload');
     PersonActions.noPassiveReload = noPassivereload === 'true';
-}
+};
 
 PersonActions.setDirection  = function(direction) {
     PlayGround.socket.send("direction:" + direction);
@@ -211,6 +220,26 @@ PersonActions.drawPerson = function(person) {
     context.beginPath();
     context.translate(x,y);
     context.rotate((angle - 90) * Math.PI / 180);
+    var recoil = person.recoil || 0;
+    var halfRecoil;
+    if(recoil > 0) {
+        if(person.recoilSide == null) {
+            person.recoilSide = Math.random() > 0.5 ? 1 : -1;
+        }
+        recoil = recoil * person.recoilSide;
+        halfRecoil = recoil /2;
+    } else {
+        if(person.recoilSide != null) {
+            person.recoilSide = null;
+        }
+        halfRecoil = 0;
+    }
+    if(recoil > -0.5 && recoil < 0.5) {
+        person.recoil = 0;
+        person.recoilSide = null;
+    } else {
+        person.recoil = person.recoil - 0.5;
+    }
     
     if(PlayGround.owner && PlayGround.owner.id && PlayGround.owner.id == person.id) {
         if ((PlayGround.laserSight == 2 && person.gun != 'knife') || (PlayGround.laserSight == 1 && person.gun == 'sniper')) {
@@ -230,9 +259,9 @@ PersonActions.drawPerson = function(person) {
         }
     }
     if(person.gun == 'pistol') {
-        context.drawImage(ZoneActions.images[person.gun], -10, -14)
+        context.drawImage(ZoneActions.images[person.gun], -10 + recoil, -14 + recoil)
     } else {
-        context.drawImage(ZoneActions.images[person.gun], -6, -14, 32, 32)
+        context.drawImage(ZoneActions.images[person.gun], -6 + recoil, -14 + recoil, 32, 32)
     }
     context.restore();
 
@@ -273,10 +302,24 @@ PersonActions.drawPerson = function(person) {
     if(PlayGround.drawBounds) {
         context.arc(0, 0, PlayGround.radius, 0, 2 * Math.PI, false);
     }
-    context.stroke();
-    context.drawImage(person.image, - PlayGround.radius - 8,  - PlayGround.radius - 3, 56, 56);
-    context.restore();
     
+    context.stroke();
+    var runIndex = person.runIndex || 0;
+    if(runIndex >= PersonActions.run.length) {
+        runIndex = 0;
+    }
+    var legRotate = Math.PI * 3 / 2;
+    context.rotate(legRotate);
+    context.drawImage(PersonActions.run[runIndex], - PlayGround.radius - 4 + halfRecoil,  - PlayGround.radius + 5 + halfRecoil, 30, 30);
+    context.rotate(-legRotate);
+    context.drawImage(person.image, - PlayGround.radius - 8 + halfRecoil,  - PlayGround.radius - 3 + halfRecoil, 56, 56);
+    context.restore();
+    if(person.prevX != person.x || person.prevY  != person.y) {
+        person.runIndex = runIndex + 1;
+    }
+
+    person.prevX = person.x;
+    person.prevY = person.y;
     
     if(PlayGround.showNames) {
         context.textAlign = 'center';

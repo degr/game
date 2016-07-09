@@ -75,6 +75,27 @@ ProjectilesActions.draw = function(projectile, fire) {
     }
 };
 ProjectilesActions.drawBullet = function(projectile){
+    if(!projectile.isFixed) {
+        projectile.isFixed = true;
+
+
+        for(var k in PlayGround.entities) {
+            var entity = PlayGround.entities[k];
+            if(projectile.x1 == entity.x && projectile.y1 == entity.y) {
+                entity.recoil = 2;
+            }
+        }
+        
+        
+        var renderStart = PlayGround.radius;
+        var cos = Math.cos(projectile.angle * Math.PI / 180);
+        var sin = Math.sin(projectile.angle * Math.PI / 180);
+        projectile.x1 = cos * renderStart + projectile.x1;
+        projectile.y1 = sin * renderStart + projectile.y1;
+        
+        
+        
+    }
     CGraphics.drawBullet(projectile);
     
 };

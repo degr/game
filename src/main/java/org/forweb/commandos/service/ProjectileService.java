@@ -254,8 +254,8 @@ public class ProjectileService {
 
             if (shooter == person) {
                 if (intersectionPoints.length > 0) {
-                    shooterStartX = (int) intersectionPoints[0].getX();
-                    shooterStartY = (int) intersectionPoints[0].getY();
+                    //shooterStartX = (int) intersectionPoints[0].getX();
+                    //shooterStartY = (int) intersectionPoints[0].getY();
                 }
                 continue;
             }
