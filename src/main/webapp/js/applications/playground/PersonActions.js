@@ -258,10 +258,43 @@ PersonActions.drawPerson = function(person) {
             context.fillRect(-grdSize, -grdSize, grdSize*2, grdSize*2);
         }
     }
-    if(person.gun == 'pistol') {
-        context.drawImage(ZoneActions.images[person.gun], -10 + recoil, -14 + recoil)
-    } else {
-        context.drawImage(ZoneActions.images[person.gun], -6 + recoil, -14 + recoil, 32, 32)
+    switch (person.gun) {
+        case 'knife':
+            var knifeAngle = 0;
+            var knifeShift = 0;
+            if(person.knifeLifeCycle > 0) {
+                if (person.isPiercingKnife) {
+                    knifeShift = person.knifeShift;
+                    if (person.knifeLifeCycle < 5) {
+                        knifeShift = person.knifeShift;
+                        person.knifeShift += 3;
+                    } else {
+                        person.knifeShift -= 3;
+                    }
+                } else {
+                    knifeAngle = (person.knifeAngle - 4) * 12 - 40;
+                    context.rotate(knifeAngle * Math.PI / 180);
+                    person.knifeAngle++;
+                    if (person.knifeAngle > 12) {
+                        person.knifeAngle = 0
+                    }
+                }
+                if (person.knifeLifeCycle > 10) {
+                    person.knifeLifeCycle = 0
+                } else {
+                    person.knifeLifeCycle++;
+                }
+            }
+            context.drawImage(ZoneActions.images.knife, -6 + knifeShift, -14, 32, 32);
+            if(knifeAngle != 0) {
+                context.rotate(-knifeAngle * Math.PI/180);
+            }
+            break;
+        case 'pistol':
+            context.drawImage(ZoneActions.images.pistol, -10 + recoil, -14 + recoil)
+            break;
+        default:
+            context.drawImage(ZoneActions.images[person.gun], -6 + recoil, -14 + recoil, 32, 32)
     }
     context.restore();
 

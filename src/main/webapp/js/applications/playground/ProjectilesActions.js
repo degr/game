@@ -192,7 +192,9 @@ ProjectilesActions.decode = function(projectiles) {
             x2: parseInt(data[4]),
             y2: parseInt(data[5]),
             angle: parseInt(data[6]),
+            personId: parseInt(data[7]),
             realDistance: null//will be calculated in CGraphics
+            
         };
         
         switch (p.type) {
@@ -236,6 +238,19 @@ ProjectilesActions.decode = function(projectiles) {
                 break;
             case 'blade':
                 PlayGround.instantBullets.push(p);
+                var person = PlayGround.entities[p.personId];
+                if(person) {
+                    if (!person.knifeLifeCycle) {
+                        if(Math.random() > 0.5) {
+                            person.isPiercingKnife = true;
+                            person.knifeShift = 0;
+                        } else {
+                            person.isPiercingKnife = false;
+                            person.knifeAngle = 0;
+                        }
+                        person.knifeLifeCycle = 1;
+                    }
+                }
                 p.created = now + 50;
                 break;
             case 'flame':

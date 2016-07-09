@@ -240,8 +240,6 @@ public class ProjectileService {
                 projectile.setyEnd((int) closest.getY());
             }
         }
-        Integer shooterStartX = null;
-        Integer shooterStartY = null;
         for (Person person : room.getPersons().values()) {
             Point linePointB = new Point((double) projectile.getxEnd(), (double) projectile.getyEnd());
             Point[] intersectionPoints = LineService.lineIntersectCircle(
@@ -276,13 +274,6 @@ public class ProjectileService {
                 }
             }
         }
-        if(shooterStartX != null) {
-            projectile.setxStart(shooterStartX);
-        }
-        if(shooterStartY != null) {
-            projectile.setyStart(shooterStartY);
-        }
-
 
         if (closestPerson != null) {
             boolean isKilled = onDamage(shooter, projectile.getDamage(), closestPerson, room);

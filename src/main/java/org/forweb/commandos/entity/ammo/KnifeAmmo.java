@@ -4,9 +4,12 @@ import org.forweb.commandos.controller.PersonWebSocketEndpoint;
 
 public class KnifeAmmo extends Projectile {
 
-    public KnifeAmmo(int xStart, int yStart, double angle) {
+    private final int personId;
+
+    public KnifeAmmo(int xStart, int yStart, double angle, int personId) {
         super(xStart, yStart, angle);
         this.setLifeTime(150L);
+        this.personId = personId;
         this.setRadius(PersonWebSocketEndpoint.PERSON_RADIUS + 15);
     }
 
@@ -23,5 +26,11 @@ public class KnifeAmmo extends Projectile {
     @Override
     public int getDamage() {
         return 45;
+    }
+
+    @Override
+    public String doResponse() {
+        String out = super.doResponse();
+        return out + ":" + personId;
     }
 }
