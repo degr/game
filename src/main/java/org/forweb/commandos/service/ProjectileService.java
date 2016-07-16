@@ -2,6 +2,7 @@ package org.forweb.commandos.service;
 
 import org.forweb.commandos.controller.PersonWebSocketEndpoint;
 import org.forweb.commandos.entity.Blood;
+import org.forweb.commandos.entity.GameMap;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.ammo.*;
@@ -119,11 +120,21 @@ public class ProjectileService {
                 PersonWebSocketEndpoint.ROCKET_RADIUS
         );
         Explosion explosion = null;
-        if (rocket.getxStart() <= 0 || rocket.getxStart() >= room.getMap().getX() ||
-                rocket.getyStart() <= 0 || rocket.getyStart() >= room.getMap().getY()) {
+        GameMap map = room.getMap();
+        if (rocket.getxStart() <= 0 || rocket.getxStart() >= map.getX() ||
+                rocket.getyStart() <= 0 || rocket.getyStart() >= map.getY()) {
             Person shooter = room.getPersons().get(rocket.getPersonId());
             if(shooter != null) {
-                explosion = new Explosion(shooter);
+                int xStart = rocket.getxStart() <= 0 ? 0 : (int)rocket.getxStart();
+                if(xStart > map.getX()) {
+                    xStart = map.getX();
+                }
+                int yStart = rocket.getyStart() <= 0 ? 0 : (int)rocket.getyStart();
+                if(yStart > map.getY()) {
+                    yStart = map.getY();
+                }
+
+                explosion = new Explosion(xStart, yStart, shooter);
             }
         }
         if (explosion == null) {
@@ -136,7 +147,7 @@ public class ProjectileService {
                     if (point.length > 0) {
                         Person shooter = room.getPersons().get(rocket.getPersonId());
                         if(shooter != null) {
-                            explosion = new Explosion(shooter);
+                            explosion = new Explosion((int)point[0].getX(), (int)point[0].getY(), shooter);
                         }
                         break;
                     }
@@ -158,7 +169,7 @@ public class ProjectileService {
                     if (point.length > 0) {
                         Person shooter = room.getPersons().get(rocket.getPersonId());
                         if(shooter != null) {
-                            explosion = new Explosion(shooter);
+                            explosion = new Explosion((int)point[0].getX(), (int)point[0].getY(), shooter);
                             boolean isKilled = onDamage(shooter, rocket.getDamage(), person, room);
                             if(isKilled) {
                                 room.getMessages().add("0:" + shooter.getName() + " explode " + person.getName());

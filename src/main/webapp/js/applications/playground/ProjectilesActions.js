@@ -1,7 +1,7 @@
 var ProjectilesActions = {
     init: function() {
         ProjectilesActions.rocket = new Image();
-        ProjectilesActions.rocket.src = 'images/map/rocketBullet.gif';
+        ProjectilesActions.rocket.src = 'images/map/rocketBullet.png';
         var image, i;
 
         /*ProjectilesActions.explosion = new Image();
@@ -137,11 +137,15 @@ ProjectilesActions.drawRocket = function(projectile) {
     var x = projectile.x1;
     var y = projectile.y1;
     context.beginPath();
-    var angle = projectile.angle + 135;
+    var angle = projectile.angle + 90;
     context.translate(x,y);
     context.rotate(angle * Math.PI/180);
-    context.drawImage(ProjectilesActions.rocket, - 9,  - 9);
+    var smokeShift = -27;
+    var width = 12;
+    var height = 26;
+    context.drawImage(ProjectilesActions.rocket, -(width/2), -(height / 2) + smokeShift, width, height);
     context.restore();
+    CGraphics.drawSmoke(projectile, true, 3000);
 };
 
 ProjectilesActions.drawBlade = function(projectile) {
@@ -158,6 +162,7 @@ ProjectilesActions.decode = function(projectiles) {
     for(var fireKey in PlayGround.fireBullets) {
         existingFire.push(PlayGround.fireBullets[fireKey].id);
     }
+    var packageRockets = [];
     for(var i = 0; i < projectiles.length; i++) {
         var data = projectiles[i].split(':');
         var p = {
@@ -242,6 +247,26 @@ ProjectilesActions.decode = function(projectiles) {
                 PlayGround.fireBullets[p.id] = p;
                 PlayGround.projectiles.push(p);
                 break;
+            case 'rocket':
+                var rocketExist = false;
+                packageRockets.push(p.id);
+                for(var i = 0; i < PlayGround.rockets.length; i++) {
+                    var r = PlayGround.rockets[i];
+                    if(r.id = p.id) {
+                        r.x1 = p.x1;
+                        r.y1 = p.y1;
+                        r.x2 = p.x2;
+                        r.y2 = p.y2;
+                        p = r;
+                        rocketExist = true;
+                        break;
+                    }
+                }
+                if(!rocketExist) {
+                    PlayGround.rockets.push(p);
+                }
+                PlayGround.projectiles.push(p);
+                break;
             default:
                 PlayGround.projectiles.push(p);
         }
@@ -249,4 +274,11 @@ ProjectilesActions.decode = function(projectiles) {
     for(var i = 0; i < existingFire.length; i++) {
         delete PlayGround.fireBullets[i];
     }
+    for(var i = PlayGround.rockets.length - 1; i >= 0; i--) {
+        var rocket = PlayGround.rockets[i];
+        if(packageRockets.indexOf(rocket.id) === -1) {
+            PlayGround.rockets.splice(i, 1);
+        }
+    }
+
 };

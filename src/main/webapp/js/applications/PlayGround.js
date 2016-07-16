@@ -37,6 +37,7 @@ var PlayGround = {
     windowInactive: false,
     newPlayerInterval: null,
     statsShown: false,
+    rockets: [],/*rockets storage. For smoke visualisation*/
     init: function () {
         var canvas = Dom.el('canvas', {width: 640, height: 480, id: 'playground'});
         PlayGround.canvas = canvas;

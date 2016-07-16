@@ -115,14 +115,6 @@ public class SpringDelegationService {
             }
 
         }
-
-        for (Person per : persons) {
-            for (Projectile proj : room.getProjectiles().values()) {
-                if ((int)proj.getxStart() != (int)per.getX() || (int)proj.getyStart() !=(int) per.getY()) {
-                    System.out.println("llol");
-                }
-            }
-        }
         personService.handlePersons(persons, room);
         projectilesService.onProjectileLifecycle(room.getProjectiles(), room);
         mapService.onItemsLifecycle(room.getMap().getZones());

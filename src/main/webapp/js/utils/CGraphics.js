@@ -57,7 +57,7 @@ var CGraphics = {
         pseudo.x2 = cos * (renderStart + trace) + bullet.x1;
         pseudo.y2 = sin * (renderStart + trace) + bullet.y1;
         var currentDistance = Math.sqrt(Math.pow(pseudo.x2 - bullet.x1, 2) + Math.pow(pseudo.y2 - bullet.y1, 2));
-        CGraphics.drawSmoke(bullet);
+        CGraphics.drawSmoke(bullet, false);
         if(currentDistance > realDistance) {
             return;
         }
@@ -83,19 +83,25 @@ var CGraphics = {
         person.flash++;
         return true;
     },
-    drawSmoke: function(bullet) {
+    drawSmoke: function(bullet, isMulty, lifeTime) {
         if(!bullet.smoke) {
-            bullet.smoke = new CGraphics.smoke(bullet.x1, bullet.y1);
+            bullet.smoke = [new CGraphics.smoke(bullet.x1, bullet.y1, lifeTime)];
+        } else {
+            if(isMulty) {
+                bullet.smoke.push(new CGraphics.smoke(bullet.x1, bullet.y1, lifeTime));
+            }
         }
         var context = CGraphics.context;
-        var sm = bullet.smoke;
-        sm.update();
-        context.save();
-        context.translate(sm.x, sm.y);
-        context.rotate(sm.angle * Math.PI / 180 );
-        context.globalAlpha  = sm.alpha;
-        context.drawImage(CGraphics.smokeImage, 0 - sm.size / 2,0- sm.size / 2, sm.size, sm.size);
-        context.restore();
+        for(var i = 0; i < bullet.smoke.length; i++) {
+            var sm = bullet.smoke[i];
+            sm.update();
+            context.save();
+            context.translate(sm.x, sm.y);
+            context.rotate(sm.angle * Math.PI / 180);
+            context.globalAlpha = sm.alpha;
+            context.drawImage(CGraphics.smokeImage, 0 - sm.size / 2, 0 - sm.size / 2, sm.size, sm.size);
+            context.restore();
+        }
     },
     /**
      * Can be override
@@ -114,7 +120,7 @@ var CGraphics = {
         context.stroke();
         context.restore();
     },
-    smoke: function(x, y) {
+    smoke: function(x, y, lifeTime) {
         this.x = x;
         this.y = y;
 
@@ -125,7 +131,7 @@ var CGraphics = {
         this.angle = Math.random() * 359;
 
         this.startLife = new Date().getTime();
-        this.lifeTime = 0;
+        this.lifeTime = lifeTime || 1000;
     },
     smokeImage: new Image()
 };
@@ -138,8 +144,8 @@ var CGraphics = {
 })();
 CGraphics.smokeImage.src = "images/map/smoke.png";
 CGraphics.smoke.prototype.update = function () {
-    this.lifeTime = new Date().getTime() - this.startLife;
-    var lifePerc = ((this.lifeTime / 1000) * 100);
+    var lifeTime = new Date().getTime() - this.startLife;
+    var lifePerc = ((lifeTime / this.lifeTime) * 100);
     this.size = this.startSize + ((this.endSize - this.startSize) * lifePerc * .1);
 
     this.alpha = 1 - (lifePerc * 0.1);
