@@ -21,10 +21,10 @@ public interface MapDao extends AbstractDao<Map> {
 
     Map findMapByTitle(String title);
 
-    @Query("select map.title from org.forweb.commandos.entity.Map map where map.gameType = :gameType")
-    List<String> loadMapNames(@Param("gameType") Map.GameType gameType);
+    @Query(nativeQuery = true, value ="select map.title from map where map.game_type = :game_type limit 20")
+    List<String> loadMapNames(@Param("game_type") String gameType);
 
-    @Query("select map.title from org.forweb.commandos.entity.Map map")
+    @Query(nativeQuery = true, value = "select map.title from map limit 20")
     List<String> loadMapNames();
 
     @Query(nativeQuery = true, value = "select * from map where title = :title limit 0, 1")

@@ -361,7 +361,6 @@ PersonActions.drawPerson = function(person) {
     if(person.onFire) {
         var flashXShift;
         var flashYShift;
-        console.log(person.gun);
         switch (person.gun) {
             case 'minigun':
                 flashXShift = PlayGround.radius + 5;
