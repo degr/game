@@ -23,6 +23,6 @@ public class Pistol extends AbstractWeapon<Bullet> {
 
     @Override
     public Projectile getProjectile(Person person, double angle) {
-        return new Bullet((int)person.getX(), (int)person.getY(), angle);
+        return new Bullet(person, angle);
     }
 }

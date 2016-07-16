@@ -1,10 +1,12 @@
 package org.forweb.commandos.entity.ammo;
 
-public class Rocket extends LinkedAmmo {
+import org.forweb.commandos.entity.Person;
+
+public class Rocket extends Projectile {
 
 
-    public Rocket(int xStart, int yStart, double angle, int personId) {
-        super(xStart, yStart, angle, personId);
+    public Rocket(Person person, double angle) {
+        super(person, angle);
         this.setLifeTime(1400L);
         this.setRadius(700);
     }

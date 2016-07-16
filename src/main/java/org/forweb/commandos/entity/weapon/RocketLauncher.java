@@ -23,6 +23,6 @@ public class RocketLauncher extends AbstractWeapon<Rocket> {
 
     @Override
     public Projectile getProjectile(Person person, double changedAngle) {
-        return new Rocket((int)person.getX(), (int)person.getY(), changedAngle, person.getId());
+        return new Rocket(person, changedAngle);
     }
 }

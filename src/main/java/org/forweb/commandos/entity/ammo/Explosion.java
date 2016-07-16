@@ -1,10 +1,11 @@
 package org.forweb.commandos.entity.ammo;
 
 import org.forweb.commandos.controller.PersonWebSocketEndpoint;
+import org.forweb.commandos.entity.Person;
 
 public class Explosion extends Projectile{
-    public Explosion(int xStart, int yStart) {
-        super(xStart, yStart, 0);
+    public Explosion(Person person) {
+        super(person, 0);
         //real radius is 60. Additional person radius is required for damage calculation.
         this.setRadius(60 + PersonWebSocketEndpoint.PERSON_RADIUS);
         setLifeTime(600L);

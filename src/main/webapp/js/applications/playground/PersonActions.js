@@ -291,7 +291,7 @@ PersonActions.drawPerson = function(person) {
             }
             break;
         case 'pistol':
-            context.drawImage(ZoneActions.images.pistol, -10 + recoil, -14 + recoil)
+            context.drawImage(ZoneActions.images.pistol, -10 + recoil, -14 + recoil);
             break;
         default:
             context.drawImage(ZoneActions.images[person.gun], -6 + recoil, -14 + recoil, 32, 32)
@@ -358,7 +358,31 @@ PersonActions.drawPerson = function(person) {
         context.textAlign = 'center';
         context.strokeText(person.name, x, y + 27);
     }
-
+    if(person.onFire) {
+        var flashXShift;
+        var flashYShift;
+        console.log(person.gun);
+        switch (person.gun) {
+            case 'minigun':
+                flashXShift = PlayGround.radius + 5;
+                flashYShift = -13;
+                break;
+            case 'sniper':
+            case 'assault':
+                flashXShift = PlayGround.radius + 5;
+                flashYShift = -14;
+                break;
+            case 'shotgun':
+                flashXShift = PlayGround.radius + 7;
+                flashYShift = -16;
+                break;
+            case 'pistol':
+            default:
+                flashXShift = PlayGround.radius;
+                flashYShift = -16;
+        }
+        person.onFire = CGraphics.drawBulletFlash(person, flashXShift, flashYShift);
+    }
 };
 
 PersonActions.mapPersonFromResponse = function (str) {

@@ -1,9 +1,11 @@
 package org.forweb.commandos.entity.ammo;
 
+import org.forweb.commandos.entity.Person;
+
 public class SubShot extends Projectile{
 
-    public SubShot(int xStart, int yStart, double angle) {
-        super(xStart, yStart, angle);
+    public SubShot(Person person, double angle) {
+        super(person, angle);
         this.setRadius(300);
         this.setLifeTime(150L);
     }

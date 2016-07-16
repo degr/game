@@ -1,10 +1,12 @@
 package org.forweb.commandos.entity.ammo;
 
+import org.forweb.commandos.entity.Person;
+
 import java.util.List;
 
 public class Shot extends Projectile {
-    public Shot(int xStart, int yStart, double angle) {
-        super(xStart, yStart, angle);
+    public Shot(Person person, double angle) {
+        super(person, angle);
         this.setLifeTime(150L);
         this.setRadius(300);
     }

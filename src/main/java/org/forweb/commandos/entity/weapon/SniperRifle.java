@@ -23,6 +23,6 @@ public class SniperRifle extends AbstractWeapon<SniperBullet> {
 
     @Override
     public Projectile getProjectile(Person person, double changedAngle) {
-        return new SniperBullet((int)person.getX(), (int)person.getY(), changedAngle);
+        return new SniperBullet(person, changedAngle);
     }
 }

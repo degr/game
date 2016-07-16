@@ -20,6 +20,7 @@ var CGraphics = {
     trace: 25,
     color: "white",//"rgba(251, 76, 2, 0.85)",
     skipFrames: 0,
+    bulletFlashImages: [],
     /**
      * Draw bullet on related canvas
      * @param bullet {x1:int, y1:int, x2:int, y2: int, trace: int, lifeTime: int, created:long(timestamp),realDistance:int,angle:float}
@@ -56,13 +57,45 @@ var CGraphics = {
         pseudo.x2 = cos * (renderStart + trace) + bullet.x1;
         pseudo.y2 = sin * (renderStart + trace) + bullet.y1;
         var currentDistance = Math.sqrt(Math.pow(pseudo.x2 - bullet.x1, 2) + Math.pow(pseudo.y2 - bullet.y1, 2));
+        CGraphics.drawSmoke(bullet);
         if(currentDistance > realDistance) {
             return;
         }
         pseudo.x1 = cos * renderStart + bullet.x1;
         pseudo.y1 = sin * renderStart + bullet.y1;
+        pseudo.trace = trace;
         
        CGraphics.bulletRender(pseudo, color, bullet);
+    },
+    drawBulletFlash: function(person, shiftX, shiftY) {
+        if(person.flash == undefined) {
+            person.flash = 0;
+        }
+        if(person.flash >= CGraphics.bulletFlashImages.length) {
+            return false;
+        }
+        var context = CGraphics.context;
+        context.save();
+        context.translate(person.x, person.y);
+        context.rotate(person.angle * Math.PI / 180);
+        context.drawImage(CGraphics.bulletFlashImages[person.flash], shiftX, shiftY);
+        context.restore();
+        person.flash++;
+        return true;
+    },
+    drawSmoke: function(bullet) {
+        if(!bullet.smoke) {
+            bullet.smoke = new CGraphics.smoke(bullet.x1, bullet.y1);
+        }
+        var context = CGraphics.context;
+        var sm = bullet.smoke;
+        sm.update();
+        context.save();
+        context.translate(sm.x, sm.y);
+        context.rotate(sm.angle * Math.PI / 180 );
+        context.globalAlpha  = sm.alpha;
+        context.drawImage(CGraphics.smokeImage, 0 - sm.size / 2,0- sm.size / 2, sm.size, sm.size);
+        context.restore();
     },
     /**
      * Can be override
@@ -74,28 +107,41 @@ var CGraphics = {
         var context = CGraphics.context;
         context.save();
         context.beginPath();
-        
-        
-        context.strokeStyle=color;
+        context.strokeStyle="white";
         context.moveTo(pseudo.x1, pseudo.y1);
         context.lineTo(pseudo.x2, pseudo.y2);
-        context.lineWidth = 1.5;
+        context.lineWidth = 1;
         context.stroke();
-
-
-        /*var cos = Math.cos(bullet.angle * Math.PI / 180);
-        var sin = Math.sin(bullet.angle * Math.PI / 180);
-        var posX = cos * 8+ bullet.x1;
-        var posY =  sin * 4 + bullet.y1;
-        var rad = 8;
-        var grd = context.createRadialGradient(posX, posY, 0, posX, posY, rad);
-        grd.addColorStop(0, "white");
-        grd.addColorStop(0.2, "orange");
-        grd.addColorStop(0.6, "red");
-        grd.addColorStop(1, "transparent");
-        context.fillStyle = grd;
-        context.fillRect(posX - rad, posY - rad, rad * 2, rad * 2);*/
-        
         context.restore();
+    },
+    smoke: function(x, y) {
+        this.x = x;
+        this.y = y;
+
+        this.size = 1;
+        this.startSize = 20;
+        this.endSize = 160;
+
+        this.angle = Math.random() * 359;
+
+        this.startLife = new Date().getTime();
+        this.lifeTime = 0;
+    },
+    smokeImage: new Image()
+};
+(function(){
+    for(var i = 0; i < 10; i++) {
+        var image = new Image();
+        image.src = '/images/map/flash/' + i + ".png";
+        CGraphics.bulletFlashImages.push(image);
     }
+})();
+CGraphics.smokeImage.src = "images/map/smoke.png";
+CGraphics.smoke.prototype.update = function () {
+    this.lifeTime = new Date().getTime() - this.startLife;
+    var lifePerc = ((this.lifeTime / 1000) * 100);
+    this.size = this.startSize + ((this.endSize - this.startSize) * lifePerc * .1);
+
+    this.alpha = 1 - (lifePerc * 0.1);
+    this.alpha = Math.max(this.alpha,0);
 };

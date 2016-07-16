@@ -28,7 +28,7 @@ public class Knife extends AbstractWeapon<KnifeAmmo>{
 
     @Override
     public Projectile getProjectile(Person person, double angle) {
-        return new KnifeAmmo((int)person.getX(), (int)person.getY(), angle, person.getId());
+        return new KnifeAmmo(person, angle);
     }
 
     @Override

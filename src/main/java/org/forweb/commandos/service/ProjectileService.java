@@ -121,7 +121,10 @@ public class ProjectileService {
         Explosion explosion = null;
         if (rocket.getxStart() <= 0 || rocket.getxStart() >= room.getMap().getX() ||
                 rocket.getyStart() <= 0 || rocket.getyStart() >= room.getMap().getY()) {
-            explosion = new Explosion((int) rocket.getxStart(), (int) rocket.getyStart());
+            Person shooter = room.getPersons().get(rocket.getPersonId());
+            if(shooter != null) {
+                explosion = new Explosion(shooter);
+            }
         }
         if (explosion == null) {
             for (AbstractZone zone : room.getMap().getZones()) {
@@ -131,7 +134,10 @@ public class ProjectileService {
                             new Bounds(zone.getX(), zone.getY(), zone.getWidth(), zone.getHeight())
                     );
                     if (point.length > 0) {
-                        explosion = new Explosion((int) point[0].getX(), (int) point[0].getY());
+                        Person shooter = room.getPersons().get(rocket.getPersonId());
+                        if(shooter != null) {
+                            explosion = new Explosion(shooter);
+                        }
                         break;
                     }
                 }
@@ -150,11 +156,13 @@ public class ProjectileService {
                             personCircle
                     );
                     if (point.length > 0) {
-                        explosion = new Explosion((int) point[0].getX(), (int) point[0].getY());
                         Person shooter = room.getPersons().get(rocket.getPersonId());
-                        boolean isKilled = onDamage(shooter, rocket.getDamage(), person, room);
-                        if(isKilled) {
-                            room.getMessages().add("0:" + shooter.getName() + " explode " + person.getName());
+                        if(shooter != null) {
+                            explosion = new Explosion(shooter);
+                            boolean isKilled = onDamage(shooter, rocket.getDamage(), person, room);
+                            if(isKilled) {
+                                room.getMessages().add("0:" + shooter.getName() + " explode " + person.getName());
+                            }
                         }
                         break;
                     }

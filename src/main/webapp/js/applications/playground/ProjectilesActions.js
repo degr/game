@@ -80,21 +80,20 @@ ProjectilesActions.drawBullet = function(projectile){
 
 
         for(var k in PlayGround.entities) {
-            var entity = PlayGround.entities[k];
-            if(projectile.x1 == entity.x && projectile.y1 == entity.y) {
+            var entity = PlayGround.entities[projectile.personId];
+            if(entity) {
                 entity.recoil = 2;
+                if(!entity.onFire) {
+                    entity.onFire = true;
+                    entity.flash = 0;
+                }
             }
         }
-        
-        
         var renderStart = PlayGround.radius;
         var cos = Math.cos(projectile.angle * Math.PI / 180);
         var sin = Math.sin(projectile.angle * Math.PI / 180);
         projectile.x1 = cos * renderStart + projectile.x1;
         projectile.y1 = sin * renderStart + projectile.y1;
-        
-        
-        
     }
     CGraphics.drawBullet(projectile);
     
@@ -146,33 +145,10 @@ ProjectilesActions.drawRocket = function(projectile) {
 };
 
 ProjectilesActions.drawBlade = function(projectile) {
-    /*var context = PlayGround.context;
-    context.save();
-    context.beginPath();
-    context.translate(projectile.x1, projectile.y1);
-    var random = Math.floor(Math.random() * 12)+ 8;
-    random = 0;
-    var randomDirection = Math.floor(Math.random() * 10);
-    if(randomDirection > 5) {
-        random *= -1;
-    }
-    
-    var shiftX = -10;
-    var shiftY = -15;
-    context.rotate((projectile.angle + random) * Math.PI / 180);
-    context.drawImage(ZoneActions.images.knife, 50, 0, 50, 100, shiftX, shiftY, 20, 32);
-    context.restore();*/
 };
 
 ProjectilesActions.generateColor = function() {
-    switch (Math.floor(Math.random() * 5)) {
-        case 0: return 'white';
-        case 1: return '#D6E085';
-        case 2: return '#E0BD5D';
-        case 3: return '#E07929';
-        case 4: return '#B5E0DF';
-        default : return '#B3E077';
-    }
+    return 'white';
 };
 ProjectilesActions.decode = function(projectiles) {
     var now = (new Date()).getTime();
