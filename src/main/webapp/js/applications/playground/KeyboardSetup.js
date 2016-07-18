@@ -192,14 +192,14 @@ var KeyboardSetup = {
     buildMuteButton: function() {
         var mute = localStorage.getItem('mute');
         if(mute == '1') {
-            SoundUtils.mute = true;
+            SoundUtils.setMute(true);
         }
         var checkbox = Dom.el('input', {type: 'checkbox', id: 'mute_checkbox'});
         if(SoundUtils.mute) {
             checkbox.checked = true;
         }
         checkbox.onclick = function() {
-            SoundUtils.mute = checkbox.checked;
+            SoundUtils.setMute(checkbox.checked);
             if(SoundUtils.mute) {
                 localStorage.setItem('mute', '1');
             } else {

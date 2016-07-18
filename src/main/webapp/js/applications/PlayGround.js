@@ -57,6 +57,13 @@ var PlayGround = {
         
         setInterval(function(){
             if(PlayGround.gameStarted) {
+                if(!PlayGround.musicStarted) {
+                    PlayGround.musicStarted = true;
+                    /*SoundUtils.music([
+                        "sound/music/04.ogg",
+                        "sound/music/05.ogg"
+                    ]);*/
+                }
                 var now = (new Date()).getTime();
                 for (var key = PlayGround.instantBullets.length - 1; key >= 0; key--) {
                     var bullet = PlayGround.instantBullets[key];

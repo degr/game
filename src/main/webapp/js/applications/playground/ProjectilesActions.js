@@ -3,9 +3,6 @@ var ProjectilesActions = {
         ProjectilesActions.rocket = new Image();
         ProjectilesActions.rocket.src = 'images/map/rocketBullet.png';
         var image, i;
-
-        /*ProjectilesActions.explosion = new Image();
-         ProjectilesActions.explosion.src = 'images/map/explosion.png';*/
         ProjectilesActions.explosion = [];
         for(i = 1; i <= 20; i++) {
             image = new Image();
@@ -250,9 +247,10 @@ ProjectilesActions.decode = function(projectiles) {
             case 'rocket':
                 var rocketExist = false;
                 packageRockets.push(p.id);
-                for(var i = 0; i < PlayGround.rockets.length; i++) {
-                    var r = PlayGround.rockets[i];
-                    if(r.id = p.id) {
+                for(var j = 0; j < PlayGround.rockets.length; j++) {
+                    var r = PlayGround.rockets[j];
+                    if(r.id === p.id) {
+                        //p.smoke = r.smoke;
                         r.x1 = p.x1;
                         r.y1 = p.y1;
                         r.x2 = p.x2;
@@ -278,6 +276,7 @@ ProjectilesActions.decode = function(projectiles) {
         var rocket = PlayGround.rockets[i];
         if(packageRockets.indexOf(rocket.id) === -1) {
             PlayGround.rockets.splice(i, 1);
+            break;
         }
     }
 
