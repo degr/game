@@ -2,28 +2,21 @@ package org.forweb.commandos.controller;
 
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.zone.AbstractZone;
-import org.forweb.commandos.entity.zone.Zone;
 import org.forweb.commandos.entity.zone.interactive.*;
 import org.forweb.commandos.entity.zone.items.*;
 import org.forweb.commandos.entity.zone.walls.Tile;
 import org.forweb.commandos.entity.zone.walls.TiledZone;
 import org.forweb.commandos.entity.zone.walls.Wall;
 import org.forweb.commandos.game.Context;
-import org.forweb.commandos.service.MapService;
 import org.forweb.commandos.service.ZoneService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.forweb.commandos.AppInitializer.ROOT;
 
 @RestController
 @RequestMapping("/zones")
@@ -34,6 +27,7 @@ public class ZoneController {
 
     @Autowired
     private Context context;
+
     @RequestMapping("/room/{roomId}")
     public List<AbstractZone> getZoneForRoom(@PathVariable("roomId") Integer roomId) {
         Room room = context.getRoom(roomId);
@@ -43,12 +37,12 @@ public class ZoneController {
     @RequestMapping("/list")
     public List<AbstractZone> getZones() {
         List<AbstractZone> out = new ArrayList<>();
-        out.add(new Wall(0,0,0,0));
-        out.add(new Respawn(0,0, 0));
-        out.add(new RespawnBlue(0,0, 0));
-        out.add(new RespawnRed(0,0, 0));
-        out.add(new FlagRed(0,0, 0));
-        out.add(new FlagBlue(0,0, 0));
+        out.add(new Wall(0, 0, 0, 0));
+        out.add(new Respawn(0, 0, 0));
+        out.add(new RespawnBlue(0, 0, 0));
+        out.add(new RespawnRed(0, 0, 0));
+        out.add(new FlagRed(0, 0, 0));
+        out.add(new FlagBlue(0, 0, 0));
         out.add(new ShotgunZone(0, 0, 0));
         out.add(new AssaultZone(0, 0, 0));
         out.add(new SniperZone(0, 0, 0));
@@ -74,7 +68,7 @@ public class ZoneController {
             @RequestParam(value = "height") Integer height,
             @RequestParam(value = "is_tileset", required = false) Boolean isTileSet,
             @RequestParam("fileupload") MultipartFile file
-    ){
+    ) {
         if (!file.isEmpty()) {
             return zoneService.createCustomTile(title, width, height, isTileSet, file);
         } else {
