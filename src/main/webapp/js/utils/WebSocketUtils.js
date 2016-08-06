@@ -1,4 +1,4 @@
-var WebSocketUtils = {
+Engine.define('WebSocketUtils', {
     getSocket: function (url, onOpen, onMessage, onClose, onError) {
         var host;
         var interval;
@@ -25,7 +25,7 @@ var WebSocketUtils = {
             onOpen();
             interval = setInterval(function () {
                 // Prevent server read timeout.
-                PlayGround.socket.send('ping');
+                socket.send('ping');
             }, 5000);
         };
 
@@ -36,4 +36,4 @@ var WebSocketUtils = {
         socket.onmessage = onMessage;
         return socket;
     }
-}
+});

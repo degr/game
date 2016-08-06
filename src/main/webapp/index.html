@@ -7,6 +7,8 @@
         }
     </script>
 
+    <script src="js/Engine.js"></script>
+
     <script src="js/utils/CGraphics.js"></script>
     <script src="js/utils/KeyboardUtils.js"></script>
     <script src="js/utils/ScreenUtils.js"></script>
@@ -20,10 +22,15 @@
     <script src="js/components/Pagination.js"></script>
     <script src="js/components/Tabs.js"></script>
 
+    <script src="js/applications/Dispatcher.js"></script>
+
+    <script src="js/applications/playground/Controls.js"></script>
     <script src="js/applications/Greetings.js"></script>
 
     <script src="js/applications/map-editor/CustomTiles.js"></script>
     <script src="js/applications/MapEditor.js"></script>
+
+    <script src="js/applications/playground/Chat.js"></script>
 
     <script src="js/applications/rooms-list/RoomsChat.js"></script>
     <script src="js/applications/RoomsList.js"></script>
@@ -31,10 +38,8 @@
 
     <script src="js/applications/playground/BloodActions.js"></script>
     <script src="js/applications/playground/PersonTracker.js"></script>
-    <script src="js/applications/playground/Chat.js"></script>
     <script src="js/applications/playground/Weapons.js"></script>
     <script src="js/applications/playground/LifeAndArmor.js"></script>
-    <script src="js/applications/playground/Control.js"></script>
     <script src="js/applications/playground/ScoreOverview.js"></script>
     <script src="js/applications/playground/TeamControl.js"></script>
     <script src="js/applications/playground/GameStats.js"></script>
@@ -46,7 +51,6 @@
     <script src="js/applications/playground/KeyboardSetup.js"></script>
 
     <script src="js/applications/PlayGround.js"></script>
-    <script src="js/applications/Dispatcher.js"></script>
 
     <title>Kill Them All</title>
     <meta charset="utf-8"/>
@@ -58,13 +62,23 @@
 <div id="appstore">
 </div>
 <script type="application/javascript">
-    Ajax.headers = {
+
+    Engine.require('Ajax').headers = {
         Accept: "application/json,text/plain",
         'Content-Type': "application/json"
     };
 
-    Rest.host = document.location.protocol + '//' + document.location.host + '/server/';
+    Engine.require('Rest').host = document.location.protocol + '//' + document.location.host + '/server/';
+    var Dispatcher = Engine.require('Dispatcher');
     Dispatcher.init();
+
+    Dispatcher.initApplication(Engine.require('Greetings'), 'Greetings');
+    Dispatcher.initApplication(Engine.require('MapList'), 'MapList');
+    Dispatcher.initApplication(Engine.require('RoomsList'), 'RoomsList');
+    Dispatcher.initApplication(Engine.require('PlayGround'), 'PlayGround');
+    Dispatcher.initApplication(Engine.require('MapEditor'), 'MapEditor');
+    Dispatcher.placeApplication('Greetings')
+
 </script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-var KeyboardUtils = {
+Engine.define('KeyboardUtils', {
     translateButton: function(code) {
         switch (code) {
             case 9: return 'tab';
@@ -60,4 +60,4 @@ var KeyboardUtils = {
             default: return String.fromCharCode(code);
         }
     }
-}
+});
