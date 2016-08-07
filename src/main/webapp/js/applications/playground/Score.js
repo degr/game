@@ -7,6 +7,10 @@ Engine.define('Score', (function () {
         fragContainer: null,
         timeContainer: null,
         frags: 0,
+        /**
+         * @var PlayGround
+         */
+        playGround: null,
         init: function () {
             Score.fragContainer = Dom.el('span', 'frags', Score.frags);
             var fragWrapper = Dom.el('div', null, ['Frags: ', Score.fragContainer]);
@@ -17,8 +21,7 @@ Engine.define('Score', (function () {
             Score.container = Dom.el('div', 'score', [fragWrapper, timeWrapper]);
         },
         update: function (owner, time) {
-            var PlayGround = Engine.require('PlayGround');
-            var p = PlayGround.entities[owner.id];
+            var p = Score.playGround.entities[owner.id];
             if (!p)return;
             var score = p.score;
             if (score != Score.frags) {

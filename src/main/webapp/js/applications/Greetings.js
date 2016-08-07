@@ -1,11 +1,24 @@
 Engine.define('Greetings', (function () {
 
     var Dom = Engine.require('Dom');
-    var Dispatcher = Engine.require('Dispatcher');
-    
-    var Greetings = function() {
+
+    /**
+     * @param dispatcher Dispatcher
+     * @param playground Playground
+     * @constructor
+     */
+    var Greetings = function(dispatcher, playground) {
+        if(!dispatcher) {
+            throw "Greetings class require dispatcher instance";
+        }
+        if(!playground) {
+            throw "Greetings class require playground instance";
+        }
+        
+        this.playGround = playground;
         this.container = null;
         this.name = null;
+        this.dispatcher = dispatcher;
     };
     Greetings.prototype.init = function () {
         var me = this;
@@ -24,11 +37,10 @@ Engine.define('Greetings', (function () {
     };
     Greetings.prototype.onSubmit = function (e) {
         e.preventDefault();
-        var PlayGround = Engine.require('PlayGround');
         var name = this.getName();
         localStorage.setItem('personName', name);
-        PlayGround.playerName = name;
-        Dispatcher.placeApplication('RoomsList');
+        this.playGround.playerName = name;
+        this.dispatcher.placeApplication('RoomsList');
         return false;
     };
     return Greetings;

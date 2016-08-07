@@ -8,19 +8,23 @@ Engine.define('GameStats', (function () {
         container: null,
         statistics: null,
         isShown: false,
+        /**
+         * @var PlayGround
+         */
+        playGround: null,
         init: function () {
             var title = Dom.el('h3', null, 'THE END');
             GameStats.statistics = Dom.el('div');
             var ready = Dom.el('input', {type: 'button', value: 'restart'});
             ready.onclick = function () {
-                var PlayGround = Engine.require('PlayGround');
-                PlayGround.gameStarted = true;
-                PlayGround.statsShown = false;
+                var playGround = GameStats.playGround;
+                playGround.gameStarted = true;
+                playGround.statsShown = false;
                 PersonTracker.start();
                 GameStats.hide();
                 TeamControl.readyCheckbox.checked = false;
-                PlayGround.socket.send('restart');
-                PlayGround.blood = [];
+                playGround.socket.send('restart');
+                playGround.blood = [];
             };
             var description = Dom.el('p', null, ['Please refresh browser to start new game, or press ', ready]);
             GameStats.container = Dom.el('div', 'game-stats hidden', [title, GameStats.statistics, description]);
@@ -35,7 +39,6 @@ Engine.define('GameStats', (function () {
         },
         update: function (stats, team1Score, team2Score) {
             GameStats.statistics.innerHTML = '';
-            var content = [];
             for (var i = 0; i < stats.length; i++) {
                 GameStats.statistics.appendChild(Dom.el('div', null, decodeURIComponent(stats[i].person) + " " + stats[i].frags));
             }

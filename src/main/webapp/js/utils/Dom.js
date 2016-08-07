@@ -1,18 +1,18 @@
 Engine.define('Dom', (function () {
-    var out = {};
+    var Dom = {};
     /**
      * @param type string
      * @param attr object|null
      * @param content string|Element|Element[]
      * @returns {Element}
      */
-    out.el = function (type, attr, content) {
+    Dom.el = function (type, attr, content) {
         var o = document.createElement(type);
-        out.update(o, attr);
-        out.append(o, content);
+        Dom.update(o, attr);
+        Dom.append(o, content);
         return o;
     };
-    out.addClass = function (el, clazz) {
+    Dom.addClass = function (el, clazz) {
         if (el.className) {
             if (el.className.indexOf(clazz) === -1) {
                 el.className += ' ' + clazz;
@@ -23,7 +23,7 @@ Engine.define('Dom', (function () {
             el.className = clazz;
         }
     }
-    out.removeClass = function (el, clazz) {
+    Dom.removeClass = function (el, clazz) {
         var cl = el.className;
         if (cl && cl.indexOf(clazz) > -1) {
             var p = cl.split(' ');
@@ -34,7 +34,7 @@ Engine.define('Dom', (function () {
             }
         }
     };
-    out.hasClass = function (el, clazz) {
+    Dom.hasClass = function (el, clazz) {
         var cl = el.className;
         if (cl.indexOf(clazz) > -1) {
             return cl.split(' ').indexOf(clazz) > -1;
@@ -42,17 +42,17 @@ Engine.define('Dom', (function () {
             return false;
         }
     };
-    out.id = function (id) {
+    Dom.id = function (id) {
         return document.getElementById(id);
     };
-    out.update = function (el, attr) {
+    Dom.update = function (el, attr) {
         if (typeof attr === 'string') {
             el.className = attr;
         } else if (attr)for (var i in attr) {
-            if(!attr.hasOwnProperty(i))continue;
-            if(typeof attr[i] == 'function') {
+            if (!attr.hasOwnProperty(i))continue;
+            if (typeof attr[i] == 'function') {
                 var key = i;
-                if(key.indexOf("on") === 0) {
+                if (key.indexOf("on") === 0) {
                     key = key.substring(2);
                 }
                 el.addEventListener(key, attr[i]);
@@ -61,7 +61,7 @@ Engine.define('Dom', (function () {
             }
         }
     };
-    out.append = function (o, content) {
+    Dom.append = function (o, content) {
         if (content) {
             if (typeof content === 'string' || typeof content === 'number') {
                 o.appendChild(document.createTextNode(content + ""));
@@ -69,7 +69,7 @@ Engine.define('Dom', (function () {
                 for (var i = 0; i < content.length; i++) {
                     var child = content[i];
                     if (child) {
-                        out.append(o, child);
+                        Dom.append(o, child);
                     }
                 }
             } else {
@@ -77,8 +77,8 @@ Engine.define('Dom', (function () {
             }
         }
     };
-    out.calculateOffset = function (elem) {
-        var top = 0, left = 0
+    Dom.calculateOffset = function (elem) {
+        var top = 0, left = 0;
         if (elem.getBoundingClientRect) {
             var box = elem.getBoundingClientRect();
 
@@ -104,32 +104,55 @@ Engine.define('Dom', (function () {
             return {top: top, left: left}
         }
     };
-    out.animate = function (el, values, time, frame, clb) {
+    Dom.animate = function (el, values, time, frame, clb, timeToWait) {
+        if (!timeToWait)timeToWait = 0;
         if (!frame)frame = 10;
-        for (var style in values) {
-            var from = el.style[style];
-            if (!from && from !== 0) {
-                from = getComputedStyle(el)[style];
-            }
-            if (!from) {
-                el.style[style] = 0;
-                from = 0;
-            } else {
-                from = parseInt(from);
-            }
-            var to = values[style];
-            (function (style, from, step) {
-                el.style[style] = from + 'px';
-                var interval = setInterval(function () {
-                    from += step;
+
+        var animate = function (el, values, time, frame) {
+            var intervals = [];
+            for (var style in values) {
+                if (!values.hasOwnProperty(style))continue;
+
+                var from = el.style[style];
+                if (!from && from !== 0) {
+                    from = getComputedStyle(el)[style];
+                }
+                if (!from) {
+                    el.style[style] = 0;
+                    from = 0;
+                } else {
+                    from = parseInt(from);
+                }
+                var to = values[style];
+                (function (style, from, step) {
                     el.style[style] = from + 'px';
-                }, frame);
-                setTimeout(function () {
-                    clearInterval(interval);
-                    if (clb)clb();
-                }, time)
-            })(style, from, (to - from) * frame / time);
-        }
+                    intervals.push(setInterval(function () {
+                        from += step;
+                        el.style[style] = from + 'px';
+                    }, frame));
+                })(style, from, (to - from) * frame / time);
+            }
+            setTimeout(function () {
+                for (var i = 0; i < intervals.length; i++) {
+                    clearInterval(intervals[i]);
+                }
+            }, time);
+        };
+        setTimeout(function () {
+            animate(el, values, time, frame, clb)
+        }, timeToWait);
+
+        timeToWait += time;
+
+        return {
+            animate: function (el, values, time, frame, clb) {
+                return Dom.animate(el, values, time, frame, clb, timeToWait);
+            },
+            then: function (clb) {
+                console.log(timeToWait);
+                setTimeout(function(){clb()}, timeToWait);
+            }
+        };
     };
-    return out
+    return Dom
 })());

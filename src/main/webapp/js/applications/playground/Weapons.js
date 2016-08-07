@@ -1,13 +1,16 @@
 Engine.define('Weapons', (function () {
 
     var Dom = Engine.require('Dom');
-    var Chat = Engine.require('Chat');
     var Controls = Engine.require('Controls');
     
     var Weapons = {
         container: '',
         rightSide: true,
         updater: {},
+        /**
+         * @var PlayGround
+         */
+        playGround: null,
         weapons: {
             knife: {type: 'knife', code: 1, active: false, enable: true, max: 1, clip: 1, total: 0, current: 0},
             pistol: {type: 'pistol', code: 2, active: false, enable: true, max: 40, clip: 9, total: 0, current: 0},
@@ -106,14 +109,14 @@ Engine.define('Weapons', (function () {
             Weapons.container.appendChild(out);
         },
         changeWeapon: function (e) {
-            var PlayGround = Engine.require('PlayGround');
+            var playGround = Weapons.playGround;
             var KeyboardSetup = Engine.require('KeyboardSetup');
-            if (!PlayGround.gameStarted || Chat.active || KeyboardSetup.isActive)return;
+            if (!playGround.gameStarted || playGround.chat.active || KeyboardSetup.isActive)return;
             e = e || window.event;
             var code = e.keyCode;
             var thisEvent = false;
             var gun = '';
-            var guns = PlayGround.owner.guns;
+            var guns = playGround.owner.guns;
             switch (code) {
                 case Controls.knife:
                     gun = 'knife';
@@ -171,9 +174,9 @@ Engine.define('Weapons', (function () {
         },
         findWeapon: function (isNext) {
             var sorted = [];
-            var PlayGround = Engine.require('PlayGround');
-            var guns = PlayGround.owner.guns;
-            var gun = PlayGround.owner.gun;
+            var playGround = Weapons.playGround;
+            var guns = playGround.owner.guns;
+            var gun = playGround.owner.gun;
             var currentIndex = -1;
             var idx = 0;
             var weapons = Weapons.weapons;
@@ -201,8 +204,7 @@ Engine.define('Weapons', (function () {
             return sorted[index];
         },
         setWeapon: function (gun) {
-            var PlayGround = Engine.require('PlayGround');
-            PlayGround.socket.send("gun:" + gun);
+            Weapons.playGround.socket.send("gun:" + gun);
         }
     };
     return Weapons

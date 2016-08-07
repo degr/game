@@ -8,6 +8,10 @@ Engine.define('PersonTracker', (function () {
         maxX: 0,
         maxY: 0,
         window: {width: 0, height: 0},
+        /**
+         * @var PlayGround
+         */
+        playGround: null,
         init: function () {
             PersonTracker.trackedContainer = document.body;
         },
@@ -37,16 +41,16 @@ Engine.define('PersonTracker', (function () {
             PersonTracker.isStarted = false;
         },
         track: function () {
-            var PlayGround = Engine.require('PlayGround');
-            if (PlayGround.owner) {
-                var p = PlayGround.entities[PlayGround.owner.id];
+            var playGround = PersonTracker.playGround;
+            if (playGround.owner) {
+                var p = playGround.entities[playGround.owner.id];
                 if (PersonTracker.trackX) {
-                    var x = PlayGround.map.x;
+                    var x = playGround.map.x;
                     PersonTracker.trackedContainer.scrollLeft = PersonTracker.calculateScroll(
                         x, p.x, PersonTracker.maxX, PersonTracker.window.width);
                 }
                 if (PersonTracker.trackY) {
-                    var y = PlayGround.map.y;
+                    var y = playGround.map.y;
                     PersonTracker.trackedContainer.scrollTop = PersonTracker.calculateScroll(
                         y, p.y, PersonTracker.maxY, PersonTracker.window.height);
                 }

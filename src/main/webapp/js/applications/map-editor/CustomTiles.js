@@ -7,9 +7,6 @@ Engine.define('CustomTiles', (function () {
     var CustomTiles = function () {
         this.container = null;
         this.isOnSubmit = false;
-    };
-
-    CustomTiles.prototype.init = function () {
         var me = this;
         var title = Dom.el('h3', null, 'Create custom tile');
         var fileupload = Dom.el('input', {type: 'file', name: 'fileupload', id: 'tile_fileupload'});

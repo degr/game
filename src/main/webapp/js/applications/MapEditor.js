@@ -3,7 +3,6 @@ Engine.define('MapEditor', (function () {
     var Dom = Engine.require('Dom');
     var CustomTiles = Engine.require('CustomTiles');
     var DomComponents = Engine.require('DomComponents');
-    var Dispatcher = Engine.require('Dispatcher');
     var Rest = Engine.require('Rest');
     
     var MapEditor = {
@@ -14,8 +13,9 @@ Engine.define('MapEditor', (function () {
         inputName: null,
         filterValue: '',
         customTiles: new CustomTiles(),
+        dispatcher: null,
+        playGround: null,
         init: function () {
-            this.customTiles.init();
 
             MapEditor.console = Dom.el('p', {id: 'editor_console'});
 
@@ -90,7 +90,7 @@ Engine.define('MapEditor', (function () {
             goBack.onclick = function () {
                 var c = confirm("Are you sure to leave this page?");
                 if (c) {
-                    Dispatcher.placeApplication('MapList');
+                    MapEditor.dispatcher.placeApplication('MapList');
                 }
             };
             var createTile = Dom.el('input', {type: 'button', value: 'Create Tile'});
@@ -298,7 +298,6 @@ Engine.define('MapEditor', (function () {
             }
         },
         render: function () {
-            var PlayGround = Engine.require('PlayGround')
             if (MapEditor.x != MapEditor.inputX.value) {
                 MapEditor.inputX.value = MapEditor.x;
             }
@@ -329,7 +328,7 @@ Engine.define('MapEditor', (function () {
                     if (zone.type === 'tiled') {
                         (function (zone, rect) {
                             var image = new Image();
-                            image.src = PlayGround.uploadPath + zone.customSprite;
+                            image.src = MapEditor.playGround.uploadPath + zone.customSprite;
                             image.onload = function () {
                                 if (zone.tileset) {
                                     context.drawImage(image, zone.stepX * rect.width, zone.stepY * rect.height, rect.width, rect.height, rect.x, rect.y, rect.width, rect.height);
@@ -384,7 +383,6 @@ Engine.define('MapEditor', (function () {
             return out;
         },
         redrawZoneButtons: function () {
-            var PlayGround = Engine.require('PlayGround')
             var doInput = function (zone, key) {
                 var name = zone.type !== 'tiled' ? zone.type : zone.tileName;
                 var input = Dom.el('input', {
@@ -396,7 +394,7 @@ Engine.define('MapEditor', (function () {
                     MapEditor.mount(zone)
                 };
                 if (zone.type == 'tiled') {
-                    input.style.background = "url(" + PlayGround.uploadPath + zone.customSprite + ") no-repeat";
+                    input.style.background = "url(" + MapEditor.playGround.uploadPath + zone.customSprite + ") no-repeat";
                     if (zone.tileset) {
                         input.style.height = zone.height + 'px';
                         input.style.width = zone.width + 'px';
@@ -453,7 +451,7 @@ Engine.define('MapEditor', (function () {
                         stepY++;
                     }
                 };
-                image.src = PlayGround.uploadPath + "/" + zone.customSprite;
+                image.src = MapEditor.playGround.uploadPath + "/" + zone.customSprite;
                 return out;
             };
             MapEditor.zonesButtons.innerHTML = '';

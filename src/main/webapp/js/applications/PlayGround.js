@@ -19,404 +19,425 @@ Engine.define('PlayGround', (function () {
     var TeamControl = Engine.require('TeamControl');
     var WebSocketUtils = Engine.require('WebSocketUtils');
     var BloodActions = Engine.require('BloodActions');
+    var CGraphics = Engine.require('CGraphics');
 
+    var PlayGround = function () {
+        this.radius = 20;
+        this.gameStarted = false;
+        this.uploadPath = "upload.images/zones/";
+        this.container = null;
+        this.canvas = Dom.el('canvas', {width: 640, height: 480, id: 'playground'});
+        this.socket = null;//websocket
+        this.entities = {};//game persons on playground
+        this.owner = {};//current person. Come from server with full information
+        this.projectiles = [];//current projectiles to display
+        this.xMouse = 0;//current x-mouse position
+        this.yMouse = 0;//current y-mouse position;
+        this.viewAngleDirection = 0;//current y-mouse position,
+        this.angle = 0;
+        this.map = {};
+        this.canvasOffset = {top: 0, left: 0};
 
-    var PlayGround = {
-        radius: 20,
-        gameStarted: false,
-        dev: true,
-        uploadPath: "upload.images/zones/",
-        container: null,
-        canvas: null,
-        socket: null,//websocket
-        entities: {},//game persons on playground
-        owner: {},//current person. Come from server with full information
-        projectiles: [],//current projectiles to display
-        xMouse: 0,//current x-mouse position
-        yMouse: 0,//current y-mouse position,
-        viewAngleDirection: 0,//current y-mouse position,
-        angle: 0,
-        map: {},
-        canvasOffset: {top: 0, left: 0},
+        this.nextFrame = null;
+        this.interval = null;
+        this.nextGameTick = 0;
+        this.skipTicks = 0;
+        this.fps = 30;
 
-        nextFrame: null,
-        interval: null,
-        nextGameTick: 0,
-        skipTicks: 0,
-        fps: 30,
+        this.showNames = false;
+        this.drawBounds = false;
+        /*this.rocketRadius = 5;
+         this.fireRadius = 7;
+         this.explosionRadius = 40;//different on 20 with server*/
+        this.instantBullets = [];
+        this.fireBullets = {};
+        this.readyToPlay = false;
+        this.laserSight = 1;
+        this.highlightOwner = true;
+        this.blood = [];
+        this.bloodTime = 60;
+        this.windowInactive = false;
+        this.newPlayerInterval = null;
+        this.statsShown = false;
+        this.rockets = [];
+        /*rockets storage. For smoke visualisation*/
+        this.playerName = '';
 
-        showNames: false,
-        drawBounds: false,
-        rocketRadius: 5,
-        fireRadius: 7,
-        explosionRadius: 40,//different on 20 with server
-        instantBullets: [],
-        fireBullets: {},
-        readyToPlay: false,
-        laserSight: 1,
-        highlightOwner: true,
-        blood: [],
-        bloodTime: 60,
-        windowInactive: false,
-        newPlayerInterval: null,
-        statsShown: false,
-        rockets: [], /*rockets storage. For smoke visualisation*/
-
-        playerName: '',
+        this.chat = new Chat(this);
         
-        
-        init: function () {
-            var canvas = Dom.el('canvas', {width: 640, height: 480, id: 'playground'});
-            PlayGround.canvas = canvas;
+        var canvas = this.canvas;
 
-            PersonActions.init();
-            ProjectilesActions.init();
-            PersonTracker.init();
-            ZoneActions.init();
-            Weapons.init();
-            LifeAndArmor.init();
-            Chat.init();
-            KeyboardSetup.init();
-            GameStats.init();
-            Score.init();
-            ScoreOverview.init();
-            TeamControl.init();
+        BloodActions.playGround = this;
+        GameStats.playGround = this;
+        KeyboardSetup.playGround = this;
+        KeyboardSetup.chat = this.chat;
+        PersonActions.playGround = this;
+        PersonTracker.playGround = this;
+        ProjectilesActions.playGround = this;
+        Score.playGround = this;
+        ScoreOverview.playGround = this;
+        Weapons.playGround = this;
+        ZoneActions.playGround = this;
+        TeamControl.playGround = this;
 
-            setInterval(function () {
-                if (PlayGround.gameStarted) {
-                    if (!PlayGround.musicStarted) {
-                        PlayGround.musicStarted = true;
-                        /*SoundUtils.music([
-                         "sound/music/04.ogg",
-                         "sound/music/05.ogg"
-                         ]);*/
-                    }
-                    var now = (new Date()).getTime();
-                    for (var key = PlayGround.instantBullets.length - 1; key >= 0; key--) {
-                        var bullet = PlayGround.instantBullets[key];
-                        if (bullet.created < now - bullet.lifeTime) {
-                            PlayGround.instantBullets.splice(key, 1);
-                        }
-                    }
-                    for (var i = PlayGround.blood.length - 1; i >= 0; i--) {
-                        if (PlayGround.blood[i].time < now) {
-                            PlayGround.blood.splice(i, 1);
-                        }
-                    }
+        PersonActions.init();
+        ProjectilesActions.init();
+        PersonTracker.init();
+        ZoneActions.init();
+        Weapons.init();
+        LifeAndArmor.init();
+        KeyboardSetup.init();
+        GameStats.init();
+        Score.init();
+        ScoreOverview.init();
+        TeamControl.init();
 
+
+        var me = this;
+        setInterval(function () {
+            if (me.gameStarted) {
+                if (!me.musicStarted) {
+                    me.musicStarted = true;
+                    /*SoundUtils.music([
+                     "sound/music/04.ogg",
+                     "sound/music/05.ogg"
+                     ]);*/
                 }
-            }, 20);
-
-            var openKeyboard = Dom.el('a', {'href': "#", 'class': 'icon-keyboard'});
-            openKeyboard.onclick = function (e) {
-                e.preventDefault();
-                KeyboardSetup.show()
-            };
-
-            PlayGround.container = Dom.el(
-                'div',
-                {'class': 'playground'},
-                [
-                    openKeyboard, Weapons.container, Chat.container, LifeAndArmor.container, KeyboardSetup.container,
-                    Score.container, GameStats.container, ScoreOverview.container, TeamControl.container, canvas
-                ]
-            );
-
-            PlayGround.nextGameTick = (new Date).getTime();
-            PlayGround.skipTicks = 1000 / PlayGround.fps;
-
-            PlayGround.entities = {};
-            if (!canvas.getContext) {
-                alert('Error: 2d canvas not supported by this browser.');
-                return;
-            }
-
-            PlayGround.rect = canvas.getBoundingClientRect();
-            PlayGround.context = canvas.getContext('2d');
-            var CGraphics = Engine.require('CGraphics');
-            CGraphics.context = PlayGround.context;
-            canvas.addEventListener('mousedown', PersonActions.startFire);
-            canvas.addEventListener('mouseup', PersonActions.stopFire);
-            var background = localStorage.getItem('background');
-            canvas.style.backgroundImage = background ? background : 'url(images/map/background/1.png)';
-            window.addEventListener('keydown', PersonActions.onKeyDown, false);
-            window.addEventListener('keydown', Weapons.changeWeapon, false);
-            window.addEventListener('keyup', PersonActions.stopMovement, false);
-            window.addEventListener('mousemove', PersonActions.updateMouseDirection);
-            window.addEventListener('resize', function () {
-                PlayGround.updateCanvas(PlayGround.map)
-            });
-            window.addEventListener('focus', function () {
-                if (PlayGround.newPlayerInterval !== null) {
-                    clearInterval(PlayGround.newPlayerInterval);
-                    PlayGround.newPlayerInterval = null;
-                }
-                PlayGround.windowInactive = false;
-                window.document.getElementsByTagName('title')[0].innerHTML = 'Kill Them All'
-            });
-            window.addEventListener('blur', function () {
-                PlayGround.windowInactive = true;
-            });
-        },
-        createGame: function (name, map) {
-            PlayGround.updateCanvas(map);
-            PlayGround.connect("create:" + map.id + ":" + encodeURIComponent(name) + ":" + encodeURIComponent(PlayGround.playerName))
-        },
-        writeMessage: function (message) {
-            PlayGround.socket.send("message:\n" + message);
-        },
-        joinGame: function (map, gameId) {
-            PlayGround.updateCanvas(map);
-            PlayGround.connect("join:" + gameId + ":" + encodeURIComponent(PlayGround.playerName))
-        },
-        updateCanvas: function (map) {
-            PlayGround.map = map;
-            var canvas = PlayGround.canvas;
-            canvas.style.width = map.x + 'px';
-            canvas.style.height = map.y + 'px';
-            canvas.width = map.x;
-            canvas.height = map.y;
-            var ScreenUtils = Engine.require('ScreenUtils');
-            var win = ScreenUtils.window();
-            if (map.x < win.width) {
-                canvas.style.marginLeft = 'auto';
-                canvas.style.marginRight = 'auto';
-                PersonTracker.trackX = false;
-            } else {
-                canvas.style.marginLeft = null;
-                canvas.style.marginRight = null;
-                PersonTracker.trackX = true;
-            }
-            if (map.y < win.height) {
-                canvas.style.marginTop = (win.height - map.y) / 2 + 'px';
-                PersonTracker.trackY = false;
-            } else {
-                canvas.style.marginTop = null;
-                PersonTracker.trackY = true;
-            }
-
-            if (PlayGround.owner && PlayGround.owner.id) {
-                PlayGround.trackPerson();
-            } else {
-                Dom.removeClass(document.body, 'no-overflow');
-            }
-            TeamControl.updateTeamHolder();
-            PlayGround.canvasOffset = Dom.calculateOffset(canvas);
-        },
-        trackPerson: function () {
-            if (PersonTracker.trackX || PersonTracker.trackY) {
-                Dom.addClass(document.body, 'no-overflow');
-                PersonTracker.start();
-            } else {
-                Dom.removeClass(document.body, 'no-overflow');
-                PersonTracker.stop();
-            }
-        },
-        connect: function (onConnectMessage) {
-            PlayGround.gameStarted = true;
-            PlayGround.socket = WebSocketUtils.getSocket(
-                'commandos',
-                function onOpen() {
-                    PlayGround.socket.send(onConnectMessage);
-                    PlayGround.startGameLoop();
-                    PlayGround.gameStarted = true;
-                    setTimeout(function () {
-                        if (PersonActions.noPassiveReload) {
-                            PersonActions.updatePassiveReload(true);
-                        }
-                    }, 2000)
-                },
-                function onMessage(message) {
-                    var data = eval('(' + message.data + ')');
-                    switch (data.type) {
-                        case 'update':
-                            PlayGround.onUpdate(data);
-                            break;
-                        case 'leave':
-                            PlayGround.removePerson(data.id);
-                            break;
-                        case 'stats':
-                            if (!PlayGround.statsShown) {
-                                TeamControl.readyCheckbox.checked = false;
-                                PlayGround.statsShown = true;
-                                PlayGround.onStats(data);
-                            }
-                            break;
-                    }
-                },
-                function onStop() {
-                    PlayGround.stopGameLoop();
-                    PlayGround.gameStarted = false;
-                },
-                function onError() {
-                    alert("Error! Please describe how it happen to developer." + JSON.stringify(arguments));
-                    PlayGround.gameStarted = false;
-                }
-            )
-        },
-        onStats: function (data) {
-            PlayGround.gameStarted = false;
-            PersonTracker.stop();
-            GameStats.show();
-            TeamControl.show();
-            GameStats.update(data.stats, parseInt(data.team1Score), parseInt(data.team2Score));
-        },
-        decryptOwner: function (owner) {
-            var data = owner.owner.split(":");
-            return {
-                id: data[0],
-                life: data[1],
-                armor: data[2],
-                gun: data[3],
-                guns: owner.guns
-            };
-        },
-        onUpdate: function (packet) {
-            if (packet.map) {
-                PlayGround.updateCanvas(packet.map)
-            }
-            if (packet.started == 1 && (TeamControl.isShown || !PlayGround.readyToPlay)) {
-                TeamControl.hide();
-                PlayGround.readyToPlay = true;
-            } else if (!packet.started && (!TeamControl.isShown)) {
-                PlayGround.readyToPlay = false;
-                TeamControl.show();
-            }
-            if (packet.owner !== null) {
-                var oldOwnerId = PlayGround.owner.id;
-                PlayGround.owner = PlayGround.decryptOwner(packet.owner);
-                if (PlayGround.owner.id != oldOwnerId) {
-                    PlayGround.updateCanvas(PlayGround.map);
-                }
-            }
-            if (packet.score) {
-                ScoreOverview.updateTeamScore(packet.score);
-            }
-            Weapons.update(PlayGround.owner);
-            LifeAndArmor.update(PlayGround.owner.life, PlayGround.owner.armor);
-            Score.update(PlayGround.owner, packet.time);
-            for (var m = 0; m < packet.messages.length; m++) {
-                var message = packet.messages[m];
-                var mId = parseInt(message.substring(0, message.indexOf(":")));
-                var subject = message.substring(message.indexOf(':') + 1);
-                Chat.update(mId, subject);
-            }
-            for (var j = 0; j < PlayGround.map.zones.length; j++) {
-                var zone = PlayGround.map.zones[j];
-                zone.available = false;
-                for (var i = 0; i < packet.items.length; i++) {
-                    var item = packet.items[i];
-                    if (zone.id === item) {
-                        zone.available = true;
-                        break;
+                var now = (new Date()).getTime();
+                for (var key = me.instantBullets.length - 1; key >= 0; key--) {
+                    var bullet = me.instantBullets[key];
+                    if (bullet.created < now - bullet.lifeTime) {
+                        me.instantBullets.splice(key, 1);
                     }
                 }
-            }
-            PlayGround.tempZones = [];
-            if (packet.tempZones && packet.tempZones.length) {
-                for (var z = 0; z < packet.tempZones.length; z++) {
-                    var tempZone = ZoneActions.decode(packet.tempZones[z]);
-                    tempZone.available = true;
-                    PlayGround.tempZones.push(tempZone);
-                }
-            }
-            var personIds = [];
-            for (var p = 0; p < packet.persons.length; p++) {
-                personIds.push(PersonActions.mapPersonFromResponse(packet.persons[p]));
-            }
-            for (var id in PlayGround.entities) {
-                if (PlayGround.entities.hasOwnProperty(id) && personIds.indexOf(parseInt(id)) === -1) {
-                    delete PlayGround.entities[id];
-                }
-            }
-
-            BloodActions.prepareBlood(packet.blood);
-            PlayGround.projectiles = [];
-            ProjectilesActions.decode(packet.projectiles);
-        },
-        addPerson: function (id) {
-            PlayGround.entities[id] = new Person(id)
-        },
-        removePerson: function (id) {
-            delete PlayGround.entities[id];
-        },
-        startGameLoop: function () {
-            if (window.webkitRequestAnimationFrame) {
-                PlayGround.nextFrame = function () {
-                    webkitRequestAnimationFrame(PlayGround.run);
-                };
-            } else if (window.mozRequestAnimationFrame) {
-                PlayGround.nextFrame = function () {
-                    mozRequestAnimationFrame(PlayGround.run);
-                };
-            } else {
-                PlayGround.interval = setInterval(PlayGround.run, 1000 / PlayGround.fps);
-            }
-            if (PlayGround.nextFrame != null) {
-                PlayGround.nextFrame();
-            }
-        },
-        run: function () {
-            while ((new Date).getTime() > PlayGround.nextGameTick) {
-                PlayGround.nextGameTick += PlayGround.skipTicks;
-            }
-            PlayGround.draw();
-            if (PlayGround.nextFrame != null) {
-                PlayGround.nextFrame();
-            }
-        },
-
-        draw: function () {
-            PlayGround.context.clearRect(0, 0, PlayGround.map.x, PlayGround.map.y);
-
-            if (PlayGround.blood && PlayGround.blood.length) {
-                for (var bloodId = 0; bloodId < PlayGround.blood.length; bloodId++) {
-                    BloodActions.drawBlood(PlayGround.blood[bloodId]);
-                }
-            }
-            var zones = PlayGround.map.zones;
-            if (zones != null) {
-
-                for (var zoneId in zones) {
-                    if(zones.hasOwnProperty(zoneId)) {
-                        ZoneActions.drawZone(zones[zoneId]);
+                for (var i = me.blood.length - 1; i >= 0; i--) {
+                    if (me.blood[i].time < now) {
+                        me.blood.splice(i, 1);
                     }
                 }
+
             }
-            if (PlayGround.tempZones && PlayGround.tempZones.length) {
-                for (var tempZoneId = 0; tempZoneId < PlayGround.tempZones.length; tempZoneId++) {
-                    ZoneActions.drawZone(PlayGround.tempZones[tempZoneId]);
-                }
+        }, 20);
+
+        var openKeyboard = Dom.el('a', {'href': "#", 'class': 'icon-keyboard'});
+        openKeyboard.onclick = function (e) {
+            e.preventDefault();
+            KeyboardSetup.show()
+        };
+
+        this.container = Dom.el(
+            'div',
+            {'class': 'playground'},
+            [
+                openKeyboard, Weapons.container, this.chat.container, LifeAndArmor.container, KeyboardSetup.container,
+                Score.container, GameStats.container, ScoreOverview.container, TeamControl.container, canvas
+            ]
+        );
+
+        this.nextGameTick = (new Date).getTime();
+        this.skipTicks = 1000 / me.fps;
+
+        if (!canvas.getContext) {
+            alert('Error: 2d canvas not supported by this browser.');
+            return;
+        }
+
+        this.rect = canvas.getBoundingClientRect();
+        this.context = canvas.getContext('2d');
+        CGraphics.context = this.context;
+        canvas.addEventListener('mousedown', function(e){PersonActions.startFire(e)});
+        canvas.addEventListener('mouseup', function(e){PersonActions.stopFire(e)});
+        var background = localStorage.getItem('background');
+        canvas.style.backgroundImage = background ? background : 'url(images/map/background/1.png)';
+        window.addEventListener('keydown', function(e){PersonActions.onKeyDown(e)}, false);
+        window.addEventListener('keydown', function(e){Weapons.changeWeapon(e)}, false);
+        window.addEventListener('keyup', function(e){PersonActions.stopMovement(e)}, false);
+        window.addEventListener('mousemove', function(e){PersonActions.updateMouseDirection(e)});
+        window.addEventListener('resize', function () {
+            me.updateCanvas(me.map)
+        });
+        window.addEventListener('focus', function () {
+            if (me.newPlayerInterval !== null) {
+                clearInterval(me.newPlayerInterval || 0);
+                me.newPlayerInterval = null;
             }
-            for (var id in PlayGround.entities) {
-                if(PlayGround.entities.hasOwnProperty(id)) {
-                    PersonActions.drawPerson(PlayGround.entities[id]);
-                }
-            }
-            var fire = {isFirePlayed: false};
-            if (PlayGround.projectiles != null) {
-                for (var i = 0; i < PlayGround.projectiles.length; i++) {
-                    ProjectilesActions.draw(PlayGround.projectiles[i], fire);
-                }
-            }
-            for (var iKey = 0; iKey < PlayGround.instantBullets.length; iKey++) {
-                ProjectilesActions.draw(PlayGround.instantBullets[iKey], fire);
-            }
-        },
-        stopGameLoop: function () {
-            PlayGround.nextFrame = null;
+            me.windowInactive = false;
+            window.document.getElementsByTagName('title')[0].innerHTML = 'Kill Them All'
+        });
+        window.addEventListener('blur', function () {
+            me.windowInactive = true;
+        });
+    };
+    PlayGround.prototype.createGame = function (name, map) {
+        this.updateCanvas(map);
+        this.connect("create:" + map.id + ":" + encodeURIComponent(name) + ":" + encodeURIComponent(this.playerName))
+    };
+    PlayGround.prototype.writeMessage = function (message) {
+        this.socket.send("message:\n" + message);
+    };
+    PlayGround.prototype.joinGame = function (map, gameId) {
+        this.updateCanvas(map);
+        this.connect("join:" + gameId + ":" + encodeURIComponent(this.playerName))
+    };
+    PlayGround.prototype.updateCanvas = function (map) {
+        this.map = map;
+        var canvas = this.canvas;
+        canvas.style.width = map.x + 'px';
+        canvas.style.height = map.y + 'px';
+        canvas.width = map.x;
+        canvas.height = map.y;
+        var ScreenUtils = Engine.require('ScreenUtils');
+        var win = ScreenUtils.window();
+        if (map.x < win.width) {
+            canvas.style.marginLeft = 'auto';
+            canvas.style.marginRight = 'auto';
+            PersonTracker.trackX = false;
+        } else {
+            canvas.style.marginLeft = null;
+            canvas.style.marginRight = null;
+            PersonTracker.trackX = true;
+        }
+        if (map.y < win.height) {
+            canvas.style.marginTop = (win.height - map.y) / 2 + 'px';
+            PersonTracker.trackY = false;
+        } else {
+            canvas.style.marginTop = null;
+            PersonTracker.trackY = true;
+        }
+
+        if (this.owner && this.owner.id) {
+            this.trackPerson();
+        } else {
             Dom.removeClass(document.body, 'no-overflow');
-            if (PlayGround.interval != null) {
-                clearInterval(PlayGround.interval || 0);
-            }
-        },
-
-        updatePersonViewAngle: function (angle) {
-            if (PlayGround.viewAngleDirection !== angle) {
-                PlayGround.viewAngleDirection = angle;
-                PlayGround.socket.send('angle:' + angle);
-            }
+        }
+        TeamControl.updateTeamHolder();
+        this.canvasOffset = Dom.calculateOffset(canvas);
+    };
+    PlayGround.prototype.trackPerson = function () {
+        if (PersonTracker.trackX || PersonTracker.trackY) {
+            Dom.addClass(document.body, 'no-overflow');
+            PersonTracker.start();
+        } else {
+            Dom.removeClass(document.body, 'no-overflow');
+            PersonTracker.stop();
         }
     };
+    PlayGround.prototype.connect = function (onConnectMessage) {
+        this.gameStarted = true;
+        var me = this;
+        this.socket = WebSocketUtils.getSocket(
+            'commandos',
+            function onOpen() {
+                me.socket.send(onConnectMessage);
+                me.startGameLoop();
+                me.gameStarted = true;
+                setTimeout(function () {
+                    if (PersonActions.noPassiveReload) {
+                        PersonActions.updatePassiveReload(true);
+                    }
+                }, 2000)
+            },
+            function onMessage(message) {
+                var data = eval('(' + message.data + ')');
+                switch (data.type) {
+                    case 'update':
+                        me.onUpdate(data);
+                        break;
+                    case 'leave':
+                        me.removePerson(data.id);
+                        break;
+                    case 'stats':
+                        if (!me.statsShown) {
+                            TeamControl.readyCheckbox.checked = false;
+                            me.statsShown = true;
+                            me.onStats(data);
+                        }
+                        break;
+                }
+            },
+            function onStop() {
+                me.stopGameLoop();
+                me.gameStarted = false;
+            },
+            function onError() {
+                alert("Error! Please describe how it happen to developer." + JSON.stringify(arguments));
+                me.gameStarted = false;
+            }
+        )
+    };
+    PlayGround.prototype.onStats = function (data) {
+        this.gameStarted = false;
+        PersonTracker.stop();
+        GameStats.show();
+        TeamControl.show();
+        GameStats.update(data.stats, parseInt(data.team1Score), parseInt(data.team2Score));
+    };
+    PlayGround.prototype.decryptOwner = function (owner) {
+        var data = owner.owner.split(":");
+        return {
+            id: data[0],
+            life: data[1],
+            armor: data[2],
+            gun: data[3],
+            guns: owner.guns
+        };
+    };
+    PlayGround.prototype.onUpdate = function (packet) {
+        if (packet.map) {
+            this.updateCanvas(packet.map)
+        }
+        if (packet.started == 1 && (TeamControl.isShown || !this.readyToPlay)) {
+            TeamControl.hide();
+            this.readyToPlay = true;
+        } else if (!packet.started && (!TeamControl.isShown)) {
+            this.readyToPlay = false;
+            TeamControl.show();
+        }
+        if (packet.owner !== null) {
+            var oldOwnerId = this.owner.id;
+            this.owner = this.decryptOwner(packet.owner);
+            if (this.owner.id != oldOwnerId) {
+                this.updateCanvas(this.map);
+            }
+        }
+        var owner = this.owner;
+        if (packet.score) {
+            ScoreOverview.updateTeamScore(packet.score);
+        }
+        Weapons.update(owner);
+        LifeAndArmor.update(owner.life, owner.armor);
+        Score.update(owner, packet.time);
+        for (var m = 0; m < packet.messages.length; m++) {
+            var message = packet.messages[m];
+            var mId = parseInt(message.substring(0, message.indexOf(":")));
+            var subject = message.substring(message.indexOf(':') + 1);
+            this.chat.update(mId, subject);
+        }
+        var zones = this.map.zones;
+        for (var j = 0; j < zones.length; j++) {
+            var zone = zones[j];
+            zone.available = false;
+            for (var i = 0; i < packet.items.length; i++) {
+                var item = packet.items[i];
+                if (zone.id === item) {
+                    zone.available = true;
+                    break;
+                }
+            }
+        }
+        this.tempZones = [];
+        if (packet.tempZones && packet.tempZones.length) {
+            for (var z = 0; z < packet.tempZones.length; z++) {
+                var tempZone = ZoneActions.decode(packet.tempZones[z]);
+                tempZone.available = true;
+                this.tempZones.push(tempZone);
+            }
+        }
+        var personIds = [];
+        for (var p = 0; p < packet.persons.length; p++) {
+            personIds.push(PersonActions.mapPersonFromResponse(packet.persons[p]));
+        }
+        for (var id in this.entities) {
+            if (this.entities.hasOwnProperty(id) && personIds.indexOf(parseInt(id)) === -1) {
+                delete this.entities[id];
+            }
+        }
+
+        BloodActions.prepareBlood(packet.blood);
+        this.projectiles = [];
+        ProjectilesActions.decode(packet.projectiles);
+    };
+    PlayGround.prototype.addPerson = function (id) {
+        this.entities[id] = new Person(id)
+    };
+    PlayGround.prototype.removePerson = function (id) {
+        delete this.entities[id];
+    };
+    PlayGround.prototype.startGameLoop = function () {
+        var me = this;
+        if (window.webkitRequestAnimationFrame) {
+            this.nextFrame = function () {
+                webkitRequestAnimationFrame(function () {
+                    me.run()
+                });
+            };
+        } else if (window.mozRequestAnimationFrame) {
+            this.nextFrame = function () {
+                mozRequestAnimationFrame(function () {
+                    me.run()
+                });
+            };
+        } else {
+            this.interval = setInterval(function () {
+                me.run()
+            }, 1000 / this.fps);
+        }
+        if (this.nextFrame != null) {
+            this.nextFrame();
+        }
+    };
+    PlayGround.prototype.run = function () {
+        while ((new Date).getTime() > this.nextGameTick) {
+            this.nextGameTick += this.skipTicks;
+        }
+        this.draw();
+        if (this.nextFrame != null) {
+            this.nextFrame();
+        }
+    };
+
+    PlayGround.prototype.draw = function () {
+        this.context.clearRect(0, 0, this.map.x, this.map.y);
+
+        var blood = this.blood;
+        if (blood && blood.length) {
+            for (var bloodId = 0; bloodId < blood.length; bloodId++) {
+                BloodActions.drawBlood(blood[bloodId]);
+            }
+        }
+        var zones = this.map.zones;
+        if (zones != null) {
+
+            for (var zoneId in zones) {
+                if (zones.hasOwnProperty(zoneId)) {
+                    ZoneActions.drawZone(zones[zoneId]);
+                }
+            }
+        }
+        if (this.tempZones && this.tempZones.length) {
+            for (var tempZoneId = 0; tempZoneId < this.tempZones.length; tempZoneId++) {
+                ZoneActions.drawZone(this.tempZones[tempZoneId]);
+            }
+        }
+        for (var id in this.entities) {
+            if (this.entities.hasOwnProperty(id)) {
+                PersonActions.drawPerson(this.entities[id]);
+            }
+        }
+        var fire = {isFirePlayed: false};
+        if (this.projectiles != null) {
+            for (var i = 0; i < this.projectiles.length; i++) {
+                ProjectilesActions.draw(this.projectiles[i], fire);
+            }
+        }
+        for (var iKey = 0; iKey < this.instantBullets.length; iKey++) {
+            ProjectilesActions.draw(this.instantBullets[iKey], fire);
+        }
+    };
+    PlayGround.prototype.stopGameLoop = function () {
+        this.nextFrame = null;
+        Dom.removeClass(document.body, 'no-overflow');
+        if (this.interval != null) {
+            clearInterval(this.interval || 0);
+        }
+    };
+
+    PlayGround.prototype.updatePersonViewAngle = function (angle) {
+        if (this.viewAngleDirection !== angle) {
+            this.viewAngleDirection = angle;
+            this.socket.send('angle:' + angle);
+        }
+    };
+
     return PlayGround;
 })());

@@ -2,35 +2,35 @@
 <html>
 <head>
     <script>
-        if(typeof Promise === 'undefined') {
+        if (typeof Promise === 'undefined') {
             document.write(atob("PHNjcmlwdCBzcmM9ImpzL3BvbHlmaWxsL1Byb21pc2UuanMiPjwvc2NyaXB0Pg=="));
         }
     </script>
 
     <script src="js/Engine.js"></script>
 
-    <script src="js/utils/CGraphics.js"></script>
-    <script src="js/utils/KeyboardUtils.js"></script>
-    <script src="js/utils/ScreenUtils.js"></script>
-    <script src="js/utils/Ajax.js"></script>
-    <script src="js/utils/Rest.js"></script>
-    <script src="js/utils/Dom.js"></script>
-    <script src="js/utils/DomComponents.js"></script>
-    <script src="js/utils/SoundUtils.js"></script>
-    <script src="js/utils/StringUtils.js"></script>
-    <script src="js/utils/WebSocketUtils.js"></script>
-    <script src="js/components/Pagination.js"></script>
-    <script src="js/components/Tabs.js"></script>
+    <script src="js/utils/CGraphics.js"></script><!-- + -->
+    <script src="js/utils/KeyboardUtils.js"></script><!-- + -->
+    <script src="js/utils/ScreenUtils.js"></script><!-- + -->
+    <script src="js/utils/Ajax.js"></script><!-- + -->
+    <script src="js/utils/Rest.js"></script><!-- + -->
+    <script src="js/utils/Dom.js"></script><!-- + -->
+    <script src="js/utils/DomComponents.js"></script><!-- + -->
+    <script src="js/utils/SoundUtils.js"></script><!-- + -->
+    <script src="js/utils/StringUtils.js"></script><!-- + -->
+    <script src="js/utils/WebSocketUtils.js"></script><!-- + -->
+    <script src="js/components/Pagination.js"></script><!-- + -->
+    <script src="js/components/Tabs.js"></script><!-- + -->
 
-    <script src="js/applications/Dispatcher.js"></script>
+    <script src="js/applications/Dispatcher.js"></script><!-- + -->
 
-    <script src="js/applications/playground/Controls.js"></script>
-    <script src="js/applications/Greetings.js"></script>
+    <script src="js/applications/playground/Controls.js"></script><!-- + -->
+    <script src="js/applications/Greetings.js"></script><!-- + -->
 
-    <script src="js/applications/map-editor/CustomTiles.js"></script>
+    <script src="js/applications/map-editor/CustomTiles.js"></script><!-- + -->
     <script src="js/applications/MapEditor.js"></script>
 
-    <script src="js/applications/playground/Chat.js"></script>
+    <script src="js/applications/playground/Chat.js"></script><!-- + -->
 
     <script src="js/applications/rooms-list/RoomsChat.js"></script>
     <script src="js/applications/RoomsList.js"></script>
@@ -54,31 +54,48 @@
 
     <title>Kill Them All</title>
     <meta charset="utf-8"/>
-    <link href="css/style.css"  rel="stylesheet"/>
+    <link href="css/style.css" rel="stylesheet"/>
 </head>
 <body>
-<div id="application">
-</div>
-<div id="appstore">
-</div>
+<div id="application"></div>
+<div id="appstore"></div>
 <script type="application/javascript">
+    (function () {
+         Engine.require('Ajax').headers = {
+         Accept: "application/json,text/plain",
+         'Content-Type': "application/json"
+         };
 
-    Engine.require('Ajax').headers = {
-        Accept: "application/json,text/plain",
-        'Content-Type': "application/json"
-    };
+         Engine.require('Rest').host = document.location.protocol + '//' + document.location.host + '/server/';
+         var Dispatcher = Engine.require('Dispatcher');
+         var dispatcher = new Dispatcher('appstore', 'application');
 
-    Engine.require('Rest').host = document.location.protocol + '//' + document.location.host + '/server/';
-    var Dispatcher = Engine.require('Dispatcher');
-    Dispatcher.init();
+         var MapEditor = Engine.require('MapEditor');
+         MapEditor.dispatcher = dispatcher;
 
-    Dispatcher.initApplication(Engine.require('Greetings'), 'Greetings');
-    Dispatcher.initApplication(Engine.require('MapList'), 'MapList');
-    Dispatcher.initApplication(Engine.require('RoomsList'), 'RoomsList');
-    Dispatcher.initApplication(Engine.require('PlayGround'), 'PlayGround');
-    Dispatcher.initApplication(Engine.require('MapEditor'), 'MapEditor');
-    Dispatcher.placeApplication('Greetings')
+         var RoomList = Engine.require('RoomsList');
+         RoomList.dispatcher = dispatcher;
 
+         var MapList = Engine.require('MapList');
+         MapList.dispatcher = dispatcher;
+
+         var PlayGround = Engine.require('PlayGround');
+         var playGround = new PlayGround();
+         MapEditor.playGround = playGround;
+         MapList.playGround = playGround;
+         RoomList.playGround = playGround;
+         RoomList.chat = playGround.chat;
+
+         var Greetings = Engine.require('Greetings');
+         var greetings = new Greetings(dispatcher, playGround);
+
+         dispatcher.initApplication(greetings, 'Greetings');
+         dispatcher.initApplication(MapList, 'MapList');
+         dispatcher.initApplication(RoomList, 'RoomsList');
+         dispatcher.initApplication(playGround, 'PlayGround');
+         dispatcher.initApplication(MapEditor, 'MapEditor');
+         dispatcher.placeApplication('Greetings')
+    })();
 </script>
 </body>
 </html>

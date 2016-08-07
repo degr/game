@@ -5,7 +5,12 @@ Engine.define('ZoneActions', (function () {
     var ZoneActions = {
         images: {},
         wallPattern: null,
+        /**
+         * @var PlayGround
+         */
+        playGround: null,
         init: function () {
+            var me = this;
             ZoneActions.images.armor = new Image();
             ZoneActions.images.armor.src = 'images/map/armor.png';
             ZoneActions.images.assault = new Image();
@@ -30,8 +35,8 @@ Engine.define('ZoneActions', (function () {
             ZoneActions.images.pistol.src = 'images/map/pistol.png';
             ZoneActions.images.wall = new Image();
             ZoneActions.images.wall.onload = function () {
-                var PlayGround = Engine.require('PlayGround');
-                ZoneActions.wallPattern = PlayGround.context.createPattern(ZoneActions.images.wall, 'repeat'); // Create a pattern with this image, and set it to "repeat".
+                var playGround = me.playGround;
+                ZoneActions.wallPattern = playGround.context.createPattern(me.images.wall, 'repeat');
             };
             ZoneActions.images.wall.src = 'images/map/wall.png';
             ZoneActions.images.flag_blue = new Image();
@@ -41,8 +46,8 @@ Engine.define('ZoneActions', (function () {
 
         },
         drawZone: function (zone) {
-            var PlayGround = Engine.require('PlayGround');
-            var context = PlayGround.context;
+            var playGround = ZoneActions.playGround;
+            var context = playGround.context;
             context.beginPath();
             switch (zone.type) {
                 case 'respawn':
@@ -94,7 +99,7 @@ Engine.define('ZoneActions', (function () {
                 case 'tiled':
                     if (!ZoneActions.images[zone.tileId]) {
                         var image = new Image();
-                        image.src = PlayGround.uploadPath + zone.customSprite;
+                        image.src = playGround.uploadPath + zone.customSprite;
                         ZoneActions.images[zone.tileId] = image;
                     }
                     try {
@@ -128,14 +133,14 @@ Engine.define('ZoneActions', (function () {
             }
         },
         drawImage: function (zone) {
-            var PlayGround = Engine.require('PlayGround');
-            var context = PlayGround.context;
+            var playGround = ZoneActions.playGround;
+            var context = playGround.context;
             if (zone.available) {
                 var size = 40;
                 var shift = (size - 40) / 2;
                 context.drawImage(ZoneActions.images[zone.type], zone.x - shift, zone.y - shift, size, size);
             }
-            if (PlayGround.drawBounds) {
+            if (playGround.drawBounds) {
                 context.fillStyle = 'rgba(138, 221, 255, 0.55)';
                 context.fillRect(zone.x, zone.y, zone.width, zone.height);
             }

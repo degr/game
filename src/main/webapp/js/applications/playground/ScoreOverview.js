@@ -6,6 +6,10 @@ Engine.define('ScoreOverview', (function () {
         container: null,
         team1: 0,
         team2: 0,
+        /**
+         * @var PlayGround
+         */
+        playGround: null,
         init: function () {
             window.addEventListener('keydown', ScoreOverview.onShow, false);
             window.addEventListener('keyup', ScoreOverview.onHide, false);
@@ -40,10 +44,10 @@ Engine.define('ScoreOverview', (function () {
         buildScore: function () {
             var even = false;
             var persons = [];
-            var PlayGround = Engine.require('PlayGround');
-            for (var key in PlayGround.entities) {
-                if(PlayGround.entities.hasOwnProperty(key)) {
-                    persons.push(PlayGround.entities[key]);
+            var entities = ScoreOverview.playGround.entities;
+            for (var key in entities) {
+                if(entities.hasOwnProperty(key)) {
+                    persons.push(entities[key]);
                 }
             }
             persons = persons.sort(function (v1, v2) {
@@ -60,9 +64,9 @@ Engine.define('ScoreOverview', (function () {
             return Dom.el('table', null, data);
         },
         buildRow: function (person, even) {
-            var PlayGround = Engine.require('PlayGround');
-            var name = PlayGround.owner.id == person.id ? Dom.el('span', 'owner', person.name) : person.name;
-            var score = PlayGround.owner.id == person.id ? Dom.el('span', 'owner', person.score) : person.score;
+            var owner = ScoreOverview.playGround.owner;
+            var name = owner.id == person.id ? Dom.el('span', 'owner', person.name) : person.name;
+            var score = owner.id == person.id ? Dom.el('span', 'owner', person.score) : person.score;
             return Dom.el('tr', even ? 'even' : 'odd', [
                 Dom.el('td', null, name),
                 Dom.el('td', null, score)

@@ -130,6 +130,7 @@ public class PersonService {
         person.setOpponentFlag(false);
         person.setSelfFlag(false);
         person.setReload(false);
+        person.setArmor(0);
         List<Stoppable> listeners = person.getListeners();
         for(int i = listeners.size() - 1; i >= 0; i--) {
             Stoppable stoppable = listeners.get(i);

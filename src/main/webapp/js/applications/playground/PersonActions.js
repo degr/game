@@ -2,7 +2,6 @@ Engine.define('PersonActions', (function () {
 
     var SoundUtils = Engine.require('SoundUtils');
     var ZoneActions = Engine.require('ZoneActions');
-    var Chat = Engine.require('Chat');
     var Controls = Engine.require('Controls');
 
     var PersonActions = {
@@ -12,7 +11,11 @@ Engine.define('PersonActions', (function () {
         buttonRight: false,
         directionX: null,
         directionY: null,
-        noPassiveReload: false
+        noPassiveReload: false,
+        /**
+         * @var PlayGround
+         */
+        playGround: null
     };
     PersonActions.run = [];
     (function () {
@@ -24,11 +27,9 @@ Engine.define('PersonActions', (function () {
     })();
 
     PersonActions.updatePassiveReload = function (value) {
-
-        var PlayGround = Engine.require('PlayGround');
         localStorage.setItem('no_passive_reload', value);
         PersonActions.noPassiveReload = value;
-        PlayGround.socket.send('noPassiveReload:' + (value ? '1' : '0'));
+        PersonActions.playGround.socket.send('noPassiveReload:' + (value ? '1' : '0'));
     };
     PersonActions.init = function () {
         var noPassivereload = localStorage.getItem('no_passive_reload');
@@ -36,35 +37,31 @@ Engine.define('PersonActions', (function () {
     };
 
     PersonActions.setDirection = function (direction) {
-
-        var PlayGround = Engine.require('PlayGround');
-        PlayGround.socket.send("direction:" + direction);
+        PersonActions.playGround.socket.send("direction:" + direction);
     };
     PersonActions.doReload = function (e) {
-
-        var PlayGround = Engine.require('PlayGround');
         if (e) {
             e = e || window.event;
             e.preventDefault();
             e.stopPropagation();
         }
-        PlayGround.socket.send("reload");
+        PersonActions.playGround.socket.send("reload");
     };
     PersonActions.startFire = function (e) {
         if (e) {
             e = e || window.event;
             e.preventDefault();
         }
-        var PlayGround = Engine.require('PlayGround');
-        if (!PlayGround.owner.id)return;
-        if (Chat.active) {
-            Chat.active = false;
+        var playGround = PersonActions.playGround;
+        if (!playGround.owner.id)return;
+        if (this.playGround.chat.active) {
+            this.playGround.chat.active = false;
             document.activeElement.blur();
         } else {
             var gun = '';
-            var guns = PlayGround.owner.guns;
+            var guns = playGround.owner.guns;
             for (var i = 0; i < guns.length; i++) {
-                if (guns[i].indexOf(PlayGround.owner.gun + ":") === 0) {
+                if (guns[i].indexOf(playGround.owner.gun + ":") === 0) {
                     gun = guns[i];
                     break;
                 }
@@ -74,21 +71,19 @@ Engine.define('PersonActions', (function () {
                 SoundUtils.play('sound/no-ammo.mp3');
             }
             //prevent reload stacking
-            PlayGround.socket.send("fire:1");
+            playGround.socket.send("fire:1");
         }
     };
     PersonActions.stopFire = function (e) {
-        var PlayGround = Engine.require('PlayGround');
+        e = e || window.event;
         if (e) {
-            e = e || window.event;
             e.preventDefault();
         }
-        PlayGround.socket.send("fire:0");
+        PersonActions.playGround.socket.send("fire:0");
     };
     PersonActions.onKeyDown = function (e) {
-        var PlayGround = Engine.require('PlayGround');
         var KeyboardSetup = Engine.require('KeyboardSetup');
-        if (!PlayGround.gameStarted || Chat.active || KeyboardSetup.isActive)return;
+        if (!PersonActions.playGround.gameStarted || this.playGround.chat.active || KeyboardSetup.isActive)return;
         e = e || window.event;
         var code = e.keyCode;
         var thisEvent = false;
@@ -149,10 +144,9 @@ Engine.define('PersonActions', (function () {
         }
     };
     PersonActions.stopMovement = function (e) {
-        var PlayGround = Engine.require('PlayGround');
-        if (!PlayGround.gameStarted)return;
+        if (!PersonActions.playGround.gameStarted)return;
         var thisEvent = false;
-        if (Chat.active) {
+        if (this.playGround.chat.active) {
             PersonActions.buttonLeft = false;
             PersonActions.buttonTop = false;
             PersonActions.buttonRight = false;
@@ -187,8 +181,8 @@ Engine.define('PersonActions', (function () {
     };
 
     PersonActions.updateMouseDirectionByXy = function (x, y, person, offset) {
-        var PlayGround = Engine.require('PlayGround');
-        if (!PlayGround.gameStarted)return;
+        var playGround = PersonActions.playGround;
+        if (!playGround.gameStarted)return;
         var angle = Math.floor(PersonActions.angle(
                     person.x,
                     person.y,
@@ -199,24 +193,24 @@ Engine.define('PersonActions', (function () {
         if (angle < 0) {
             angle = 360 + angle;
         }
-        PlayGround.updatePersonViewAngle(angle);
+        playGround.updatePersonViewAngle(angle);
     };
 
     PersonActions.updateMouseDirection = function (e) {
-        var PlayGround = Engine.require('PlayGround');
+        var playGround = PersonActions.playGround;
         e = e || window.event;
         if ("undefined" == typeof e.clientX) {
             return;
         }
-        PlayGround.xMouse = e.clientX;
-        PlayGround.yMouse = e.clientY;
-        var person = PlayGround.entities[PlayGround.owner ? PlayGround.owner.id : null];
+        playGround.xMouse = e.clientX;
+        playGround.yMouse = e.clientY;
+        var person = playGround.entities[playGround.owner ? playGround.owner.id : null];
         if (person) {
             PersonActions.updateMouseDirectionByXy(
                 e.clientX,
                 e.clientY,
                 person,
-                PlayGround.canvasOffset
+                playGround.canvasOffset
             );
         }
     };
@@ -228,8 +222,8 @@ Engine.define('PersonActions', (function () {
         return theta;
     };
     PersonActions.drawPerson = function (person) {
-        var PlayGround = Engine.require('PlayGround');
-        var context = PlayGround.context;
+        var playGround = PersonActions.playGround;
+        var context = playGround.context;
         var x = person.x;
         var y = person.y;
         var angle = person.angle + 90;
@@ -262,15 +256,15 @@ Engine.define('PersonActions', (function () {
             person.recoil = person.recoil - 0.5;
         }
 
-        if (PlayGround.owner && PlayGround.owner.id && PlayGround.owner.id == person.id) {
-            if ((PlayGround.laserSight == 2 && person.gun != 'knife') || (PlayGround.laserSight == 1 && person.gun == 'sniper')) {
+        if (playGround.owner && playGround.owner.id && playGround.owner.id == person.id) {
+            if ((playGround.laserSight == 2 && person.gun != 'knife') || (playGround.laserSight == 1 && person.gun == 'sniper')) {
                 context.moveTo(0, 0);
                 context.strokeStyle = "rgba(0, 255, 24, 0.6)";
                 context.lineTo(500, 0);
                 context.stroke();
             }
 
-            if (PlayGround.highlightOwner) {
+            if (playGround.highlightOwner) {
                 var grdSize = 20;
                 var grd = context.createRadialGradient(0, 0, 3, 0, 0, grdSize);
                 grd.addColorStop(0, "#FEFF22");
@@ -324,7 +318,7 @@ Engine.define('PersonActions', (function () {
         context.strokeStyle = person.hexColor;
         context.translate(x, y);
         if (person.reload) {
-            context.drawImage(PersonActions.reload, +PlayGround.radius + 4, -PlayGround.radius);
+            context.drawImage(PersonActions.reload, +playGround.radius + 4, -playGround.radius);
         }
         var rotated = false;
         if (person.team > 0) {
@@ -353,8 +347,8 @@ Engine.define('PersonActions', (function () {
             context.rotate(angle * Math.PI / 180);
         }
 
-        if (PlayGround.drawBounds) {
-            context.arc(0, 0, PlayGround.radius, 0, 2 * Math.PI, false);
+        if (playGround.drawBounds) {
+            context.arc(0, 0, playGround.radius, 0, 2 * Math.PI, false);
         }
 
         context.stroke();
@@ -364,9 +358,9 @@ Engine.define('PersonActions', (function () {
         }
         var legRotate = Math.PI * 3 / 2;
         context.rotate(legRotate);
-        context.drawImage(PersonActions.run[runIndex], -PlayGround.radius - 4 + halfRecoil, -PlayGround.radius + 5 + halfRecoil, 30, 30);
+        context.drawImage(PersonActions.run[runIndex], -playGround.radius - 4 + halfRecoil, -playGround.radius + 5 + halfRecoil, 30, 30);
         context.rotate(-legRotate);
-        context.drawImage(person.image, -PlayGround.radius - 8 + halfRecoil, -PlayGround.radius - 3 + halfRecoil, 56, 56);
+        context.drawImage(person.image, -playGround.radius - 8 + halfRecoil, -playGround.radius - 3 + halfRecoil, 56, 56);
         context.restore();
         if (person.prevX != person.x || person.prevY != person.y) {
             person.runIndex = runIndex + 1;
@@ -375,7 +369,7 @@ Engine.define('PersonActions', (function () {
         person.prevX = person.x;
         person.prevY = person.y;
 
-        if (PlayGround.showNames) {
+        if (playGround.showNames) {
             context.textAlign = 'center';
             context.strokeText(person.name, x, y + 27);
         }
@@ -384,21 +378,21 @@ Engine.define('PersonActions', (function () {
             var flashYShift;
             switch (person.gun) {
                 case 'minigun':
-                    flashXShift = PlayGround.radius + 5;
+                    flashXShift = playGround.radius + 5;
                     flashYShift = -13;
                     break;
                 case 'sniper':
                 case 'assault':
-                    flashXShift = PlayGround.radius + 5;
+                    flashXShift = playGround.radius + 5;
                     flashYShift = -14;
                     break;
                 case 'shotgun':
-                    flashXShift = PlayGround.radius + 7;
+                    flashXShift = playGround.radius + 7;
                     flashYShift = -16;
                     break;
                 case 'pistol':
                 default:
-                    flashXShift = PlayGround.radius;
+                    flashXShift = playGround.radius;
                     flashYShift = -16;
             }
 
@@ -408,14 +402,14 @@ Engine.define('PersonActions', (function () {
     };
 
     PersonActions.mapPersonFromResponse = function (str) {
-        var PlayGround = Engine.require('PlayGround');
+        var playGround = PersonActions.playGround;
         var data = str.split(":");
         var id = parseInt(data[0]);
         var name = decodeURIComponent(data[1]);
-        if (!PlayGround.entities[id]) {
-            PlayGround.addPerson(id);
-            if (PlayGround.windowInactive && PlayGround.newPlayerInterval == null) {
-                PlayGround.newPlayerInterval = (function (name) {
+        if (!playGround.entities[id]) {
+            playGround.addPerson(id);
+            if (playGround.windowInactive && playGround.newPlayerInterval == null) {
+                playGround.newPlayerInterval = (function (name) {
                     var nSwitch = false;
                     var title = window.document.getElementsByTagName('title')[0];
                     return setInterval(function () {
@@ -425,7 +419,7 @@ Engine.define('PersonActions', (function () {
                 })(name);
             }
         }
-        var p = PlayGround.entities[id];
+        var p = playGround.entities[id];
         p.name = name;
         p.reload = data[2] == 1;
         p.gun = data[3];
@@ -439,12 +433,12 @@ Engine.define('PersonActions', (function () {
         p.status = PersonActions.getStatus(parseInt(data[11]));
 
 
-        if (PlayGround.owner.id == id) {
+        if (playGround.owner.id == id) {
             PersonActions.updateMouseDirectionByXy(
-                PlayGround.xMouse,
-                PlayGround.yMouse,
+                playGround.xMouse,
+                playGround.yMouse,
                 p,
-                PlayGround.canvasOffset
+                playGround.canvasOffset
             );
         }
         return p.id;
