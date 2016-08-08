@@ -10,7 +10,7 @@ Engine.define('PlayGround', (function () {
     var ProjectilesActions = Engine.require('ProjectilesActions');
     var PersonTracker = Engine.require('PersonTracker');
     var ZoneActions = Engine.require('ZoneActions');
-    var Weapons = Engine.require('Weapons');
+    var WeaponActions = Engine.require('WeaponActions');
     var LifeAndArmor = Engine.require('LifeAndArmor');
     var KeyboardSetup = Engine.require('KeyboardSetup');
     var GameStats = Engine.require('GameStats');
@@ -76,7 +76,7 @@ Engine.define('PlayGround', (function () {
         ProjectilesActions.playGround = this;
         Score.playGround = this;
         ScoreOverview.playGround = this;
-        Weapons.playGround = this;
+        WeaponActions.playGround = this;
         ZoneActions.playGround = this;
         TeamControl.playGround = this;
 
@@ -84,7 +84,7 @@ Engine.define('PlayGround', (function () {
         ProjectilesActions.init();
         PersonTracker.init();
         ZoneActions.init();
-        Weapons.init();
+        WeaponActions.init();
         LifeAndArmor.init();
         KeyboardSetup.init();
         GameStats.init();
@@ -129,7 +129,7 @@ Engine.define('PlayGround', (function () {
             'div',
             {'class': 'playground'},
             [
-                openKeyboard, Weapons.container, this.chat.container, LifeAndArmor.container, KeyboardSetup.container,
+                openKeyboard, WeaponActions.container, this.chat.container, LifeAndArmor.container, KeyboardSetup.container,
                 Score.container, GameStats.container, ScoreOverview.container, TeamControl.container, canvas
             ]
         );
@@ -150,7 +150,7 @@ Engine.define('PlayGround', (function () {
         var background = localStorage.getItem('background');
         canvas.style.backgroundImage = background ? background : 'url(images/map/background/1.png)';
         window.addEventListener('keydown', function(e){PersonActions.onKeyDown(e)}, false);
-        window.addEventListener('keydown', function(e){Weapons.changeWeapon(e)}, false);
+        window.addEventListener('keydown', function(e){WeaponActions.changeWeapon(e)}, false);
         window.addEventListener('keyup', function(e){PersonActions.stopMovement(e)}, false);
         window.addEventListener('mousemove', function(e){PersonActions.updateMouseDirection(e)});
         window.addEventListener('resize', function () {
@@ -304,7 +304,7 @@ Engine.define('PlayGround', (function () {
         if (packet.score) {
             ScoreOverview.updateTeamScore(packet.score);
         }
-        Weapons.update(owner);
+        WeaponActions.update(owner);
         LifeAndArmor.update(owner.life, owner.armor);
         Score.update(owner, packet.time);
         for (var m = 0; m < packet.messages.length; m++) {
