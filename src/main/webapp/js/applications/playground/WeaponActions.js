@@ -5,82 +5,11 @@ Engine.define('WeaponActions', (function () {
     var Weapons = Engine.require('Weapons');
     
     var WeaponActions = {
-        container: '',
-        rightSide: true,
-        updater: {},
         /**
          * @var PlayGround
          */
         playGround: null,
         weapons: Weapons.getInstance(),
-        init: function () {
-            WeaponActions.container = Dom.el('div', {'class': 'weapon-holder'});
-            WeaponActions.container.addEventListener('mouseover', function () {
-                if (WeaponActions.rightSide) {
-                    Dom.addClass(WeaponActions.container, 'left');
-                } else {
-                    Dom.removeClass(WeaponActions.container, 'left');
-                }
-                WeaponActions.rightSide = !WeaponActions.rightSide;
-            }, false);
-            for (var i in WeaponActions.weapons) {
-                if(WeaponActions.weapons.hasOwnProperty(i)) {
-                    WeaponActions.buildWeapon(WeaponActions.weapons[i]);
-                }
-            }
-        },
-        update: function (owner) {
-            if (!owner)return;
-            var weapons = WeaponActions.mapResponse(owner.guns, owner.gun);
-            for (var i in weapons) {
-                if(!weapons.hasOwnProperty(i))continue;
-                var weapon = weapons[i];
-                WeaponActions.updater[weapon.type](weapon);
-            }
-        },
-        mapResponse: function (guns, active) {
-            if (!guns)return;
-            var out = {};
-            for (var i = 0; i < guns.length; i++) {
-                var proto = guns[i].split(':');
-                out[proto[0]] = {type: proto[0], total: proto[1], current: proto[2], enable: true};
-            }
-            var weapons = WeaponActions.weapons;
-            for (var j in weapons) {
-                if(!weapons.hasOwnProperty(j))continue;
-                var inList = weapons[j];
-                if (!out[j]) {
-                    out[j] = inList;
-                } else {
-                    out[j].clip = inList.clip;
-                    out[j].max = inList.max;
-                }
-            }
-            out[active].active = true;
-            return out;
-        },
-        buildWeapon: function (weapon) {
-            var out = document.createElement("div");
-            var amount = document.createElement("div");
-            var ammoholder = document.createElement("div");
-            out.appendChild(Dom.el('div', null, weapon.type));
-            out.appendChild(amount);
-            out.appendChild(ammoholder);
-            ammoholder.className = "ammoholder";
-            var now = document.createElement("div");
-            ammoholder.appendChild(now);
-            now.className = "now";
-            var onUpdateCallback = function (weapon) {
-                amount.innerHTML = weapon.total + "/" + weapon.max;
-                var percents = weapon.current * 100 / weapon.clip;
-                now.setAttribute('style', 'width:' + percents + '%');
-                now.innerHTML = weapon.current;
-                out.className = "weapon " + (weapon.enable ? "enable " : "disable ") + (weapon.active ? 'active' : '');
-            };
-            onUpdateCallback(weapon);
-            WeaponActions.updater[weapon.type] = onUpdateCallback;
-            WeaponActions.container.appendChild(out);
-        },
         changeWeapon: function (e) {
             var playGround = WeaponActions.playGround;
             var KeyboardSetup = Engine.require('KeyboardSetup');

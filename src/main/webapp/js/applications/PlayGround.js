@@ -11,6 +11,7 @@ Engine.define('PlayGround', (function () {
     var PersonTracker = Engine.require('PersonTracker');
     var ZoneActions = Engine.require('ZoneActions');
     var WeaponActions = Engine.require('WeaponActions');
+    var WeaponControl = Engine.require('WeaponControl');
     var LifeAndArmor = Engine.require('LifeAndArmor');
     var KeyboardSetup = Engine.require('KeyboardSetup');
     var GameStats = Engine.require('GameStats');
@@ -66,7 +67,8 @@ Engine.define('PlayGround', (function () {
         this.chat = new Chat(this);
         
         var canvas = this.canvas;
-
+        this.weaponControl = new WeaponControl();
+        
         BloodActions.playGround = this;
         GameStats.playGround = this;
         KeyboardSetup.playGround = this;
@@ -84,7 +86,6 @@ Engine.define('PlayGround', (function () {
         ProjectilesActions.init();
         PersonTracker.init();
         ZoneActions.init();
-        WeaponActions.init();
         LifeAndArmor.init();
         KeyboardSetup.init();
         GameStats.init();
@@ -129,7 +130,7 @@ Engine.define('PlayGround', (function () {
             'div',
             {'class': 'playground'},
             [
-                openKeyboard, WeaponActions.container, this.chat.container, LifeAndArmor.container, KeyboardSetup.container,
+                openKeyboard, this.weaponControl.container, this.chat.container, LifeAndArmor.container, KeyboardSetup.container,
                 Score.container, GameStats.container, ScoreOverview.container, TeamControl.container, canvas
             ]
         );
@@ -304,7 +305,7 @@ Engine.define('PlayGround', (function () {
         if (packet.score) {
             ScoreOverview.updateTeamScore(packet.score);
         }
-        WeaponActions.update(owner);
+        this.weaponControl.update(owner);
         LifeAndArmor.update(owner.life, owner.armor);
         Score.update(owner, packet.time);
         for (var m = 0; m < packet.messages.length; m++) {

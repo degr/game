@@ -1,4 +1,11 @@
 Engine.define('Weapons', (function () {
+    
+    function getImage(src) {
+        var out = new Image();
+        out.src = 'images/map/' + src + '.png';
+        return out;
+    }
+    
     var data = {
         knife: {
             type: 'knife',
@@ -8,7 +15,8 @@ Engine.define('Weapons', (function () {
             max: 1,
             clip: 1,
             total: 0,
-            current: 0
+            current: 0,
+            image: getImage('knife')
         },
         pistol: {
             type: 'pistol',
@@ -18,7 +26,8 @@ Engine.define('Weapons', (function () {
             max: 40,
             clip: 9,
             total: 0,
-            current: 0
+            current: 0,
+            image: getImage('pistol')
         },
         shotgun: {
             type: 'shotgun',
@@ -28,7 +37,8 @@ Engine.define('Weapons', (function () {
             max: 28,
             clip: 2,
             total: 0,
-            current: 0
+            current: 0,
+            image: getImage('shotgun')
         },
         assault: {
             type: 'assault',
@@ -38,7 +48,8 @@ Engine.define('Weapons', (function () {
             max: 120,
             clip: 30,
             total: 0,
-            current: 0
+            current: 0,
+            image: getImage('assault')
         },
         sniper: {
             type: 'sniper',
@@ -48,7 +59,8 @@ Engine.define('Weapons', (function () {
             max: 20,
             clip: 5,
             total: 0,
-            current: 0
+            current: 0,
+            image: getImage('sniper')
         },
         flamethrower: {
             type: 'flamethrower',
@@ -58,7 +70,8 @@ Engine.define('Weapons', (function () {
             max: 480,
             clip: 120,
             total: 0,
-            current: 0
+            current: 0,
+            image: getImage('flame')
         },
         minigun: {
             type: 'minigun',
@@ -68,7 +81,8 @@ Engine.define('Weapons', (function () {
             max: 480,
             clip: 120,
             total: 0,
-            current: 0
+            current: 0,
+            image: getImage('minigun')
         },
         //grenade: {type: 'grenade', code: 8,active: false, enable: false, max: 4, clip: 1, total: 0, current: 0},
         rocket: {
@@ -79,7 +93,8 @@ Engine.define('Weapons', (function () {
             max: 5,
             clip: 1,
             total: 0,
-            current: 0
+            current: 0,
+            image: getImage('rocket')
         }
     };
     return {
@@ -91,7 +106,11 @@ Engine.define('Weapons', (function () {
                 var proto = data[weapon];
                 for(var key in proto) {
                     if(!proto.hasOwnProperty(key))continue;
-                    item[key] = proto[key];
+                    if(key === 'image') {
+                        item.image = proto.image.cloneNode(true);
+                    } else {
+                        item[key] = proto[key];
+                    }
                 }
                 out[weapon] = item;
             }

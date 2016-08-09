@@ -5,8 +5,8 @@ import org.forweb.commandos.entity.WebSocketResponse;
 
 public class FlagBlueTemp extends FlagBlue implements WebSocketResponse {
 
-    public FlagBlueTemp(int leftTopX, int leftTopY, int id) {
-        super(leftTopX, leftTopY, id);
+    public FlagBlueTemp(int leftTopX, int leftTopY, int id, float angle) {
+        super(leftTopX, leftTopY, id, angle);
     }
 
     @Override

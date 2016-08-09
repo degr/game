@@ -415,6 +415,7 @@ Engine.define('MapEditor', (function () {
                 var zone = MapEditor.mountedObjects[i];
                 var rect = MapEditor.doRectangle(zone);
                 rect.type = zone.type;
+                
                 if (zone.type === 'tiled') {
                     if (zone.tileset) {
                         var data = zone.tileId.split('_');
@@ -690,6 +691,7 @@ Engine.define('MapEditor', (function () {
                 out.y = p2.y;
                 out.height = p1.y - p2.y;
             }
+            out.angle = zone.angle
             return out;
         },
         getControlRectangles: function (rect, obj) {

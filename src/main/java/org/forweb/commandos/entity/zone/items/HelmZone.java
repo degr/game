@@ -6,8 +6,8 @@ import org.forweb.commandos.entity.zone.AbstractItem;
 
 public class HelmZone extends AbstractItem {
     public static final String TITLE = "helm";
-    public HelmZone(int topX, int topY, int id) {
-        super(topX, topY, TITLE, id);
+    public HelmZone(int topX, int topY, int id, float angle) {
+        super(topX, topY, TITLE, id, angle);
     }
 
     @Override

@@ -5,8 +5,8 @@ import org.forweb.commandos.entity.weapon.AssaultRifle;
 
 public class AssaultZone extends WeaponZone {
     public static final String TITLE = "assault";
-    public AssaultZone(int topX, int topY, Integer id) {
-        super(topX, topY, TITLE, id );
+    public AssaultZone(int topX, int topY, Integer id, float angle) {
+        super(topX, topY, TITLE, id, angle);
     }
 
     @Override

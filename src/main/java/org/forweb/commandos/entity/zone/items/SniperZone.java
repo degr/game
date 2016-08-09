@@ -6,8 +6,8 @@ import org.forweb.commandos.entity.weapon.SniperRifle;
 public class SniperZone extends WeaponZone{
     public static final String TITLE = "sniper";
 
-    public SniperZone(int topX, int topY, Integer id) {
-        super(topX, topY, TITLE, id);
+    public SniperZone(int topX, int topY, Integer id, float angle) {
+        super(topX, topY, TITLE, id, angle);
     }
 
     @Override

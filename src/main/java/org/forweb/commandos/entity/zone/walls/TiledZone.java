@@ -16,8 +16,8 @@ public class TiledZone extends AbstractZone {
     private Integer shiftX;
     private Integer shiftY;
 
-    public TiledZone(Integer x, Integer y, Zone zone, Tile tile) {
-        super(TITLE, new Bounds(new Point(x, y), new Point(x + tile.getWidth(), y + tile.getHeight())));
+    public TiledZone(Integer x, Integer y, Zone zone, Tile tile, float angle) {
+        super(TITLE, new Bounds(new Point(x, y), new Point(x + tile.getWidth(), y + tile.getHeight())), angle);
         setStaticSize(true);
         setCustomSprite(tile.getImage());
         setTileId(tile.getId());

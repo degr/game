@@ -6,8 +6,8 @@ import org.forweb.commandos.entity.weapon.RocketLauncher;
 
 public class RocketZone extends WeaponZone {
     public static final String TITLE = "rocket";
-    public RocketZone(int topX, int topY, Integer id) {
-        super(topX, topY, TITLE, id);
+    public RocketZone(int topX, int topY, Integer id, float angle) {
+        super(topX, topY, TITLE, id, angle);
     }
 
     @Override

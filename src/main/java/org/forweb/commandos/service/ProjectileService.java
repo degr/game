@@ -13,10 +13,7 @@ import org.forweb.commandos.service.projectile.ExplosionThread;
 import org.forweb.geometry.services.CircleService;
 import org.forweb.geometry.services.LineService;
 import org.forweb.geometry.services.PointService;
-import org.forweb.geometry.shapes.Bounds;
-import org.forweb.geometry.shapes.Circle;
-import org.forweb.geometry.shapes.Line;
-import org.forweb.geometry.shapes.Point;
+import org.forweb.geometry.shapes.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -77,9 +74,9 @@ public class ProjectileService {
         if (!flame.isStoped()) {
             for (AbstractZone zone : room.getMap().getZones()) {
                 if (!zone.isShootable()) {
-                    Point[] point = CircleService.circleBoundsIntersection(
+                    Point[] point = GeometryService.circleIntersectRectangle(
                             flameCircle,
-                            new Bounds(zone.getX(), zone.getY(), zone.getWidth(), zone.getHeight())
+                            new Rectangle(new Bounds(zone.getX(), zone.getY(), zone.getWidth(), zone.getHeight()), zone.getAngle())
                     );
                     if (point.length > 0) {
                         flame.setStoped(true);
@@ -140,9 +137,9 @@ public class ProjectileService {
         if (explosion == null) {
             for (AbstractZone zone : room.getMap().getZones()) {
                 if (!zone.isShootable()) {
-                    Point[] point = CircleService.circleBoundsIntersection(
+                    Point[] point = GeometryService.circleIntersectRectangle(
                             rocketCircle,
-                            new Bounds(zone.getX(), zone.getY(), zone.getWidth(), zone.getHeight())
+                            new Rectangle(new Bounds(zone.getX(), zone.getY(), zone.getWidth(), zone.getHeight()), zone.getAngle())
                     );
                     if (point.length > 0) {
                         Person shooter = room.getPersons().get(rocket.getPersonId());
@@ -239,8 +236,8 @@ public class ProjectileService {
             if (zone.isShootable()) {
                 continue;
             }
-            Bounds zoneBounds = GeometryService.getRectangle(zone);
-            Point[] zoneIntersection = LineService.lineBoundsIntersections(
+            Rectangle zoneBounds = GeometryService.getRectangle(zone);
+            Point[] zoneIntersection = GeometryService.lineBoundsIntersections(
                     new Line(
                             new Point(shooter.getX(), shooter.getY()),
                             new Point(projectile.getxEnd(), projectile.getyEnd())

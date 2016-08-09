@@ -9,8 +9,8 @@ public class ArmorZone extends AbstractItem {
 
     public static final String TITLE = "armor";
 
-    public ArmorZone(int topX, int topY, Integer id) {
-        super(topX, topY, TITLE, id);
+    public ArmorZone(int topX, int topY, Integer id, float angle) {
+        super(topX, topY, TITLE, id, angle);
     }
 
 

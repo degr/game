@@ -107,7 +107,16 @@ Engine.define('RoomsList', (function () {
                 for (var i = 0; i < zones.length; i++) {
                     var zone = zones[i];
                     if (!zone.passable) {
-                        context.fillRect(zone.x, zone.y, zone.width, zone.height);
+                        context.save();
+                        if(zone.angle) {
+                            context.translate(zone.x + zone.width / 2, zone.y + zone.height / 2);
+                            context.rotate(zone.angle);
+                            context.fillRect(-zone.width / 2, -zone.height/2, zone.width, zone.height);
+                            context.restore();
+                        } else {
+                            context.fillRect(zone.x, zone.y, zone.width, zone.height);
+                        }
+                        context.restore();
                     }
                 }
             }
