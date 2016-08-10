@@ -1,6 +1,7 @@
 Engine.define('MapEditor', (function () {
 
     var Dom = Engine.require('Dom');
+    var Text = Engine.require('Text');
     var CustomTiles = Engine.require('CustomTiles');
     var DomComponents = Engine.require('DomComponents');
     var Rest = Engine.require('Rest');
@@ -910,37 +911,56 @@ Engine.define('MapEditor', (function () {
             var zone = MapEditor.zones[key];
             var isStaticSize = zone.staticSize;
             var out = Dom.el('div');
-            var createInput = function (point, pointB) {
-                var labelX = Dom.el('label', {'for': 'x_' + ts}, 'x');
-                var x = Dom.el('input', {type: 'text', id: 'x_' + ts, value: point.x});
-                x.onkeyup = function () {
-                    point.x = parseInt(this.value);
-                    if (isStaticSize && pointB) {
-                        pointB.x = point.x + zone.width
-                    }
-                    MapEditor.render();
-                };
-
-                var labelY = Dom.el('label', {'for': 'y_' + ts}, 'y');
-                var y = Dom.el('input', {type: 'text', id: 'y_' + ts, value: point.y});
-                y.onkeyup = function () {
-                    point.y = parseInt(this.value);
-                    if (isStaticSize && pointB) {
-                        pointB.y = point.y + zone.height
-                    }
-                    MapEditor.render();
-                };
-                return Dom.el('div', {'class': 'coordinates'}, [labelX, x, labelY, y]);
-            };
-
-            var input1 = createInput(obj.pointA, obj.pointB);
-            var input2 = null;
+            var x = new Text({type: 'text', name: 'x', id: 'x_' + ts, value: obj.pointA.x, onkeyup: function (e) {
+                if(e.keyCode === 9) {
+                    return;
+                }
+                var oldX = obj.pointA.x; 
+                obj.pointA.x = parseInt(this.value);
+                if (isStaticSize) {
+                    obj.pointB.x = obj.pointA.x + zone.width
+                } else {
+                    obj.pointB.x = obj.pointB.x + (obj.pointA.x - oldX);
+                }
+                MapEditor.render();
+            }});
+            
+            var y = new Text({type: 'text', name: 'y', id: 'y_' + ts, value: obj.pointA.y, onkeyup: function (e) {
+                if(e.keyCode === 9) {
+                    return;
+                }
+                var oldY = obj.pointA.y; 
+                obj.pointA.y = parseInt(this.value);
+                if (isStaticSize) {
+                    obj.pointB.y = obj.pointA.y + zone.height
+                } else {
+                    obj.pointB.y = obj.pointB.y + (obj.pointA.y - oldY);
+                }
+                MapEditor.render();
+            }});
+            var coordinates = Dom.el('div', 'coordinates', [x.container, y.container]);
+            
+            var coordinatesWh = null;
             if (!isStaticSize) {
-                input2 = createInput(obj.pointB);
+                var width = new Text({type: 'text', name: 'width', id: 'width_' + ts, value: Math.abs(obj.pointB.x - obj.pointA.x), onkeyup: function (e) {
+                    if(e.keyCode === 9) {
+                        return;
+                    }
+                    obj.pointB.x = parseInt(this.value) + obj.pointA.x;
+                    MapEditor.render();
+                }});
+
+                var height = new Text({type: 'text', name: 'height', id: 'height_' + ts, value: Math.abs(obj.pointB.x - obj.pointA.x), onkeyup: function (e) {
+                    if(e.keyCode === 9) {
+                        return;
+                    }
+                    obj.pointB.y = parseInt(this.value) + obj.pointA.y;
+                    MapEditor.render();
+                }});
+                coordinatesWh = Dom.el('div', 'coordinates', [width.container, height.container]);
             }
-            var delButton = document.createElement('input');
-            delButton.type = 'button';
-            delButton.value = 'delete';
+            var delButton = Dom.el('input', {type: 'button', value: 'delete'});
+            
             delButton.onclick = function () {
                 for (var i = 0; i < MapEditor.mountedObjects.length; i++) {
                     if (MapEditor.mountedObjects[i] == obj) {
@@ -950,6 +970,12 @@ Engine.define('MapEditor', (function () {
                     }
                 }
             };
+            var angle = new Text({name: 'angle', class: 'angle', id: "angle_"+ts, value: 0, onkeyup: function(){
+                obj.angle = Math.PI * parseInt(this.value) / 180;
+                MapEditor.render();
+            }});
+            
+            
             var highlight = Dom.el('input', {type: 'checkbox', id: 'h_' + ts});
             highlight.onchange = function () {
                 obj.highlight = this.checked;
@@ -965,18 +991,20 @@ Engine.define('MapEditor', (function () {
                 MapEditor.render();
             };
             var highLightLabel = Dom.el('label', {'for': 'h_' + ts}, [highlight, 'highlight']);
-            var label = Dom.el('p', null, [type, delButton, highLightLabel]);
-            Dom.append(out, [label, input1, input2]);
+            var label = Dom.el('p', "controls", [type, delButton, angle.container, highLightLabel]);
+            Dom.append(out, [label, coordinates, coordinatesWh]);
             obj.component = {
                 dom: out,
                 update: function () {
-                    input1.querySelector('#x_' + ts).value = obj.pointA.x;
-                    input1.querySelector('#y_' + ts).value = obj.pointA.y;
-                    if (input2 != null) {
-                        input2.querySelector('#x_' + ts).value = obj.pointB.x;
-                        input2.querySelector('#y_' + ts).value = obj.pointB.y;
+                    x.input.value = obj.pointA.x;
+                    y.input.value = obj.pointA.y;
+                    if (coordinatesWh != null) {
+                        width.input.value = Math.abs(obj.pointA.x - obj.pointB.x);
+                        height.input.value = Math.abs(obj.pointA.y - obj.pointB.y);
                     }
                     highlight.checked = obj.highlight;
+                    var newAngle = obj.angle * 180/Math.PI;
+                    angle.input.value = Math.round((newAngle >= 0 ? newAngle : 360 + newAngle) * 100) / 100;
                 }
             };
             MapEditor.updateMountedObjects();
