@@ -7,6 +7,10 @@ Engine.define('TeamControl', (function () {
         isShown: false,
         teamHolder: null,
         readyCheckbox: null,
+        /**
+         * @var PlayGround
+         */
+        playGround: null,
         init: function () {
             var ready = TeamControl.buildReadyCheckbox();
             var teamRed = TeamControl.buildTeamSwitch('red', 1);
@@ -15,10 +19,10 @@ Engine.define('TeamControl', (function () {
             TeamControl.container = Dom.el('div', 'team-control', [TeamControl.teamHolder, ready]);
             setInterval(function () {
                 if (TeamControl.isShown) {
-                    Dom.animate(TeamControl.container, {paddingTop: 60}, 2000, 10,
-                        function () {
-                            Dom.animate(TeamControl.container, {paddingTop: 20}, 600)
-                        }
+                    Dom.animate(
+                        TeamControl.container, {paddingTop: 60}, 2000, 10
+                    ).animate(
+                        TeamControl.container, {paddingTop: 20}, 600
                     );
                 }
             }, 10000)
@@ -48,32 +52,32 @@ Engine.define('TeamControl', (function () {
             }
         },
         buildTeamSwitch: function (teamName, value) {
-            var PlayGround = Engine.require('PlayGround');
+            var playGround = TeamControl.playGround;
             var id = 'team_' + teamName;
             var radio = Dom.el('input', {type: 'radio', id: id, name: 'team_choose', value: value});
             radio.onclick = function () {
                 TeamControl.readyCheckbox.checked = false;
-                PlayGround.socket.send('team:' + value);
+                playGround.socket.send('team:' + value);
             };
             var label = Dom.el('label', {'for': id}, [radio, teamName]);
             return Dom.el('div', 'form-control', label);
         },
         buildReadyCheckbox: function () {
-            var PlayGround = Engine.require('PlayGround');
+            var playGround = TeamControl.playGround;
             var id = 'ready_to_play';
             var checkbox = Dom.el('input', {type: 'checkbox', id: id, name: id});
             checkbox.onchange = function () {
-                var person = PlayGround.entities[PlayGround.owner.id];
+                var person = playGround.entities[playGround.owner.id];
                 if (person) {
                     if (TeamControl.isTeamGame()) {
                         if (person.team) {
-                            PlayGround.socket.send('ready:' + (this.checked ? '1' : '0'));
+                            playGround.socket.send('ready:' + (this.checked ? '1' : '0'));
                         } else {
-                            Chat.update(0, "Please choose team at first");
+                            playGround.chat.update(0, "Please choose team at first");
                             checkbox.checked = false;
                         }
                     } else {
-                        PlayGround.socket.send('ready:' + (this.checked ? '1' : '0'));
+                        playGround.socket.send('ready:' + (this.checked ? '1' : '0'));
                     }
                 } else {
                     checkbox.checked = false;
@@ -84,8 +88,7 @@ Engine.define('TeamControl', (function () {
             return Dom.el('div', 'form-control', label);
         },
         isTeamGame: function () {
-            var PlayGround = Engine.require('PlayGround');
-            return PlayGround.map.gameType != 'dm';
+            return TeamControl.playGround.map.gameType != 'dm';
         }
     };
     return TeamControl;

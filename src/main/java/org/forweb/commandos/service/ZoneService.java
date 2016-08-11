@@ -105,58 +105,64 @@ public class ZoneService extends AbstractService<Zone, ZoneDao> {
 
     public AbstractZone getZone(Zone zone, Tile tile) {
         AbstractZone out;
-        Integer x = zone.getX(), y = zone.getY(), id = zone.getId();
+        Integer x = zone.getX(),
+                y = zone.getY(),
+                id = zone.getId();
+        Float angle = zone.getAngle();
+        if(angle == null) {
+            angle = 0F;
+        }
         switch (zone.getType()) {
             case ShotgunZone.TITLE:
-                out = new ShotgunZone(x, y, id);
+                out = new ShotgunZone(x, y, id, angle);
                 break;
             case AssaultZone.TITLE:
-                out = new AssaultZone(x, y, id);
+                out = new AssaultZone(x, y, id, angle);
                 break;
             case SniperZone.TITLE:
-                out = new SniperZone(x, y, id);
+                out = new SniperZone(x, y, id, angle);
                 break;
             case MinigunZone.TITLE:
-                out = new MinigunZone(x, y, id);
+                out = new MinigunZone(x, y, id, angle);
                 break;
             case RocketZone.TITLE:
-                out = new RocketZone(x, y, id);
+                out = new RocketZone(x, y, id, angle);
                 break;
             case FlameZone.TITLE:
-                out = new FlameZone(x, y, id);
+                out = new FlameZone(x, y, id, angle);
                 break;
             case MedkitZone.TITLE:
-                out = new MedkitZone(x, y, id);
+                out = new MedkitZone(x, y, id, angle);
                 break;
             case ArmorZone.TITLE:
-                out = new ArmorZone(x, y, id);
+                out = new ArmorZone(x, y, id, angle);
                 break;
             case HelmZone.TITLE:
-                out = new HelmZone(x, y, id);
+                out = new HelmZone(x, y, id, angle);
                 break;
             case Respawn.TITLE:
-                out = new Respawn(x, y, id);
+                out = new Respawn(x, y, id, angle);
                 break;
             case RespawnBlue.TITLE:
-                out = new RespawnBlue(x, y, id);
+                out = new RespawnBlue(x, y, id, angle);
                 break;
             case RespawnRed.TITLE:
-                out = new RespawnRed(x, y, id);
+                out = new RespawnRed(x, y, id, angle);
                 break;
             case FlagBlue.TITLE:
-                out = new FlagBlue(x, y, id);
+                out = new FlagBlue(x, y, id, angle);
                 break;
             case FlagRed.TITLE:
-                out = new FlagRed(x, y, id);
+                out = new FlagRed(x, y, id, angle);
                 break;
             case Wall.TITLE:
-                out = new Wall(x, y, zone.getWidth(), zone.getHeight());
+                out = new Wall(x, y, zone.getWidth(), zone.getHeight(), angle);
                 break;
             case TiledZone.TITLE:
                 if(tile != null) {
-                    out = new TiledZone(x, y, zone, tile);
+                    out = new TiledZone(x, y, zone, tile, angle);
                 } else {
-                    out = new Wall(x, y, zone.getWidth(), zone.getHeight());
+                    out = new Wall(x, y, zone.getWidth(), zone.getHeight(), angle);
                 }
                 break;
             default:

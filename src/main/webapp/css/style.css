@@ -153,7 +153,7 @@ body, html {
 }
 
 .editor .mounted-wrapper {
-    width: 250px;
+    width: 290px;
     position: fixed;
     top: 10px;
     right: 10px;
@@ -238,7 +238,6 @@ body, html {
     position: fixed;
     right: 0;
     top: 0;
-    background: white;
     border-bottom-left-radius: 3px;
     padding-bottom: 3px;
     border-bottom: 1px solid gray;
@@ -258,7 +257,7 @@ body, html {
 
 .weapon-holder .weapon {
     width: 60px;
-    height: 48px;
+    height: 59px;
 }
 .weapon-holder:first-child {
     border: none;
@@ -278,7 +277,23 @@ body, html {
 }
 
 .weapon-holder .weapon.disable {
-    background-color: gainsboro;
+    position: relative;
+}
+.weapon-holder .weapon.disable:after {
+    display: block;
+    content: ' ';
+    position: absolute;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.weapon-holder .weapon img {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    height: 32px;
 }
 .weapon-holder .weapon.active {
     background-color: #c3eaab;
@@ -489,3 +504,17 @@ input[button], input[submit], button {
     border-radius: 4px;
 }
 
+.editor .coordinates {
+    height: 40px;
+}
+.editor .coordinates label {
+    display: inline-block;
+    width: 50px;
+    text-align: center;
+}
+.editor .coordinates > * {
+    float: left;
+}
+.editor p.controls .angle{
+    display: inline-block;
+}

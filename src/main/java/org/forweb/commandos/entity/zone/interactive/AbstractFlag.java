@@ -19,12 +19,13 @@ public abstract class AbstractFlag extends AbstractZone implements Interactive {
         return false;
     }
 
-    public AbstractFlag(String type, int leftTopX, int leftTopY, int id) {
+    public AbstractFlag(String type, int leftTopX, int leftTopY, int id, float angle) {
         super(type, new Bounds(
                 leftTopX,
                 leftTopY,
                 PersonWebSocketEndpoint.PERSON_RADIUS * 2,
-                PersonWebSocketEndpoint.PERSON_RADIUS * 2)
+                PersonWebSocketEndpoint.PERSON_RADIUS * 2),
+                angle
         );
         this.setId(id);
         setPassable(true);

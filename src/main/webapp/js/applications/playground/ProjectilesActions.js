@@ -3,6 +3,12 @@ Engine.define('ProjectilesActions', (function () {
     var SoundUtils = Engine.require('SoundUtils');
 
     var ProjectilesActions = {
+
+        /**
+         * @var PlayGround
+         */
+        playGround: null,
+        
         init: function () {
             ProjectilesActions.rocket = new Image();
             ProjectilesActions.rocket.src = 'images/map/rocketBullet.png';
@@ -79,9 +85,9 @@ Engine.define('ProjectilesActions', (function () {
         if (!projectile.isFixed) {
             projectile.isFixed = true;
 
-            var PlayGround = Engine.require('PlayGround');
+            var playGround = ProjectilesActions.playGround;
 
-            var entity = PlayGround.entities[projectile.personId];
+            var entity = playGround.entities[projectile.personId];
             if (entity) {
                 entity.recoil = 2;
                 if (!entity.onFire) {
@@ -90,7 +96,7 @@ Engine.define('ProjectilesActions', (function () {
                 }
             }
 
-            var renderStart = PlayGround.radius;
+            var renderStart = playGround.radius;
             var cos = Math.cos(projectile.angle * Math.PI / 180);
             var sin = Math.sin(projectile.angle * Math.PI / 180);
             projectile.x1 = cos * renderStart + projectile.x1;
@@ -103,8 +109,8 @@ Engine.define('ProjectilesActions', (function () {
     };
 
     ProjectilesActions.drawFlame = function (projectile) {
-        var PlayGround = Engine.require('PlayGround');
-        var context = PlayGround.context;
+        var playGround = ProjectilesActions.playGround;
+        var context = playGround.context;
         var frameSet = ProjectilesActions.flame[projectile.frameSet];
         if (projectile.animationFrame >= frameSet.length) {
             projectile.animationFrame = 0;
@@ -112,7 +118,7 @@ Engine.define('ProjectilesActions', (function () {
         var radius = 12;
         var diameter = radius * 2;
         context.drawImage(frameSet[projectile.animationFrame], projectile.x1 - 12, projectile.y1 - 12, diameter, diameter);
-        if (PlayGround.drawBounds) {
+        if (playGround.drawBounds) {
             context.arc(projectile.x1, projectile.y1, 9, 0, 2 * Math.PI, false);
         }
     };
@@ -120,25 +126,22 @@ Engine.define('ProjectilesActions', (function () {
         if (projectile.animationFrame >= ProjectilesActions.explosion.length) {
             return;
         }
-        var PlayGround = Engine.require('PlayGround');
+        var playGround = ProjectilesActions.playGround;
         var image = ProjectilesActions.explosion[projectile.animationFrame];
         projectile.animationFrame++;
         var radius = 60;
         var diameter = radius * 2;
-        var context = PlayGround.context;
+        var context = playGround.context;
         context.drawImage(image, projectile.x1 - radius, projectile.y1 - radius, diameter, diameter);
-        if (PlayGround.drawBounds) {
+        if (playGround.drawBounds) {
             context.beginPath();
             context.arc(projectile.x1, projectile.y1, radius, 0, 2 * Math.PI, false);
             context.stroke();
         }
-
-
     };
 
     ProjectilesActions.drawRocket = function (projectile) {
-        var PlayGround = Engine.require('PlayGround');
-        var context = PlayGround.context;
+        var context = ProjectilesActions.playGround.context;
         context.save();
         var x = projectile.x1;
         var y = projectile.y1;
@@ -163,14 +166,14 @@ Engine.define('ProjectilesActions', (function () {
         return 'white';
     };
     ProjectilesActions.decode = function (projectiles) {
-        var PlayGround = Engine.require('PlayGround');
+        var playGround = ProjectilesActions.playGround;
         var now = (new Date()).getTime();
         var playShootgun = false;
         var shotgunColor = null;
         var existingFire = [];
-        for (var fireKey in PlayGround.fireBullets) {
-            if (PlayGround.fireBullets.hasOwnProperty(fireKey)) {
-                existingFire.push(PlayGround.fireBullets[fireKey].id);
+        for (var fireKey in playGround.fireBullets) {
+            if (playGround.fireBullets.hasOwnProperty(fireKey)) {
+                existingFire.push(playGround.fireBullets[fireKey].id);
             }
         }
         var packageRockets = [];
@@ -192,14 +195,14 @@ Engine.define('ProjectilesActions', (function () {
             switch (p.type) {
                 case 'slug':
                     p.trace = 50;
-                    PlayGround.instantBullets.push(p);
+                    playGround.instantBullets.push(p);
                     p.created = now;
                     p.color = ProjectilesActions.generateColor();
                     p.lifeTime = 300;
                     p.maxDistance = 700;
                     break;
                 case 'bullet':
-                    PlayGround.instantBullets.push(p);
+                    playGround.instantBullets.push(p);
                     p.created = now;
                     p.color = ProjectilesActions.generateColor();
                     p.trace = 25;
@@ -219,18 +222,18 @@ Engine.define('ProjectilesActions', (function () {
                         shotgunColor = ProjectilesActions.generateColor();
                     }
                     p.color = shotgunColor;
-                    PlayGround.instantBullets.push(p);
+                    playGround.instantBullets.push(p);
                     p.created = now;
                     break;
                 case 'explosion':
-                    PlayGround.instantBullets.push(p);
+                    playGround.instantBullets.push(p);
                     p.created = now;
                     p.lifeTime = 1000;
                     p.animationFrame = 0;
                     break;
                 case 'blade':
-                    PlayGround.instantBullets.push(p);
-                    var person = PlayGround.entities[p.personId];
+                    playGround.instantBullets.push(p);
+                    var person = playGround.entities[p.personId];
                     if (person) {
                         if (!person.knifeLifeCycle) {
                             if (Math.random() > 0.5) {
@@ -246,7 +249,7 @@ Engine.define('ProjectilesActions', (function () {
                     p.created = now + 50;
                     break;
                 case 'flame':
-                    var old = PlayGround.fireBullets[p.id];
+                    var old = playGround.fireBullets[p.id];
                     if (old) {
                         existingFire.splice(existingFire.indexOf(p.id), 1);
                         p.animationFrame = old.animationFrame + 1;
@@ -255,14 +258,14 @@ Engine.define('ProjectilesActions', (function () {
                         p.frameSet = Math.floor(Math.random() * ProjectilesActions.flame.length);
                         p.animationFrame = 0;
                     }
-                    PlayGround.fireBullets[p.id] = p;
-                    PlayGround.projectiles.push(p);
+                    playGround.fireBullets[p.id] = p;
+                    playGround.projectiles.push(p);
                     break;
                 case 'rocket':
                     var rocketExist = false;
                     packageRockets.push(p.id);
-                    for (var j = 0; j < PlayGround.rockets.length; j++) {
-                        var r = PlayGround.rockets[j];
+                    for (var j = 0; j < playGround.rockets.length; j++) {
+                        var r = playGround.rockets[j];
                         if (r.id === p.id) {
                             //p.smoke = r.smoke;
                             r.x1 = p.x1;
@@ -275,21 +278,21 @@ Engine.define('ProjectilesActions', (function () {
                         }
                     }
                     if (!rocketExist) {
-                        PlayGround.rockets.push(p);
+                        playGround.rockets.push(p);
                     }
-                    PlayGround.projectiles.push(p);
+                    playGround.projectiles.push(p);
                     break;
                 default:
-                    PlayGround.projectiles.push(p);
+                    playGround.projectiles.push(p);
             }
         }
         for (var fb = 0; fb < existingFire.length; fb++) {
-            delete PlayGround.fireBullets[fb];
+            delete playGround.fireBullets[fb];
         }
-        for (var ro = PlayGround.rockets.length - 1; ro >= 0; ro--) {
-            var rocket = PlayGround.rockets[ro];
+        for (var ro = playGround.rockets.length - 1; ro >= 0; ro--) {
+            var rocket = playGround.rockets[ro];
             if (packageRockets.indexOf(rocket.id) === -1) {
-                PlayGround.rockets.splice(ro, 1);
+                playGround.rockets.splice(ro, 1);
                 break;
             }
         }

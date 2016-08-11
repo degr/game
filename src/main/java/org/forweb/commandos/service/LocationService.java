@@ -8,9 +8,12 @@ import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.entity.zone.Interactive;
 import org.forweb.commandos.entity.zone.interactive.Respawn;
 import org.forweb.geometry.services.CircleService;
+import org.forweb.geometry.services.LineService;
 import org.forweb.geometry.services.PointService;
 import org.forweb.geometry.shapes.Circle;
+import org.forweb.geometry.shapes.Line;
 import org.forweb.geometry.shapes.Point;
+import org.forweb.geometry.shapes.Rectangle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -109,8 +112,10 @@ public class LocationService {
         );
         List<Interactive> itemsToPick = null;
         for (AbstractZone zone : room.getMap().getZones()) {
-            Point[] point = CircleService.circleBoundsIntersection(playerCircle, GeometryService.getRectangle(zone));
-            if (point.length > 0) {
+            Rectangle rectangle = GeometryService.getRectangle(zone);
+            Point[] point = GeometryService.circleIntersectRectangle(playerCircle, rectangle);
+
+            if (!point.equals(PointService.EMPTY)) {
                 if (zone.isPassable()) {
                     if (zone instanceof Interactive) {
                         if (itemsToPick == null) {

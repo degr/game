@@ -6,8 +6,8 @@ import org.forweb.commandos.entity.weapon.Flamethrower;
 public class FlameZone extends WeaponZone {
     public static final String TITLE = "flamethrower";
 
-    public FlameZone(int topX, int topY, Integer id) {
-        super(topX, topY, TITLE, id);
+    public FlameZone(int topX, int topY, Integer id, float angle) {
+        super(topX, topY, TITLE, id, angle);
     }
 
     @Override

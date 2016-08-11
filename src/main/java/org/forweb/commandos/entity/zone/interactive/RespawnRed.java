@@ -5,8 +5,8 @@ public class RespawnRed extends Respawn {
 
     public static final String TITLE = "respawn_red";
 
-    public RespawnRed(int leftTopX, int leftTopY, int id) {
-        super(TITLE, leftTopX, leftTopY, id);
+    public RespawnRed(int leftTopX, int leftTopY, int id, float angle) {
+        super(TITLE, leftTopX, leftTopY, id, angle);
     }
 
     @Override

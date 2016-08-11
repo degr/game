@@ -148,9 +148,6 @@ public class SpringDelegationService {
                 try {
                     tick(room);
                     if (current >= PersonWebSocketEndpoint.SKIP_FRAMES) {
-                        if(room.getProjectiles().values().size() > 2) {
-                            System.out.println("w");
-                        }
                         responseService.broadcast(
                                 new Update(
                                         responseService.mapPersons(room.getPersons()),

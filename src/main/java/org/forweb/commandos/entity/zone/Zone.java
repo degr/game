@@ -14,6 +14,7 @@ public class Zone extends AbstractEntity {
     private int height;
     private Integer shiftX;
     private Integer shiftY;
+    private Float angle;
     private String type;
     private Integer map;
     private Integer tile;
@@ -100,6 +101,15 @@ public class Zone extends AbstractEntity {
 
     public void setShiftY(Integer shiftY) {
         this.shiftY = shiftY;
+    }
+
+
+    public Float getAngle() {
+        return angle;
+    }
+
+    public void setAngle(Float angle) {
+        this.angle = angle;
     }
 
 }

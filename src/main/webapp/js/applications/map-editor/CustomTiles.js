@@ -4,12 +4,10 @@ Engine.define('CustomTiles', (function () {
     var Rest = Engine.require('Rest');
     var DomComponents = Engine.require('DomComponents');
     
-    var CustomTiles = function () {
+    var CustomTiles = function (loadObjects) {
         this.container = null;
         this.isOnSubmit = false;
-    };
-
-    CustomTiles.prototype.init = function () {
+        this.loadObjects = loadObjects;
         var me = this;
         var title = Dom.el('h3', null, 'Create custom tile');
         var fileupload = Dom.el('input', {type: 'file', name: 'fileupload', id: 'tile_fileupload'});
@@ -34,7 +32,7 @@ Engine.define('CustomTiles', (function () {
                 var contents = target.contentDocument || target.contentWindow.document;
                 var body = contents.body;
                 if (body && body.innerText == 'true') {
-                    MapEditor.loadObjects();
+                    me.loadObjects();
                     me.hide()
                 } else {
                     alert("Can't save tile. Possible width and height is undefined, or file is not a valid image. Please upload only JPG, PNG, GIF and JPEG");
@@ -47,7 +45,7 @@ Engine.define('CustomTiles', (function () {
                 method: 'post',
                 enctype: 'multipart/form-data',
                 'class': 'panel hidden',
-                action: Rest.host + 'zones/create-zone',
+                onsubmit: function(){this.action = Rest.host + 'zones/create-zone'},
                 target: 'custom_tile_iframe'
             },
             [

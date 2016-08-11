@@ -5,8 +5,8 @@ import org.forweb.commandos.entity.weapon.Pistol;
 
 public class PistolZone extends WeaponZone{
     public static final String TITLE = "pistol";
-    public PistolZone(int topX, int topY, int id) {
-        super(topX, topY, TITLE, id);
+    public PistolZone(int topX, int topY, int id, float angle) {
+        super(topX, topY, TITLE, id, 0);
     }
 
     @Override

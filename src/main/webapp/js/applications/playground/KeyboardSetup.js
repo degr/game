@@ -2,7 +2,6 @@ Engine.define('KeyboardSetup', (function () {
 
     var Dom = Engine.require('Dom');
     var Controls = Engine.require('Controls');
-    var Chat = Engine.require('Chat');
     var Tabs = Engine.require('Tabs');
     var PersonActions = Engine.require('PersonActions');
     var SoundUtils = Engine.require('SoundUtils');
@@ -13,6 +12,14 @@ Engine.define('KeyboardSetup', (function () {
         showNames: null,
         hideChatMessage: 'Hide Chat',
         showChatMessage: 'Show Chat',
+        /**
+         * @var PlayGround
+         */
+        playGround: null,
+        /**
+         * @var Chat
+         */
+        chat: null,
         show: function () {
             KeyboardSetup.isActive = true;
             Dom.removeClass(KeyboardSetup.container, 'hidden');
@@ -61,31 +68,32 @@ Engine.define('KeyboardSetup', (function () {
                 type: 'button',
                 value: KeyboardSetup.hideChatMessage
             });
+            var me = this;
             chatToggler.onclick = function () {
-                if (Chat.isHidden) {
-                    Chat.show();
+                if (this.chat.isHidden) {
+                    me.chat.show();
                     chatToggler.value = KeyboardSetup.hideChatMessage;
                 } else {
-                    Chat.hide();
+                    me.chat.hide();
                     chatToggler.value = KeyboardSetup.showChatMessage;
                 }
             };
             return Dom.el('div', 'form-control', chatToggler);
         },
         buildShowNames: function () {
-            var PlayGround = Engine.require('PlayGround');
+            var playGround = KeyboardSetup.playGround;
             var showNames = localStorage.getItem('showNames');
             if (showNames) {
-                PlayGround.showNames = !!parseInt(showNames);
+                playGround.showNames = !!parseInt(showNames);
             }
             var showNamesEl = Dom.el('input', {
                 type: 'button',
-                value: PlayGround.showNames ? 'Hide names' : 'Show names'
+                value: playGround.showNames ? 'Hide names' : 'Show names'
             });
             showNamesEl.onclick = function () {
-                PlayGround.showNames = !PlayGround.showNames;
-                showNamesEl.value = PlayGround.showNames ? 'Hide names' : 'Show names';
-                localStorage.setItem('showNames', PlayGround.showNames ? 1 : 0)
+                playGround.showNames = !playGround.showNames;
+                showNamesEl.value = playGround.showNames ? 'Hide names' : 'Show names';
+                localStorage.setItem('showNames', playGround.showNames ? 1 : 0)
             };
 
             return Dom.el('div', 'form-control', showNamesEl);
@@ -112,21 +120,20 @@ Engine.define('KeyboardSetup', (function () {
             return out;
         },
         buildLaserSightControl: function () {
-
-            var PlayGround = Engine.require('PlayGround');
+            var playGround = KeyboardSetup.playGround;
             var laserSight = localStorage.getItem('laserSight');
             if (laserSight) {
-                PlayGround.laserSight = parseInt(laserSight);
+                playGround.laserSight = parseInt(laserSight);
             }
 
             var buildButton = function (value, label) {
                 var id = 'laser_sight_' + value;
                 var button = Dom.el('input', {type: 'radio', name: 'laser_sight', id: id});
-                if (PlayGround.laserSight == value) {
+                if (playGround.laserSight == value) {
                     button.checked = true;
                 }
                 button.onclick = function () {
-                    PlayGround.laserSight = value;
+                    playGround.laserSight = value;
                     localStorage.setItem('laserSight', value);
                 };
                 return Dom.el('div', null, Dom.el('label', {'for': id}, [button, label]));
@@ -176,23 +183,23 @@ Engine.define('KeyboardSetup', (function () {
             ];
         },
         buildBloodTime: function () {
-            var PlayGround = Engine.require('PlayGround');
+            var playGround = KeyboardSetup.playGround;
             var id = 'blood_time';
             var value = localStorage.getItem(id);
             if (value) {
                 value = parseInt(value);
             }
             if (value) {
-                PlayGround.bloodTime = value;
+                playGround.bloodTime = value;
             } else {
-                value = PlayGround.bloodTime;
+                value = playGround.bloodTime;
             }
             var input = Dom.el('input', {id: id, type: 'text', value: value});
             input.onkeyup = function (e) {
                 e.preventDefault();
                 var value = parseInt(this.value);
                 if (!isFinite(value))value = 60;
-                PlayGround.bloodTime = value;
+                playGround.bloodTime = value;
                 this.value = value;
                 localStorage.setItem(id, value);
             };
@@ -200,17 +207,17 @@ Engine.define('KeyboardSetup', (function () {
             return Dom.el('div', null, [label, input])
         },
         buildHightLightButton: function () {
-            var PlayGround = Engine.require('PlayGround');
+            var playGround = KeyboardSetup.playGround;
             var highLight = localStorage.getItem('highlightOwner');
             if (highLight) {
-                PlayGround.highlightOwner = highLight == '1';
+                playGround.highlightOwner = highLight == '1';
             }
             var checkbox = Dom.el('input', {type: 'checkbox', id: 'highlight_checkbox'});
-            if (PlayGround.highlightOwner) {
+            if (playGround.highlightOwner) {
                 checkbox.checked = true;
             }
             checkbox.onclick = function () {
-                PlayGround.highlightOwner = checkbox.checked;
+                playGround.highlightOwner = checkbox.checked;
                 if (SoundUtils.mute) {
                     localStorage.setItem('highlightOwner', '1');
                 } else {
@@ -242,14 +249,14 @@ Engine.define('KeyboardSetup', (function () {
             return KeyboardSetup.createInput('score');
         },
         buildBackgounds: function () {
-            var PlayGround = Engine.require('PlayGround');
+            var playGround = KeyboardSetup.playGround;
             var buttons = ["Background: "];
             var back = localStorage.getItem('background');
             var setBackground = function (i) {
                 try {
                     var background = 'url(images/map/background/' + i + '.png)';
                     localStorage.setItem('background', background);
-                    PlayGround.canvas.style.backgroundImage = background;
+                    playGround.canvas.style.backgroundImage = background;
                     document.body.style.background = background;
                     localStorage.setItem('background', i);
                 } catch (e) {
@@ -276,26 +283,27 @@ Engine.define('KeyboardSetup', (function () {
             return Dom.el('div', 'form-control', buttons);
         },
         buildDrawBounds: function () {
-            var PlayGround = Engine.require('PlayGround');
+            var playGround = KeyboardSetup.playGround;
             var checkbox = Dom.el('input', {type: 'checkbox', id: 'draw_bounds'});
-            checkbox.checked = PlayGround.drawBounds;
+            checkbox.checked = playGround.drawBounds;
             checkbox.onchange = function () {
-                PlayGround.drawBounds = checkbox.checked;
-                PlayGround.updateCanvas(PlayGround.map);
+                playGround.drawBounds = checkbox.checked;
+                playGround.updateCanvas(playGround.map);
             };
             var label = Dom.el('label', {'for': 'draw_bounds'}, [checkbox, 'Draw bounds']);
             return Dom.el('div', 'form-control', label);
         },
         createChatInput: function (key) {
             var container = KeyboardSetup.createInput(key);
+            var me = this;
             var messageInput = Dom.el('input', {
                 type: 'text',
                 id: 'chat_' + key,
-                value: Chat.binds[key] || ''
+                value: me.chat.binds[key] || ''
             });
             messageInput.onblur = function () {
-                Chat.binds[key] = this.value;
-                Chat.save();
+                me.chat.binds[key] = this.value;
+                me.chat.save();
             };
             container.appendChild(messageInput);
             return container;

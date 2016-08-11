@@ -2,48 +2,49 @@ Engine.define('Dispatcher', (function () {
 
     var Dom = Engine.require('Dom');
 
-    var Dispatcher = {
-        appStore: null,
-        app: null,
-        applications: {},
-        activeApplication: null
+    var Dispatcher = function(appstore, application){
+        this.appStore = Dom.id(appstore);
+        this.app = Dom.id(application);
+        this.applications = {};
+        this.activeApplication = null;
     };
     
-    Dispatcher.init = function () {
-        Dispatcher.appStore = Dom.id('appstore');
-        Dispatcher.app = Dom.id('application');
-    };
-    Dispatcher.initApplication = function (application, name) {
+    Dispatcher.prototype.initApplication = function (contructor, name) {
+        var application;
         if(typeof application == "function") {
-            application = new application();
+            application = new contructor();
+        } else {
+            application = contructor;
         }
-        application.init();
-        if (!Dispatcher.applications[name]) {
-            Dispatcher.applications[name] = application;
+        if(application.init) {
+            application.init();
+        }
+        if (!this.applications[name]) {
+            this.applications[name] = application;
         } else {
             throw 'Application with name ' + name + " already was initialized";
         }
-        Dispatcher.appStore.appendChild(application.container);
+        this.appStore.appendChild(application.container);
     };
-    Dispatcher.placeApplication = function (applicationName) {
-        var application = Dispatcher.applications[applicationName];
+    Dispatcher.prototype.placeApplication = function (applicationName) {
+        var application = this.applications[applicationName];
         if (!application) {
             throw "Undefined application " + applicationName;
         }
-        if (Dispatcher.activeApplication) {
-            if (Dispatcher.activeApplication.beforeClose) {
-                Dispatcher.activeApplication.beforeClose();
+        if (this.activeApplication) {
+            if (this.activeApplication.beforeClose) {
+                this.activeApplication.beforeClose();
             }
-            Dispatcher.appStore.appendChild(Dispatcher.activeApplication.container);
-            if (Dispatcher.activeApplication.afterClose) {
-                Dispatcher.activeApplication.afterClose();
+            this.appStore.appendChild(this.activeApplication.container);
+            if (this.activeApplication.afterClose) {
+                this.activeApplication.afterClose();
             }
         }
-        Dispatcher.activeApplication = application;
+        this.activeApplication = application;
         if (application.beforeOpen) {
             application.beforeOpen();
         }
-        Dispatcher.app.appendChild(application.container);
+        this.app.appendChild(application.container);
         if (application.afterOpen) {
             application.afterOpen();
         }

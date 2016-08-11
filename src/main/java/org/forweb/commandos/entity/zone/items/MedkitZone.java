@@ -7,8 +7,8 @@ import org.forweb.commandos.entity.zone.AbstractItem;
 public class MedkitZone extends AbstractItem {
     public static final String TITLE = "medkit";
 
-    public MedkitZone(int topX, int topY, Integer id) {
-        super(topX, topY, TITLE, id);
+    public MedkitZone(int topX, int topY, Integer id, float angle) {
+        super(topX, topY, TITLE, id, angle);
     }
 
     @Override

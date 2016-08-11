@@ -1,18 +1,19 @@
 package org.forweb.commandos.entity.zone;
 
 import org.forweb.geometry.shapes.Bounds;
-import org.forweb.geometry.shapes.Rectangle;
 
 public abstract class AbstractZone {
 
     private Integer id;
+    private float angle;
 
-    public AbstractZone(String type, Bounds bounds) {
+    public AbstractZone(String type, Bounds bounds, float angle) {
         this.type = type;
         this.setX((int) bounds.getX());
         this.setY((int) bounds.getY());
         this.setWidth((int) bounds.getWidth());
         this.setHeight((int) bounds.getHeight());
+        this.setAngle(angle);
     }
 
     private int x;
@@ -105,5 +106,13 @@ public abstract class AbstractZone {
 
     public void setCustomSprite(String customSprite) {
         this.customSprite = customSprite;
+    }
+
+    public void setAngle(float angle) {
+        this.angle = angle;
+    }
+
+    public float getAngle() {
+        return angle;
     }
 }

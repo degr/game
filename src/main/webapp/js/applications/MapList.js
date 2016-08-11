@@ -1,7 +1,6 @@
 Engine.define('MapList', (function () {
 
     var Dom = Engine.require('Dom');
-    var Dispatcher = Engine.require('Dispatcher');
     var Pagination = Engine.require('Pagination');
     var Rest = Engine.require('Rest');
     var StringUtils = Engine.require('StringUtils');
@@ -14,6 +13,8 @@ Engine.define('MapList', (function () {
         mapBackground: '#ffffff',
         mapForeground: '#000000',
         mapWidth: 200,
+        dispatcher: null,
+        playGround: null,
         beforeOpen: function () {
             if (!MapList.mapsLoaded) {
                 MapList.openPage(MapList.pageNumber);
@@ -24,11 +25,11 @@ Engine.define('MapList', (function () {
             MapList.content = Dom.el('div', 'maps');
             var joinGame = Dom.el('input', {type: 'button', value: 'Join to existing room'});
             joinGame.onclick = function () {
-                Dispatcher.placeApplication('RoomsList')
+                MapList.dispatcher.placeApplication('RoomsList')
             };
             var createMap = Dom.el('input', {type: 'button', value: 'Create new map'});
             createMap.onclick = function () {
-                Dispatcher.placeApplication('MapEditor')
+                MapList.dispatcher.placeApplication('MapEditor')
             };
             MapList.container = Dom.el(
                 'div',
@@ -49,8 +50,6 @@ Engine.define('MapList', (function () {
             }
         },
         buildMap: function (map) {
-
-            var PlayGround = Engine.require('PlayGround');
             var clb = function (e) {
                 e.preventDefault();
                 var name = prompt(
@@ -58,8 +57,8 @@ Engine.define('MapList', (function () {
                     "unnamed-" + StringUtils.unique()
                 );
                 if (name !== null) {
-                    Dispatcher.placeApplication("PlayGround");
-                    PlayGround.createGame(name, map);
+                    MapList.dispatcher.placeApplication("PlayGround");
+                    MapList.playGround.createGame(name, map);
                 }
             };
             var descriptionLink;
@@ -90,7 +89,16 @@ Engine.define('MapList', (function () {
                 for (var i = 0; i < zones.length; i++) {
                     var zone = zones[i];
                     if (!zone.passable) {
-                        context.fillRect(zone.x, zone.y, zone.width, zone.height);
+                        context.save();
+                        if(zone.angle) {
+                            context.translate(zone.x + zone.width / 2, zone.y + zone.height / 2);
+                            context.rotate(zone.angle);
+                            context.fillRect(-zone.width / 2, -zone.height/2, zone.width, zone.height);
+                            context.restore();
+                        } else {
+                            context.fillRect(zone.x, zone.y, zone.width, zone.height);
+                        }
+                        context.restore();
                     }
                 }
             }

@@ -58,19 +58,19 @@ public class PersonService {
 
             int id = room.getNewWeaponId();
             if(weapon instanceof Pistol) {
-                candidate = new PistolZone(topx, topY, id);
+                candidate = new PistolZone(topx, topY, id, 0);
             } else if(weapon instanceof AssaultRifle) {
-                candidate = new AssaultZone(topx, topY, id);
+                candidate = new AssaultZone(topx, topY, id, 0);
             } else if(weapon instanceof Shotgun) {
-                candidate = new ShotgunZone(topx, topY, id);
+                candidate = new ShotgunZone(topx, topY, id, 0);
             } else if(weapon instanceof SniperRifle) {
-                candidate = new SniperZone(topx, topY, id);
+                candidate = new SniperZone(topx, topY, id, 0);
             } else if(weapon instanceof Flamethrower) {
-                candidate = new FlameZone(topx, topY, id);
+                candidate = new FlameZone(topx, topY, id, 0);
             } else if(weapon instanceof Minigun) {
-                candidate = new MinigunZone(topx, topY, id);
+                candidate = new MinigunZone(topx, topY, id, 0);
             } else if(weapon instanceof RocketLauncher) {
-                candidate = new RocketZone(topx, topY, id);
+                candidate = new RocketZone(topx, topY, id, 0);
             }
             if(candidate != null) {
                 candidate.setTemporary(true);
@@ -78,10 +78,10 @@ public class PersonService {
             }
         }
         if(person.isSelfFlag() && person.getTeam() > 0) {
-            zones.add(person.getTeam() == 1 ? new FlagRedTemp(topx, topY, zones.size()) : new FlagBlueTemp(topx, topY, zones.size()));
+            zones.add(person.getTeam() == 1 ? new FlagRedTemp(topx, topY, zones.size(), 0) : new FlagBlueTemp(topx, topY, zones.size(), 0));
         }
         if(person.isOpponentFlag() && person.getTeam() > 0) {
-            zones.add(person.getTeam() != 1 ? new FlagRedTemp(topx, topY, zones.size()) : new FlagBlueTemp(topx, topY, zones.size()));
+            zones.add(person.getTeam() != 1 ? new FlagRedTemp(topx, topY, zones.size(), 0) : new FlagBlueTemp(topx, topY, zones.size(), 0));
         }
         resetState(person, room);
     }
@@ -130,6 +130,7 @@ public class PersonService {
         person.setOpponentFlag(false);
         person.setSelfFlag(false);
         person.setReload(false);
+        person.setArmor(0);
         List<Stoppable> listeners = person.getListeners();
         for(int i = listeners.size() - 1; i >= 0; i--) {
             Stoppable stoppable = listeners.get(i);

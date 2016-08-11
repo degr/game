@@ -2,9 +2,7 @@ Engine.define('RoomsList', (function () {
     var RoomsChat = Engine.require('RoomsChat');
     var Dom = Engine.require('Dom');
     var Pagination = Engine.require('Pagination');
-    var Dispatcher = Engine.require('Dispatcher');
     var Rest = Engine.require('Rest');
-    var Chat = Engine.require('Chat');
     
     
     var RoomsList = {
@@ -17,6 +15,9 @@ Engine.define('RoomsList', (function () {
         mapWidth: 200,
         rooms: [],
         selectedRoomId: -1,//@todo unused
+        dispatcher: null,
+        playGround: null,
+        chat: null,
         beforeOpen: function () {
             if (!RoomsList.mapsLoaded) {
                 RoomsList.openPage(RoomsList.pageNumber);
@@ -34,7 +35,7 @@ Engine.define('RoomsList', (function () {
             var controlPanel = new Pagination(RoomsList.openPage, RoomsList.pageNumber);
             var createGame = Dom.el('input', {type: 'button', value: 'Create room'});
             createGame.onclick = function () {
-                Dispatcher.placeApplication('MapList')
+                RoomsList.dispatcher.placeApplication('MapList')
             };
             var info = [
                 Dom.el('div', null, 'ASDW for movement, 1-7 for weapon switch, mouse click for shoot'),
@@ -78,11 +79,10 @@ Engine.define('RoomsList', (function () {
                     if (!confirm("This room is full. You can join as spectator only. Continue?")) {
                         return;
                     }
-                    Chat.update(0, "You joined as SPECTATOR");
+                    this.chat.update(0, "You joined as SPECTATOR");
                 }
-                var PlayGround = Engine.require('PlayGround');
-                Dispatcher.placeApplication('PlayGround');
-                PlayGround.joinGame(room.map, room.id);
+                RoomsList.dispatcher.placeApplication('PlayGround');
+                RoomsList.playGround.joinGame(room.map, room.id);
             };
             descriptionLink.onclick = clb;
             descriptionLink.innerText = room.description;
@@ -107,7 +107,16 @@ Engine.define('RoomsList', (function () {
                 for (var i = 0; i < zones.length; i++) {
                     var zone = zones[i];
                     if (!zone.passable) {
-                        context.fillRect(zone.x, zone.y, zone.width, zone.height);
+                        context.save();
+                        if(zone.angle) {
+                            context.translate(zone.x + zone.width / 2, zone.y + zone.height / 2);
+                            context.rotate(zone.angle);
+                            context.fillRect(-zone.width / 2, -zone.height/2, zone.width, zone.height);
+                            context.restore();
+                        } else {
+                            context.fillRect(zone.x, zone.y, zone.width, zone.height);
+                        }
+                        context.restore();
                     }
                 }
             }

@@ -37,25 +37,25 @@ public class ZoneController {
     @RequestMapping("/list")
     public List<AbstractZone> getZones() {
         List<AbstractZone> out = new ArrayList<>();
-        out.add(new Wall(0, 0, 0, 0));
-        out.add(new Respawn(0, 0, 0));
-        out.add(new RespawnBlue(0, 0, 0));
-        out.add(new RespawnRed(0, 0, 0));
-        out.add(new FlagRed(0, 0, 0));
-        out.add(new FlagBlue(0, 0, 0));
-        out.add(new ShotgunZone(0, 0, 0));
-        out.add(new AssaultZone(0, 0, 0));
-        out.add(new SniperZone(0, 0, 0));
-        out.add(new MinigunZone(0, 0, 0));
-        out.add(new FlameZone(0, 0, 0));
-        out.add(new RocketZone(0, 0, 0));
-        out.add(new MedkitZone(0, 0, 0));
-        out.add(new ArmorZone(0, 0, 0));
-        out.add(new HelmZone(0, 0, 0));
+        out.add(new Wall(0, 0, 0, 0, 0f));
+        out.add(new Respawn(0, 0, 0, 0));
+        out.add(new RespawnBlue(0, 0, 0, 0));
+        out.add(new RespawnRed(0, 0, 0, 0));
+        out.add(new FlagRed(0, 0, 0, 0));
+        out.add(new FlagBlue(0, 0, 0, 0));
+        out.add(new ShotgunZone(0, 0, 0, 0));
+        out.add(new AssaultZone(0, 0, 0, 0));
+        out.add(new SniperZone(0, 0, 0, 0));
+        out.add(new MinigunZone(0, 0, 0, 0));
+        out.add(new FlameZone(0, 0, 0, 0));
+        out.add(new RocketZone(0, 0, 0, 0));
+        out.add(new MedkitZone(0, 0, 0, 0));
+        out.add(new ArmorZone(0, 0, 0, 0));
+        out.add(new HelmZone(0, 0, 0, 0));
 
         List<Tile> tiles = zoneService.getAllTiles();
         out.addAll(tiles.stream()
-                .map(v -> new TiledZone(0, 0, null, v))
+                .map(v -> new TiledZone(0, 0, null, v, 0))
                 .collect(Collectors.toList())
         );
         return out;

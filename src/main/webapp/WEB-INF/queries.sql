@@ -39,3 +39,4 @@ alter table zone add COLUMN shifty int(11);
 
 update map set game_type = 'dm' where game_type is NULL;
 alter TABLE map modify COLUMN game_type enum('dm', 'tdm', 'ctf') not null DEFAULT 'dm';
+alter TABLE zone add COLUMN angle FLOAT;

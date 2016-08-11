@@ -12,13 +12,13 @@ public abstract class AbstractItem extends AbstractZone implements Interactive, 
     private long timeout;
     private long time;
 
-    public AbstractItem(int topX, int topY, String itemName, int id) {
+    public AbstractItem(int topX, int topY, String itemName, int id, float angle) {
         super(itemName, new Bounds(
                 topX,
                 topY,
                 PersonWebSocketEndpoint.PERSON_RADIUS * 2,
                 PersonWebSocketEndpoint.PERSON_RADIUS * 2
-        ));
+        ), angle);
         setPassable(true);
         setShootable(true);
         setAvailable(true);
