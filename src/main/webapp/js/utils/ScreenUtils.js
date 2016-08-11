@@ -1,4 +1,4 @@
-var ScreenUtils = {
+Engine.define('ScreenUtils', {
     window: function () {
         var e = window, a = 'inner';
         if (!( a + 'Width' in window )) {
@@ -10,4 +10,4 @@ var ScreenUtils = {
     monitor: function () {
         return {width: outerWidth, height: outerHeight}
     }
-};
+});

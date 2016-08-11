@@ -5,6 +5,7 @@ import org.forweb.commandos.entity.Map;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.Vote;
+import org.forweb.commandos.entity.ammo.Projectile;
 import org.forweb.commandos.game.Context;
 import org.forweb.commandos.response.Leave;
 import org.forweb.commandos.response.Status;
@@ -117,6 +118,8 @@ public class SpringDelegationService {
         personService.handlePersons(persons, room);
         projectilesService.onProjectileLifecycle(room.getProjectiles(), room);
         mapService.onItemsLifecycle(room.getMap().getZones());
+
+
         Vote vote = room.getVote();
         if(vote != null) {
             if(vote.isOld()) {
@@ -145,6 +148,9 @@ public class SpringDelegationService {
                 try {
                     tick(room);
                     if (current >= PersonWebSocketEndpoint.SKIP_FRAMES) {
+                        if(room.getProjectiles().values().size() > 2) {
+                            System.out.println("w");
+                        }
                         responseService.broadcast(
                                 new Update(
                                         responseService.mapPersons(room.getPersons()),

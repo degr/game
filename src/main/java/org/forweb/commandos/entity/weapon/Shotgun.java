@@ -5,8 +5,6 @@ import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.ammo.Projectile;
 import org.forweb.commandos.entity.ammo.Shot;
 import org.forweb.commandos.entity.ammo.SubShot;
-import org.forweb.commandos.service.ProjectileService;
-import org.hibernate.service.internal.ProvidedService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,13 +31,13 @@ public class Shotgun extends AbstractWeapon<Shot> {
     @Override
     public Projectile getProjectile(Person person, double angle) {
         int subShotsCount = getBulletsPerShot();
-        Shot out = new Shot((int)person.getX(), (int)person.getY(), person.getAngle());
+        Shot out = new Shot(person, person.getAngle());
         double spread = 15d;
         double shift = spread / getBulletsPerShot();
         double initialAngle = angle - spread / 2;
         List<SubShot> list = new ArrayList<>(subShotsCount);
         for(int i = 0; i < subShotsCount; i++) {
-            list.add(new SubShot((int)person.getX(), (int)person.getY(), initialAngle));
+            list.add(new SubShot(person, initialAngle));
             initialAngle += shift;
         }
         out.setSubShots(list);

@@ -8,7 +8,7 @@ public class RocketLauncher extends AbstractWeapon<Rocket> {
     public RocketLauncher(){
         this.setReloadTimeout(2000);
         this.setShotTimeout(1000);
-        setSpread(7);
+        setSpread(0);
 
         this.setMaxClip(5);
         this.setClipSize(1);
@@ -23,6 +23,6 @@ public class RocketLauncher extends AbstractWeapon<Rocket> {
 
     @Override
     public Projectile getProjectile(Person person, double changedAngle) {
-        return new Rocket((int)person.getX(), (int)person.getY(), changedAngle, person.getId());
+        return new Rocket(person, changedAngle);
     }
 }

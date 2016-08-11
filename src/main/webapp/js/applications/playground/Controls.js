@@ -1,4 +1,4 @@
-var Controls = {
+Engine.define('Controls', {
     left: 65,
     top: 87,
     right: 68,
@@ -26,4 +26,4 @@ var Controls = {
     bind9: null,
     //grenage: 9
     chat: 13
-};
+});

@@ -24,6 +24,6 @@ public class AssaultRifle extends AbstractWeapon<Bullet> {
 
     @Override
     public Projectile getProjectile(Person person, double changedAngle) {
-        return new Bullet((int)person.getX(), (int)person.getY(), changedAngle);
+        return new Bullet(person, changedAngle);
     }
 }

@@ -1,7 +1,16 @@
-var CustomTiles = {
-    container: null,
-    isOnSubmit: false,
-    init: function() {
+Engine.define('CustomTiles', (function () {
+    
+    var Dom = Engine.require('Dom');
+    var Rest = Engine.require('Rest');
+    var DomComponents = Engine.require('DomComponents');
+    
+    var CustomTiles = function () {
+        this.container = null;
+        this.isOnSubmit = false;
+    };
+
+    CustomTiles.prototype.init = function () {
+        var me = this;
         var title = Dom.el('h3', null, 'Create custom tile');
         var fileupload = Dom.el('input', {type: 'file', name: 'fileupload', id: 'tile_fileupload'});
         var labelFileupload = Dom.el('label', {for: 'tile_fileupload'}, 'Tile image');
@@ -16,27 +25,27 @@ var CustomTiles = {
         var submit = Dom.el('input', {type: 'submit', value: 'Create tile'});
         var target = Dom.el('iframe', {id: 'custom_tile_iframe', name: 'custom_tile_iframe'});
         var hide = Dom.el('input', {type: 'button', value: 'Close'});
-        hide.onclick = function() {
-            CustomTiles.hide();
+        hide.onclick = function () {
+            me.hide();
         };
-        target.onload = function() {
-            if(CustomTiles.isOnSubmit) {
-                CustomTiles.isOnSubmit = false;
+        target.onload = function () {
+            if (me.isOnSubmit) {
+                me.isOnSubmit = false;
                 var contents = target.contentDocument || target.contentWindow.document;
                 var body = contents.body;
                 if (body && body.innerText == 'true') {
                     MapEditor.loadObjects();
-                    CustomTiles.hide()
+                    me.hide()
                 } else {
                     alert("Can't save tile. Possible width and height is undefined, or file is not a valid image. Please upload only JPG, PNG, GIF and JPEG");
                 }
             }
         };
-        CustomTiles.container = Dom.el(
+        this.container = Dom.el(
             'form',
             {
                 method: 'post',
-                enctype: 'multipart/form-data', 
+                enctype: 'multipart/form-data',
                 'class': 'panel hidden',
                 action: Rest.host + 'zones/create-zone',
                 target: 'custom_tile_iframe'
@@ -51,16 +60,18 @@ var CustomTiles = {
                 submit, hide, target
             ]
         );
-        DomComponents.doModal(CustomTiles.container);
-        CustomTiles.container.onsubmit = function() {
-            CustomTiles.isOnSubmit = true;
+        DomComponents.doModal(this.container);
+        this.container.onsubmit = function () {
+            me.isOnSubmit = true;
         }
-    },
-    show: function() {
-        Dom.removeClass(CustomTiles.container, 'hidden');
-    },
-    hide: function() {
-        Dom.addClass(CustomTiles.container, 'hidden');
-    }
+    };
+    
+    CustomTiles.prototype.show = function () {
+        Dom.removeClass(this.container, 'hidden');
+    };
 
-};
+    CustomTiles.prototype.hide = function () {
+        Dom.addClass(this.container, 'hidden');
+    };
+    return CustomTiles;
+})());

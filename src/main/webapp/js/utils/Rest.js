@@ -1,22 +1,26 @@
-var Rest = {
-    host: null,
-    doGet: function(url, responseType) {
-        return Rest._onRequest(url, 'get', null, responseType)
-    },
-    doPost: function(url, data, responseType) {
-        return Rest._onRequest(url, 'post', data, responseType)
-    },
-    doPut: function(url, data, responseType) {
-        return Rest._onRequest(url, 'put', data, responseType)
-    },
-    doDelete: function (url, data, responseType) {
-        return Rest._onRequest(url, 'delete', data, responseType)
-    },
-    _onRequest: function (url, type, data, responseType) {
-        if(Rest.host !== null) {
-            url = Rest.host + url;
+Engine.define('Rest', (function () {
+    var Ajax = Engine.require('Ajax');
+    
+    var out = {
+        host: null
+    };
+    out.doGet = function (url, responseType) {
+        return out._onRequest(url, 'get', null, responseType)
+    };
+    out.doPost = function (url, data, responseType) {
+        return out._onRequest(url, 'post', data, responseType)
+    };
+    out.doPut = function (url, data, responseType) {
+        return out._onRequest(url, 'put', data, responseType)
+    };
+    out.doDelete = function (url, data, responseType) {
+        return out._onRequest(url, 'delete', data, responseType)
+    };
+    out._onRequest = function (url, type, data, responseType) {
+        if (out.host !== null) {
+            url = out.host + url;
         }
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             Ajax.ajax({
                 responseType: responseType ? responseType : 'json',
                 type: type,
@@ -25,4 +29,5 @@ var Rest = {
             }, resolve, reject)
         })
     }
-};
+    return out;
+})());

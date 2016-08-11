@@ -2,6 +2,7 @@ package org.forweb.commandos.service;
 
 import org.forweb.commandos.controller.PersonWebSocketEndpoint;
 import org.forweb.commandos.entity.Blood;
+import org.forweb.commandos.entity.GameMap;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.ammo.*;
@@ -119,9 +120,22 @@ public class ProjectileService {
                 PersonWebSocketEndpoint.ROCKET_RADIUS
         );
         Explosion explosion = null;
-        if (rocket.getxStart() <= 0 || rocket.getxStart() >= room.getMap().getX() ||
-                rocket.getyStart() <= 0 || rocket.getyStart() >= room.getMap().getY()) {
-            explosion = new Explosion((int) rocket.getxStart(), (int) rocket.getyStart());
+        GameMap map = room.getMap();
+        if (rocket.getxStart() <= 0 || rocket.getxStart() >= map.getX() ||
+                rocket.getyStart() <= 0 || rocket.getyStart() >= map.getY()) {
+            Person shooter = room.getPersons().get(rocket.getPersonId());
+            if(shooter != null) {
+                int xStart = rocket.getxStart() <= 0 ? 0 : (int)rocket.getxStart();
+                if(xStart > map.getX()) {
+                    xStart = map.getX();
+                }
+                int yStart = rocket.getyStart() <= 0 ? 0 : (int)rocket.getyStart();
+                if(yStart > map.getY()) {
+                    yStart = map.getY();
+                }
+
+                explosion = new Explosion(xStart, yStart, shooter);
+            }
         }
         if (explosion == null) {
             for (AbstractZone zone : room.getMap().getZones()) {
@@ -131,7 +145,10 @@ public class ProjectileService {
                             new Bounds(zone.getX(), zone.getY(), zone.getWidth(), zone.getHeight())
                     );
                     if (point.length > 0) {
-                        explosion = new Explosion((int) point[0].getX(), (int) point[0].getY());
+                        Person shooter = room.getPersons().get(rocket.getPersonId());
+                        if(shooter != null) {
+                            explosion = new Explosion((int)point[0].getX(), (int)point[0].getY(), shooter);
+                        }
                         break;
                     }
                 }
@@ -150,11 +167,13 @@ public class ProjectileService {
                             personCircle
                     );
                     if (point.length > 0) {
-                        explosion = new Explosion((int) point[0].getX(), (int) point[0].getY());
                         Person shooter = room.getPersons().get(rocket.getPersonId());
-                        boolean isKilled = onDamage(shooter, rocket.getDamage(), person, room);
-                        if(isKilled) {
-                            room.getMessages().add("0:" + shooter.getName() + " explode " + person.getName());
+                        if(shooter != null) {
+                            explosion = new Explosion((int)point[0].getX(), (int)point[0].getY(), shooter);
+                            boolean isKilled = onDamage(shooter, rocket.getDamage(), person, room);
+                            if(isKilled) {
+                                room.getMessages().add("0:" + shooter.getName() + " explode " + person.getName());
+                            }
                         }
                         break;
                     }
@@ -240,8 +259,6 @@ public class ProjectileService {
                 projectile.setyEnd((int) closest.getY());
             }
         }
-        Integer shooterStartX = null;
-        Integer shooterStartY = null;
         for (Person person : room.getPersons().values()) {
             Point linePointB = new Point((double) projectile.getxEnd(), (double) projectile.getyEnd());
             Point[] intersectionPoints = LineService.lineIntersectCircle(
@@ -254,8 +271,8 @@ public class ProjectileService {
 
             if (shooter == person) {
                 if (intersectionPoints.length > 0) {
-                    shooterStartX = (int) intersectionPoints[0].getX();
-                    shooterStartY = (int) intersectionPoints[0].getY();
+                    //shooterStartX = (int) intersectionPoints[0].getX();
+                    //shooterStartY = (int) intersectionPoints[0].getY();
                 }
                 continue;
             }
@@ -276,13 +293,6 @@ public class ProjectileService {
                 }
             }
         }
-        if(shooterStartX != null) {
-            projectile.setxStart(shooterStartX);
-        }
-        if(shooterStartY != null) {
-            projectile.setyStart(shooterStartY);
-        }
-
 
         if (closestPerson != null) {
             boolean isKilled = onDamage(shooter, projectile.getDamage(), closestPerson, room);

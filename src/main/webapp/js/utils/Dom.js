@@ -1,71 +1,84 @@
-var Dom = {
+Engine.define('Dom', (function () {
+    var out = {};
     /**
      * @param type string
      * @param attr object|null
      * @param content string|Element|Element[]
      * @returns {Element}
      */
-    el: function (type, attr, content) {
+    out.el = function (type, attr, content) {
         var o = document.createElement(type);
-        Dom.update(o, attr);
-        Dom.append(o, content);
+        out.update(o, attr);
+        out.append(o, content);
         return o;
-    },
-    addClass: function(el, clazz) {
-        if(el.className) {
-            if(el.className.indexOf(clazz) === -1) {
+    };
+    out.addClass = function (el, clazz) {
+        if (el.className) {
+            if (el.className.indexOf(clazz) === -1) {
                 el.className += ' ' + clazz;
-            } else if(el.className.split(' ').indexOf(clazz) === -1) {
+            } else if (el.className.split(' ').indexOf(clazz) === -1) {
                 el.className += ' ' + clazz;
             }
         } else {
             el.className = clazz;
         }
-    },
-    removeClass: function(el, clazz) {
+    }
+    out.removeClass = function (el, clazz) {
         var cl = el.className;
-        if(cl && cl.indexOf(clazz) > -1) {
+        if (cl && cl.indexOf(clazz) > -1) {
             var p = cl.split(' ');
             var i = p.indexOf(clazz);
-            if(i > -1) {
+            if (i > -1) {
                 p.splice(i, 1);
                 el.className = p.join(' ');
             }
         }
-    },
-    hasClass: function (el, clazz) {
+    };
+    out.hasClass = function (el, clazz) {
         var cl = el.className;
-        if(cl.indexOf(clazz) > -1) {
+        if (cl.indexOf(clazz) > -1) {
             return cl.split(' ').indexOf(clazz) > -1;
         } else {
             return false;
         }
-    },
-    id: function (id) {
+    };
+    out.id = function (id) {
         return document.getElementById(id);
-    },
-    update: function(el, attr) {
-        if(typeof attr === 'string'){el.className = attr;
-        }else if(attr)for(var i in attr)el.setAttribute(i, attr[i]);
-    },
-    append: function(o, content) {
-        if(content) {
-            if(typeof content === 'string' || typeof content === 'number') {
+    };
+    out.update = function (el, attr) {
+        if (typeof attr === 'string') {
+            el.className = attr;
+        } else if (attr)for (var i in attr) {
+            if(!attr.hasOwnProperty(i))continue;
+            if(typeof attr[i] == 'function') {
+                var key = i;
+                if(key.indexOf("on") === 0) {
+                    key = key.substring(2);
+                }
+                el.addEventListener(key, attr[i]);
+            } else {
+                el.setAttribute(i, attr[i])
+            }
+        }
+    };
+    out.append = function (o, content) {
+        if (content) {
+            if (typeof content === 'string' || typeof content === 'number') {
                 o.appendChild(document.createTextNode(content + ""));
-            } else if(content.length && content.push && content.pop) {
-                for(var i = 0;i<content.length;i++) {
+            } else if (content.length && content.push && content.pop) {
+                for (var i = 0; i < content.length; i++) {
                     var child = content[i];
-                    if(child) {
-                        Dom.append(o, child);
+                    if (child) {
+                        out.append(o, child);
                     }
                 }
             } else {
                 o.appendChild(content)
             }
         }
-    },
-    calculateOffset: function (elem) {
-        var top=0, left=0
+    };
+    out.calculateOffset = function (elem) {
+        var top = 0, left = 0
         if (elem.getBoundingClientRect) {
             var box = elem.getBoundingClientRect();
 
@@ -78,27 +91,27 @@ var Dom = {
             var clientTop = docElem.clientTop || body.clientTop || 0;
             var clientLeft = docElem.clientLeft || body.clientLeft || 0;
 
-            top  = box.top +  scrollTop - clientTop;
+            top = box.top + scrollTop - clientTop;
             left = box.left + scrollLeft - clientLeft;
 
-            return { top: Math.round(top), left: Math.round(left) }
+            return {top: Math.round(top), left: Math.round(left)}
         } else {
-            while(elem) {
+            while (elem) {
                 top = top + parseInt(elem.offsetTop);
                 left = left + parseInt(elem.offsetLeft);
                 elem = elem.offsetParent
             }
             return {top: top, left: left}
         }
-    },
-    animate: function(el, values, time, frame, clb) {
-        if(!frame)frame = 10;
-        for(var style in values) {
+    };
+    out.animate = function (el, values, time, frame, clb) {
+        if (!frame)frame = 10;
+        for (var style in values) {
             var from = el.style[style];
-            if(!from && from !== 0) {
+            if (!from && from !== 0) {
                 from = getComputedStyle(el)[style];
             }
-            if(!from) {
+            if (!from) {
                 el.style[style] = 0;
                 from = 0;
             } else {
@@ -113,9 +126,10 @@ var Dom = {
                 }, frame);
                 setTimeout(function () {
                     clearInterval(interval);
-                    if(clb)clb();
+                    if (clb)clb();
                 }, time)
             })(style, from, (to - from) * frame / time);
         }
-    }
-};
+    };
+    return out
+})());

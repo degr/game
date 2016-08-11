@@ -208,7 +208,7 @@ public class MapService extends AbstractService<Map, MapDao> {
     }
 
     public List<String> loadMapNames(Map.GameType gameType) {
-        return dao.loadMapNames(gameType);
+        return dao.loadMapNames(gameType.toString());
     }
 
     public List<String> loadMapNames() {
