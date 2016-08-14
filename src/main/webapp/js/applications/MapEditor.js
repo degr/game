@@ -602,13 +602,11 @@ Engine.define('MapEditor', (function () {
         drawZone: function (zone) {
             var context = MapEditor.context;
             context.save();
+            context.beginPath();
             var rect = MapEditor.doRectangle(zone);
             if (zone.highlight) {
                 context.strokeStyle = "#EA0013";
                 context.fillStyle = '#EA0013';
-            } else {
-                context.strokeStyle = "#5E354F";
-                context.fillStyle = '#5E354F';
             }
             var center = MapEditor.getCenter(zone);
             context.translate(center.x, center.y);
@@ -619,27 +617,61 @@ Engine.define('MapEditor', (function () {
                 width: rect.width,
                 height: rect.height
             };
-            if (zone.type != 'wall') {
-                context.beginPath();
-                context.strokeText(zone.type, rect.x + 3, rect.y + 20, rect.width - 6);
+
+            var image = new Image();
+            function drawZoneImage(path, fullPath) {
+                image.src = fullPath === true ? path : "images/map/" + path;
+                context.drawImage(image, rect.x, rect.y, rect.width, rect.height);
                 context.rect(rect.x, rect.y, rect.width, rect.height);
-                if (zone.type === 'tiled') {
+                context.stroke();
+            }
+            switch (zone.type) {
+                case 'flag_blue':
+                case 'flag_red':
+                    drawZoneImage('images/teams/'+zone.type + ".png", true);
+                    break;
+                case 'respawn_blue':
+                    context.fillStyle = 'rgba(54, 159, 236, 0.41)';
+                    context.fillRect(rect.x, rect.y, rect.width, rect.height);
+                    break;
+                case 'respawn_red':
+                    context.fillStyle = 'rgba(210, 63, 63, 0.41)';
+                    context.fillRect(rect.x, rect.y, rect.width, rect.height);
+                    break;
+                case 'respawn':
+                    context.fillStyle = '#35ff4c';
+                    context.fillRect(rect.x, rect.y, rect.width, rect.height);
+                    break;
+                case 'wall':
+                case "pistol":
+                case "shotgun":
+                case "assault":
+                case "sniper":
+                case "minigun":
+                case "rocket":
+                case "medkit":
+                case "armor":
+                case "helm":
+                    drawZoneImage(zone.type + '.png');
+                    break;
+                case "flamethrower":
+                    drawZoneImage('flame.png');
+                    break;
+                case 'tiles':
                     (function (zone, rect) {
-                        var image = new Image();
                         image.src = MapEditor.playGround.uploadPath + zone.customSprite;
                         image.onload = function () {
                             if (zone.tileset) {
                                 context.drawImage(image, zone.stepX * rect.width, zone.stepY * rect.height, rect.width, rect.height, rect.x, rect.y, rect.width, rect.height);
                             } else {
-                                context.drawImage(image, rect.x, rect.y, rect.width, rect.height);
+                                drawZoneImage(image);
                             }
                         }
                     })(zone, rect);
-                }
-            } else {
-                context.fillRect(rect.x, rect.y, rect.width, rect.height)
+                    break;
+                default:
+                    context.fillRect(rect.x, rect.y, rect.width, rect.height);
             }
-            context.stroke();
 
             if (zone.highlight) {
                 context.fillStyle = '#EA0013';
@@ -751,7 +783,7 @@ Engine.define('MapEditor', (function () {
                 var input = Dom.el('input', {
                     type: 'button',
                     'class': 'item item-' + zone.type,
-                    value: name
+                    value: name.indexOf('respawn') > -1 ? 'respawn' : ' '
                 });
                 input.onclick = function () {
                     MapEditor.mount(zone)

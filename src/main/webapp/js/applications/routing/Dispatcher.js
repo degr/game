@@ -2,22 +2,26 @@ Engine.define('Dispatcher', (function () {
 
     var Dom = Engine.require('Dom');
 
-    var Dispatcher = function(appstore, application){
+    var Dispatcher = function(appstore, application, context){
         this.appStore = Dom.id(appstore);
         this.app = Dom.id(application);
+        this.context = context;
         this.applications = {};
         this.activeApplication = null;
     };
     
     Dispatcher.prototype.initApplication = function (contructor, name) {
         var application;
-        if(typeof application == "function") {
-            application = new contructor();
+        if(typeof contructor == "function") {
+            var me = this;
+            application = new contructor(this.context, function(applicationName, directives){
+                me.placeApplication(applicationName, directives);
+            });
         } else {
             application = contructor;
         }
         if(application.init) {
-            application.init();
+            application.init(this.context);
         }
         if (!this.applications[name]) {
             this.applications[name] = application;
@@ -26,7 +30,7 @@ Engine.define('Dispatcher', (function () {
         }
         this.appStore.appendChild(application.container);
     };
-    Dispatcher.prototype.placeApplication = function (applicationName) {
+    Dispatcher.prototype.placeApplication = function (applicationName, directives) {
         var application = this.applications[applicationName];
         if (!application) {
             throw "Undefined application " + applicationName;
@@ -42,7 +46,7 @@ Engine.define('Dispatcher', (function () {
         }
         this.activeApplication = application;
         if (application.beforeOpen) {
-            application.beforeOpen();
+            application.beforeOpen(directives);
         }
         this.app.appendChild(application.container);
         if (application.afterOpen) {

@@ -73,8 +73,7 @@ Engine.define('WeaponControl', (function(){
             out.className = "weapon " + (weapon.enable ? "enable " : "disable ") + (weapon.active ? 'active' : '');
         };
         onUpdateCallback(weapon);
-        var me = this;
-        this.updater[weapon.type] = onUpdateCallback
+        this.updater[weapon.type] = onUpdateCallback;
         this.container.appendChild(out);
     };
 

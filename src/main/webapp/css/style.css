@@ -108,48 +108,67 @@ body, html {
     box-sizing: border-box;
 }
 
-.editor td.respawn, .editor .item-respawn {
+.editor td.respawn, .editor .item{
+    -webkit-background-size: 32px 32px;
+    background-size: 100%;
+    background: transparent no-repeat center;
+    min-width: 32px;
+}
+.editor td.respawn, .editor .item.item-flag_red {
+    background-image: url(../images/teams/flag_red.png);
+}
+.editor td.respawn, .editor .item.item-flag_blue {
+    background-image: url(../images/teams/flag_blue.png);
+}
+.editor td.respawn, .editor .item.item-respawn_blue {
+    background-color: rgba(54, 159, 236, 0.41);
+}
+.editor td.respawn, .editor .item.item-respawn_red {
+    background-color: rgba(210, 63, 63, 0.41);;
+}
+.editor td.respawn, .editor .item.item-respawn {
     background: #35ff4c;
 }
 
 .editor td.wall, .editor .item-wall {
-    background: rgba(145, 150, 157, 0.82);
+    background-image: url(../images/map/wall.png);
+    background-size: auto;
 }
 
 .editor td.shotgun, .editor .item-shotgun {
-    background: #ffcb9a;
+    background-image: url(../images/map/shotgun.png);
 }
 
 .editor td.sniper, .editor .item-sniper {
-    background: rgba(94, 53, 79, 0.79);
+    background-image: url(../images/map/sniper.png);
 }
 
 .editor td.assault, .editor .item-assault {
-    background: rgba(234, 120, 71, 0.82);
+    background-image: url(../images/map/assault.png);
 }
 
 .editor td.minigun, .editor .item-minigun {
-    background: rgba(65, 29, 234, 0.82);
+    background-image: url(../images/map/minigun.png);
 }
 
-.editor td.flame, .editor .item-flame {
-    background: rgba(234, 0, 19, 0.82);
+.editor td.flame, .editor .item-flamethrower {
+    background-image: url(../images/map/flame.png);
 }
 
 .editor td.rocket, .editor .item-rocket {
-    background: rgba(230, 234, 76, 0.82);
+    background-image: url(../images/map/rocket.png);
 }
 
 .editor td.medkit, .editor .item-medkit {
-    background: rgba(106, 231, 234, 0.82);
+    background-image: url(../images/map/medkit.png);
 }
 
 .editor td.armor, .editor .item-armor {
-    background: rgba(195, 234, 171, 1);
+    background-image: url(../images/map/armor.png);
 }
 
 .editor td.helm, .editor .item-helm {
-    background: rgb(234, 145, 145);
+    background-image: url(../images/map/helm.png);
 }
 
 .editor .mounted-wrapper {
@@ -517,4 +536,26 @@ input[button], input[submit], button {
 }
 .editor p.controls .angle{
     display: inline-block;
+}
+.hint {
+    background: white;
+    border-radius: 3px;
+    border: 1px solid gray;
+    padding: 5px;
+    margin-bottom: 10px;
+    float: left;
+    clear: left;
+}
+
+.clearfix {
+    *zoom: 1;
+}
+.clearfix:before,
+.clearfix:after {
+    display: table;
+    content: "";
+    line-height: 0;
+}
+.clearfix:after {
+     clear: both;
 }

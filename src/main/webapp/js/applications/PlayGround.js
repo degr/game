@@ -14,7 +14,7 @@ Engine.define('PlayGround', (function () {
     var WeaponControl = Engine.require('WeaponControl');
     var LifeAndArmor = Engine.require('LifeAndArmor');
     var KeyboardSetup = Engine.require('KeyboardSetup');
-    var GameStats = Engine.require('GameStats');
+    var GameStats = Engine.modules.GameStats;
     var Score = Engine.require('Score');
     var ScoreOverview = Engine.require('ScoreOverview');
     var TeamControl = Engine.require('TeamControl');
@@ -28,11 +28,12 @@ Engine.define('PlayGround', (function () {
         this.uploadPath = "upload.images/zones/";
         this.container = null;
         this.canvas = Dom.el('canvas', {width: 640, height: 480, id: 'playground'});
+        this.context = this.canvas.getContext('2d');
         this.socket = null;//websocket
         this.entities = {};//game persons on playground
         this.owner = {};//current person. Come from server with full information
         this.projectiles = [];//current projectiles to display
-        this.xMouse = 0;//current x-mouse position
+        this.xMouse = 0;//current x-mouse position`
         this.yMouse = 0;//current y-mouse position;
         this.viewAngleDirection = 0;//current y-mouse position,
         this.angle = 0;
@@ -65,34 +66,27 @@ Engine.define('PlayGround', (function () {
         this.playerName = '';
 
         this.chat = new Chat(this);
-        
+        this.personTracker = new PersonTracker(document.body, this);
         var canvas = this.canvas;
         this.weaponControl = new WeaponControl();
         
         BloodActions.playGround = this;
-        GameStats.playGround = this;
+        this.teamControl = new TeamControl(this);
+        this.gameStats = new GameStats(this, this.personTracker, this.teamControl);
         KeyboardSetup.playGround = this;
         KeyboardSetup.chat = this.chat;
         PersonActions.playGround = this;
-        PersonTracker.playGround = this;
         ProjectilesActions.playGround = this;
-        Score.playGround = this;
-        ScoreOverview.playGround = this;
+        this.score = new Score(this);
+        this.scoreOverview = new ScoreOverview(this);
         WeaponActions.playGround = this;
         ZoneActions.playGround = this;
-        TeamControl.playGround = this;
 
         PersonActions.init();
         ProjectilesActions.init();
-        PersonTracker.init();
         ZoneActions.init();
-        LifeAndArmor.init();
+        this.lifeAndArmor = new LifeAndArmor();
         KeyboardSetup.init();
-        GameStats.init();
-        Score.init();
-        ScoreOverview.init();
-        TeamControl.init();
-
 
         var me = this;
         setInterval(function () {
@@ -130,8 +124,8 @@ Engine.define('PlayGround', (function () {
             'div',
             {'class': 'playground'},
             [
-                openKeyboard, this.weaponControl.container, this.chat.container, LifeAndArmor.container, KeyboardSetup.container,
-                Score.container, GameStats.container, ScoreOverview.container, TeamControl.container, canvas
+                openKeyboard, this.weaponControl.container, this.chat.container, this.lifeAndArmor.container, KeyboardSetup.container,
+                this.score.container, this.gameStats.container, this.scoreOverview.container, this.teamControl.container, canvas
             ]
         );
 
@@ -144,7 +138,6 @@ Engine.define('PlayGround', (function () {
         }
 
         this.rect = canvas.getBoundingClientRect();
-        this.context = canvas.getContext('2d');
         CGraphics.context = this.context;
         canvas.addEventListener('mousedown', function(e){PersonActions.startFire(e)});
         canvas.addEventListener('mouseup', function(e){PersonActions.stopFire(e)});
@@ -169,6 +162,16 @@ Engine.define('PlayGround', (function () {
             me.windowInactive = true;
         });
     };
+    PlayGround.prototype.beforeOpen = function (directives) {
+        var dto;
+        if(directives.joinGame) {
+            dto = directives.joinGame; 
+            this.joinGame(dto.map, dto.roomId);
+        } else if(directives.createGame) {
+            dto = directives.createGame;
+            this.createGame(dto.name, dto.map);
+        }
+    };
     PlayGround.prototype.createGame = function (name, map) {
         this.updateCanvas(map);
         this.connect("create:" + map.id + ":" + encodeURIComponent(name) + ":" + encodeURIComponent(this.playerName))
@@ -192,18 +195,18 @@ Engine.define('PlayGround', (function () {
         if (map.x < win.width) {
             canvas.style.marginLeft = 'auto';
             canvas.style.marginRight = 'auto';
-            PersonTracker.trackX = false;
+            this.personTracker.trackX = false;
         } else {
             canvas.style.marginLeft = null;
             canvas.style.marginRight = null;
-            PersonTracker.trackX = true;
+            this.personTracker.trackX = true;
         }
         if (map.y < win.height) {
             canvas.style.marginTop = (win.height - map.y) / 2 + 'px';
-            PersonTracker.trackY = false;
+            this.personTracker.trackY = false;
         } else {
             canvas.style.marginTop = null;
-            PersonTracker.trackY = true;
+            this.personTracker.trackY = true;
         }
 
         if (this.owner && this.owner.id) {
@@ -211,16 +214,16 @@ Engine.define('PlayGround', (function () {
         } else {
             Dom.removeClass(document.body, 'no-overflow');
         }
-        TeamControl.updateTeamHolder();
+        this.teamControl.updateTeamHolder();
         this.canvasOffset = Dom.calculateOffset(canvas);
     };
     PlayGround.prototype.trackPerson = function () {
-        if (PersonTracker.trackX || PersonTracker.trackY) {
+        if (this.personTracker.trackX || this.personTracker.trackY) {
             Dom.addClass(document.body, 'no-overflow');
-            PersonTracker.start();
+            this.personTracker.start();
         } else {
             Dom.removeClass(document.body, 'no-overflow');
-            PersonTracker.stop();
+            this.personTracker.stop();
         }
     };
     PlayGround.prototype.connect = function (onConnectMessage) {
@@ -249,7 +252,7 @@ Engine.define('PlayGround', (function () {
                         break;
                     case 'stats':
                         if (!me.statsShown) {
-                            TeamControl.readyCheckbox.checked = false;
+                            this.teamControl.readyCheckbox.checked = false;
                             me.statsShown = true;
                             me.onStats(data);
                         }
@@ -268,10 +271,10 @@ Engine.define('PlayGround', (function () {
     };
     PlayGround.prototype.onStats = function (data) {
         this.gameStarted = false;
-        PersonTracker.stop();
-        GameStats.show();
-        TeamControl.show();
-        GameStats.update(data.stats, parseInt(data.team1Score), parseInt(data.team2Score));
+        this.personTracker.stop();
+        this.gameStats.show();
+        this.teamControl.show();
+        this.gameStats.update(data.stats, parseInt(data.team1Score), parseInt(data.team2Score));
     };
     PlayGround.prototype.decryptOwner = function (owner) {
         var data = owner.owner.split(":");
@@ -287,12 +290,12 @@ Engine.define('PlayGround', (function () {
         if (packet.map) {
             this.updateCanvas(packet.map)
         }
-        if (packet.started == 1 && (TeamControl.isShown || !this.readyToPlay)) {
-            TeamControl.hide();
+        if (packet.started == 1 && (this.teamControl.isShown || !this.readyToPlay)) {
+            this.teamControl.hide();
             this.readyToPlay = true;
-        } else if (!packet.started && (!TeamControl.isShown)) {
+        } else if (!packet.started && (!this.teamControl.isShown)) {
             this.readyToPlay = false;
-            TeamControl.show();
+            this.teamControl.show();
         }
         if (packet.owner !== null) {
             var oldOwnerId = this.owner.id;
@@ -303,11 +306,11 @@ Engine.define('PlayGround', (function () {
         }
         var owner = this.owner;
         if (packet.score) {
-            ScoreOverview.updateTeamScore(packet.score);
+            this.scoreOverview.updateTeamScore(packet.score);
         }
         this.weaponControl.update(owner);
-        LifeAndArmor.update(owner.life, owner.armor);
-        Score.update(owner, packet.time);
+        this.lifeAndArmor.update(owner.life, owner.armor);
+        this.score.update(owner, packet.time);
         for (var m = 0; m < packet.messages.length; m++) {
             var message = packet.messages[m];
             var mId = parseInt(message.substring(0, message.indexOf(":")));

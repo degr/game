@@ -25,7 +25,8 @@
     <script src="js/components/Pagination.js"></script><!-- + -->
     <script src="js/components/Tabs.js"></script><!-- + -->
 
-    <script src="js/applications/Dispatcher.js"></script><!-- + -->
+    <script src="js/applications/routing/Context.js"></script><!-- + -->
+    <script src="js/applications/routing/Dispatcher.js"></script><!-- + -->
 
     <script src="js/applications/playground/Weapons.js"></script><!-- + -->
     <script src="js/applications/playground/Controls.js"></script><!-- + -->
@@ -36,23 +37,23 @@
 
     <script src="js/applications/playground/Chat.js"></script><!-- + -->
 
-    <script src="js/applications/rooms-list/RoomsChat.js"></script>
-    <script src="js/applications/RoomsList.js"></script>
-    <script src="js/applications/MapList.js"></script>
+    <script src="js/applications/rooms-list/RoomsChat.js"></script><!-- + -->
+    <script src="js/applications/RoomsList.js"></script><!-- + -->
+    <script src="js/applications/MapList.js"></script><!-- + -->
 
-    <script src="js/applications/playground/WeaponControl.js"></script>
-    <script src="js/applications/playground/BloodActions.js"></script>
-    <script src="js/applications/playground/PersonTracker.js"></script>
-    <script src="js/applications/playground/WeaponActions.js"></script>
-    <script src="js/applications/playground/LifeAndArmor.js"></script>
-    <script src="js/applications/playground/ScoreOverview.js"></script>
-    <script src="js/applications/playground/TeamControl.js"></script>
-    <script src="js/applications/playground/GameStats.js"></script>
-    <script src="js/applications/playground/ZoneActions.js"></script>
-    <script src="js/applications/playground/Person.js"></script>
+    <script src="js/applications/playground/WeaponControl.js"></script><!-- + -->
+    <script src="js/applications/playground/BloodActions.js"></script><!-- +- -->
+    <script src="js/applications/playground/PersonTracker.js"></script><!-- + -->
+    <script src="js/applications/playground/WeaponActions.js"></script><!-- + -->
+    <script src="js/applications/playground/LifeAndArmor.js"></script><!-- + -->
+    <script src="js/applications/playground/ScoreOverview.js"></script><!-- + -->
+    <script src="js/applications/playground/TeamControl.js"></script><!-- + -->
+    <script src="js/applications/playground/GameStats.js"></script><!-- + -->
+    <script src="js/applications/playground/ZoneActions.js"></script><!-- +- -->
+    <script src="js/applications/playground/Person.js"></script><!-- + -->
     <script src="js/applications/playground/Score.js"></script>
-    <script src="js/applications/playground/PersonActions.js"></script>
-    <script src="js/applications/playground/ProjectilesActions.js"></script>
+    <script src="js/applications/playground/PersonActions.js"></script><!-- +- -->
+    <script src="js/applications/playground/ProjectilesActions.js"></script><!-- +- -->
     <script src="js/applications/playground/KeyboardSetup.js"></script>
 
     <script src="js/applications/PlayGround.js"></script>
@@ -72,14 +73,16 @@
          };
 
          Engine.require('Rest').host = document.location.protocol + '//' + document.location.host + '/server/';
+         var Context = Engine.require('Context');
+         var context = new Context();
+
          var Dispatcher = Engine.require('Dispatcher');
-         var dispatcher = new Dispatcher('appstore', 'application');
+         var dispatcher = new Dispatcher('appstore', 'application', context);
 
          var MapEditor = Engine.require('MapEditor');
          MapEditor.dispatcher = dispatcher;
 
          var RoomList = Engine.require('RoomsList');
-         RoomList.dispatcher = dispatcher;
 
          var MapList = Engine.require('MapList');
          MapList.dispatcher = dispatcher;
@@ -88,13 +91,8 @@
          var playGround = new PlayGround();
          MapEditor.playGround = playGround;
          MapList.playGround = playGround;
-         RoomList.playGround = playGround;
-         RoomList.chat = playGround.chat;
 
-         var Greetings = Engine.require('Greetings');
-         var greetings = new Greetings(dispatcher, playGround);
-
-         dispatcher.initApplication(greetings, 'Greetings');
+         dispatcher.initApplication(Engine.require('Greetings'), 'Greetings');
          dispatcher.initApplication(MapList, 'MapList');
          dispatcher.initApplication(RoomList, 'RoomsList');
          dispatcher.initApplication(playGround, 'PlayGround');

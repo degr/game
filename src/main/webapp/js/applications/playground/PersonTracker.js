@@ -1,72 +1,73 @@
 Engine.define('PersonTracker', (function () {
-    var PersonTracker = {
-        trackX: false,
-        trackY: false,
-        interval: null,
-        isStarted: false,
-        trackedContainer: null,
-        maxX: 0,
-        maxY: 0,
-        window: {width: 0, height: 0},
+    function PersonTracker (trackedContainer, playGround) {
+        if(!trackedContainer) {
+            throw "Track container not defined";
+        }
+        this.trackX = false;
+        this.trackY = false;
+        this.interval = null;
+        this.isStarted = false;
+        this.trackedContainer = trackedContainer;
+        this.maxX = 0;
+        this.maxY = 0;
+        this.window = {width: 0, height: 0};
         /**
          * @var PlayGround
          */
-        playGround: null,
-        init: function () {
-            PersonTracker.trackedContainer = document.body;
-        },
-        start: function () {
-            if (PersonTracker.isStarted) {
-                clearInterval(PersonTracker.interval || 0);
+        this.playGround = playGround;
+    }
+    PersonTracker.prototype.start = function () {
+        if (this.isStarted) {
+            clearInterval(this.interval || 0);
+        }
+        var ScreenUtils = Engine.require('ScreenUtils');
+        this.window = ScreenUtils.window();
+        if (this.trackY) {
+            this.trackedContainer.scrollTop = this.trackedContainer.scrollHeight;
+            this.maxY = this.trackedContainer.scrollTop;
+        }
+        if (this.trackX) {
+            this.trackedContainer.scrollLeft = this.trackedContainer.scrollWidth;
+            this.maxX = this.trackedContainer.scrollLeft;
+        }
+        this.isStarted = true;
+        var me = this;
+        this.interval = setInterval(function () {
+            me.track();
+        }, 20)
+    };
+    PersonTracker.prototype.stop = function () {
+        if (this.interval !== null) {
+            clearInterval(this.interval || 0);
+        }
+        this.isStarted = false;
+    };
+    PersonTracker.prototype.track = function () {
+        var playGround = this.playGround;
+        if (playGround.owner) {
+            var p = playGround.entities[playGround.owner.id];
+            if (this.trackX) {
+                var x = playGround.map.x;
+                this.trackedContainer.scrollLeft = this.calculateScroll(
+                    x, p.x, this.maxX, this.window.width);
             }
-            var ScreenUtils = Engine.require('ScreenUtils');
-            PersonTracker.window = ScreenUtils.window();
-            if (PersonTracker.trackY) {
-                document.body.scrollTop = document.body.scrollHeight;
-                PersonTracker.maxY = document.body.scrollTop;
+            if (this.trackY) {
+                var y = playGround.map.y;
+                this.trackedContainer.scrollTop = this.calculateScroll(
+                    y, p.y, this.maxY, this.window.height);
             }
-            if (PersonTracker.trackX) {
-                document.body.scrollLeft = document.body.scrollWidth;
-                PersonTracker.maxX = document.body.scrollLeft;
-            }
-            PersonTracker.isStarted = true;
-            PersonTracker.interval = setInterval(function () {
-                PersonTracker.track();
-            }, 20)
-        },
-        stop: function () {
-            if (PersonTracker.interval !== null) {
-                clearInterval(PersonTracker.interval || 0);
-            }
-            PersonTracker.isStarted = false;
-        },
-        track: function () {
-            var playGround = PersonTracker.playGround;
-            if (playGround.owner) {
-                var p = playGround.entities[playGround.owner.id];
-                if (PersonTracker.trackX) {
-                    var x = playGround.map.x;
-                    PersonTracker.trackedContainer.scrollLeft = PersonTracker.calculateScroll(
-                        x, p.x, PersonTracker.maxX, PersonTracker.window.width);
-                }
-                if (PersonTracker.trackY) {
-                    var y = playGround.map.y;
-                    PersonTracker.trackedContainer.scrollTop = PersonTracker.calculateScroll(
-                        y, p.y, PersonTracker.maxY, PersonTracker.window.height);
-                }
-            }
-        },
-        calculateScroll: function (map, person, scrollMax, window) {
-            var half = window / 2;
-            if (person / map < 0.5 && person < half) {
-                return 0;
-            } else if (map - person < half) {
-                return scrollMax;
-            } else {
-                var realP = person - half;
-                var realM = map - window;
-                return (realP / realM) * scrollMax;
-            }
+        }
+    };
+    PersonTracker.prototype.calculateScroll = function (map, person, scrollMax, window) {
+        var half = window / 2;
+        if (person / map < 0.5 && person < half) {
+            return 0;
+        } else if (map - person < half) {
+            return scrollMax;
+        } else {
+            var realP = person - half;
+            var realM = map - window;
+            return (realP / realM) * scrollMax;
         }
     };
     return PersonTracker;

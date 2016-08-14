@@ -3,26 +3,19 @@ Engine.define('Greetings', (function () {
     var Dom = Engine.require('Dom');
 
     /**
-     * @param dispatcher Dispatcher
-     * @param playground Playground
+     * @param context Context
+     * @param placeApplication function
      * @constructor
      */
-    var Greetings = function(dispatcher, playground) {
-        if(!dispatcher) {
-            throw "Greetings class require dispatcher instance";
-        }
-        if(!playground) {
-            throw "Greetings class require playground instance";
-        }
-        
-        this.playGround = playground;
+    var Greetings = function(context, placeApplication) {
         this.container = null;
         this.name = null;
-        this.dispatcher = dispatcher;
+        this.context = context;
+        this.placeApplication = placeApplication;
     };
     Greetings.prototype.init = function () {
         var me = this;
-        var name = localStorage.getItem('personName') || '';
+        var name = this.context.get('personName') || '';
         this.name = Dom.el('input', {name: 'name', type: 'text', placeholder: 'Your name', value: name});
         var submit = Dom.el('input', {type: 'submit', value: 'Ready to kill'});
         var form = Dom.el('form', {onsubmit: function(event){me.onSubmit(event)}}, [me.name, submit]);
@@ -38,10 +31,11 @@ Engine.define('Greetings', (function () {
     Greetings.prototype.onSubmit = function (e) {
         e.preventDefault();
         var name = this.getName();
-        localStorage.setItem('personName', name);
-        this.playGround.playerName = name;
-        this.dispatcher.placeApplication('RoomsList');
-        return false;
+        this.context.set('personName', name);
+        this.placeApplication('RoomsList');
+    };
+    Greetings.prototype.toString = function (e) {
+        return "Greetings application";
     };
     return Greetings;
 
