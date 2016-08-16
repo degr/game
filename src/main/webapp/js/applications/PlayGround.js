@@ -26,7 +26,7 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
     var BloodActions = Engine.require('BloodActions');
     var CGraphics = Engine.require('CGraphics');
 
-    var PlayGround = function () {
+    var PlayGround = function (context, placeApplication) {
         this.radius = 20;
         this.gameStarted = false;
         this.container = null;
@@ -149,7 +149,8 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         this.windowListeners = {
             keydown: [
                 function(e){PersonActions.onKeyDown(e)},
-                function(e){PersonActions.changeWeapon(e)}
+                function(e){WeaponActions.changeWeapon(e)},
+                function(e){if(e.keyCode === 27){placeApplication("Greetings")}}
             ],
             keyup: function(e){PersonActions.stopMovement(e)},
             mousemove: function(e){PersonActions.updateMouseDirection(e)},
@@ -166,9 +167,10 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
                 me.windowInactive = true;
             }
         };
-        Dom.addListeners(window, this.windowListeners);
+        Dom.addListeners(this.windowListeners);
     };
     PlayGround.prototype.beforeOpen = function (directives) {
+        KeyboardSetup.addListeners();
         var dto;
         if(directives.joinGame) {
             dto = directives.joinGame; 
@@ -179,7 +181,12 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         }
     };
     PlayGround.prototype.beforeClose = function () {
-        Dom.removeListeners(window, this.windowListeners);
+        Dom.removeListeners(this.windowListeners);
+        this.scoreOverview.removeListeners();
+        this.chat.removeListeners();
+        KeyboardSetup.removeListeners();
+        this.stopGameLoop();
+        this.socket.close();
     };
     PlayGround.prototype.createGame = function (name, map) {
         this.updateCanvas(map);
@@ -260,7 +267,7 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
                         break;
                     case 'stats':
                         if (!me.statsShown) {
-                            this.teamControl.readyCheckbox.checked = false;
+                            me.teamControl.readyCheckbox.checked = false;
                             me.statsShown = true;
                             me.onStats(data);
                         }

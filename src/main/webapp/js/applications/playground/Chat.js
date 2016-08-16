@@ -14,9 +14,10 @@ Engine.define('Chat', 'Dom', (function (Dom) {
          */
         this.playGround = playGround;
         var me = this;
-        window.addEventListener('keyup', function (e) {
-            me.onChatKeyup(e)
-        }, false);
+        this.listners = {
+            keyup: function (e) {me.onChatKeyup(e)}
+        };
+        Dom.addListeners(this.listners);
         try {
             var value = localStorage.getItem('chat');
             if (value) {
@@ -60,6 +61,10 @@ Engine.define('Chat', 'Dom', (function (Dom) {
                 me.wasMoved = !me.wasMoved;
             }
         };
+    };
+
+    Chat.prototype.removeListeners = function() {
+        Dom.removeListeners(this.listners);
     };
 
     Chat.prototype.save = function () {

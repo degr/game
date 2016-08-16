@@ -81,21 +81,35 @@ Engine.define('Dom', (function () {
         for(var key in listeners) {
             if(!listeners.hasOwnProperty(key))continue;
             var wrapper = listeners[key];
+            var listnerName = key.indexOf('on') === 0 ? key.substring(2) : key;
             if(typeof wrapper === "function") {
-                clb(el, wrapper)
+                clb(el, listnerName, wrapper)
             } else {
                 for(var i = 0; i < wrapper.length; i++) {
-                    clb(el, wrapper[i]);
+                    clb(el, listnerName, wrapper[i]);
                 }
             }
         }
     }
     Dom.addListeners = function(el, listeners) {
-      iterateListeners(el, listeners, function(el, key, listener){
-          el.addEventListener(key, listener, false);
-      }) 
+        if(!listeners) {
+            listeners = el;
+            el = window;
+        }
+        iterateListeners(el, listeners, function(el, key, listener){
+            el.addEventListener(key, listener, false);
+        })
     };
+    /**
+     * Remove event listners
+     * @param el Node|object
+     * @param listeners object|null
+     */
     Dom.removeListeners = function(el, listeners) {
+        if(!listeners) {
+            listeners = el;
+            el = window;
+        }
         iterateListeners(el, listeners, function(el, key, listener){
             el.removeEventListener(key, listener, false);
         })

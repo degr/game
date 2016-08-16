@@ -14,14 +14,11 @@ Engine.define('ScoreOverview', ['Dom', 'Controls'], (function (Dom, Controls) {
         this.playGround = playGround;
         //todo add destruction logic
         var me = this;
-        
-        window.addEventListener('keydown', me.listeners.keydown, false);
-        window.addEventListener('keyup', me.listeners.keyup, false);
+        Dom.addListeners(this.listeners);
         this.container = Dom.el('div', 'score-overview window hidden');
     }
     ScoreOverview.prototype.removeListeners = function() {
-        window.removeEventListener('keydown', this.listeners.keydown, false);
-        window.removeEventListener('keyup', this.listeners.keyup, false);
+        Dom.removeListeners(this.listeners);
     };
     ScoreOverview.prototype.show = function () {
         this.container.innerHTML = '';

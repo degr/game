@@ -54,13 +54,21 @@ Engine.define('KeyboardSetup', ['Dom', 'Controls', 'Tabs', 'PersonActions', 'Sou
 
             var esc = Dom.el('input', {type: 'button', value: 'Close'});
             esc.onclick = KeyboardSetup.hide;
-            window.addEventListener('keyup', KeyboardSetup.onEscapeButton, false);
+            this.listeners = {
+                keyup: function(e){KeyboardSetup.onEscapeButton(e)}
+            };
 
             KeyboardSetup.container = Dom.el(
                 'div',
                 {class: 'keyboard-setup hidden'},
                 [title, tabs.container, esc]
             );
+        },
+        removeListeners: function() {
+            Dom.removeListeners(this.listeners);
+        },
+        addListeners: function() {
+            Dom.addListeners(this.listeners);
         },
         buildChatToggler: function () {
             var chatToggler = Dom.el('input', {

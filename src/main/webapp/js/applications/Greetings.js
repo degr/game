@@ -16,11 +16,11 @@ Engine.define('Greetings', ['Dom'], (function (Dom) {
         this.name = Dom.el('input', {name: 'name', type: 'text', placeholder: 'Your name', value: name});
         var submit = Dom.el('input', {type: 'submit', value: 'Ready to kill'});
         var form = Dom.el('form', {onsubmit: function(event){me.onSubmit(event)}}, [me.name, submit]);
-        var window = Dom.el('div', {'class': 'window'}, [
+        var win = Dom.el('div', {'class': 'window'}, [
             Dom.el('h1', null, 'Kill Them All'),
             form,
             Dom.el('p', null, 'Online browser game. No registration, just fun')]);
-        this.container = Dom.el('div', {'class': 'overlay'}, window);
+        this.container = Dom.el('div', {'class': 'overlay'}, win);
     };
     Greetings.prototype.getName = function () {
         return this.name.value;
