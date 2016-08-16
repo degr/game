@@ -1,6 +1,5 @@
-Engine.define('Greetings', (function () {
+Engine.define('Greetings', ['Dom'], (function (Dom) {
 
-    var Dom = Engine.require('Dom');
 
     /**
      * @param context Context
@@ -12,8 +11,6 @@ Engine.define('Greetings', (function () {
         this.name = null;
         this.context = context;
         this.placeApplication = placeApplication;
-    };
-    Greetings.prototype.init = function () {
         var me = this;
         var name = this.context.get('personName') || '';
         this.name = Dom.el('input', {name: 'name', type: 'text', placeholder: 'Your name', value: name});
@@ -39,4 +36,4 @@ Engine.define('Greetings', (function () {
     };
     return Greetings;
 
-})());
+}));

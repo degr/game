@@ -1,4 +1,4 @@
-Engine.define('KeyboardSetup', (function () {
+Engine.define('KeyboardSetup', ['Dom', 'Controls', 'Tabs', 'PersonActions', 'SoundUtils', 'KeyboardUtils'], (function () {
 
     var Dom = Engine.require('Dom');
     var Controls = Engine.require('Controls');
@@ -336,4 +336,4 @@ Engine.define('KeyboardSetup', (function () {
         }
     };
     return KeyboardSetup
-})());
+}));

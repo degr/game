@@ -1,4 +1,4 @@
-Engine.modules.GameStats = (function () {
+Engine.define('GameStats', 'Dom', (function () {
 
     var Dom = Engine.require('Dom');
     
@@ -56,4 +56,4 @@ Engine.modules.GameStats = (function () {
     };
 
     return GameStats
-})();
+}));

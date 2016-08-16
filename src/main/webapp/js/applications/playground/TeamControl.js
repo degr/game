@@ -92,4 +92,4 @@ Engine.define('TeamControl', (function () {
         return this.playGround.map.gameType != 'dm';
     };
     return TeamControl;
-})());
+}));

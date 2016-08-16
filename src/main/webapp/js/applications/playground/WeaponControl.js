@@ -1,4 +1,4 @@
-Engine.define('WeaponControl', (function(){
+Engine.define('WeaponControl', ['Dom', 'Weapons'], (function(){
     var Dom = Engine.require('Dom');
     var Weapons = Engine.require('Weapons');
 
@@ -78,4 +78,4 @@ Engine.define('WeaponControl', (function(){
     };
 
     return WeaponControl;
-})());
+}));

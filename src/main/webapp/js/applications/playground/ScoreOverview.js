@@ -1,21 +1,28 @@
-Engine.define('ScoreOverview', (function () {
-    var Dom = Engine.require('Dom');
-    var Controls = Engine.require('Controls');
+Engine.define('ScoreOverview', ['Dom', 'Controls'], (function (Dom, Controls) {
 
     function ScoreOverview(playGround){
         this.container = null;
         this.team1 = 0;
         this.team2 = 0;
+        this.listeners = {
+            keydown: function(e){me.onShow(e)},
+            keyup:  function(e){me.onHide(e)}
+        };
         /**
          * @var PlayGround
          */
         this.playGround = playGround;
         //todo add destruction logic
         var me = this;
-        window.addEventListener('keydown', function(e){me.onShow(e)}, false);
-        window.addEventListener('keyup',  function(e){me.onHide(e)}, false);
+        
+        window.addEventListener('keydown', me.listeners.keydown, false);
+        window.addEventListener('keyup', me.listeners.keyup, false);
         this.container = Dom.el('div', 'score-overview window hidden');
     }
+    ScoreOverview.prototype.removeListeners = function() {
+        window.removeEventListener('keydown', this.listeners.keydown, false);
+        window.removeEventListener('keyup', this.listeners.keyup, false);
+    };
     ScoreOverview.prototype.show = function () {
         this.container.innerHTML = '';
         Dom.removeClass(this.container, 'hidden');
@@ -89,4 +96,4 @@ Engine.define('ScoreOverview', (function () {
         }
     };
     return ScoreOverview;
-})());
+}));

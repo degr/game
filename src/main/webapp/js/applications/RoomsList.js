@@ -1,9 +1,5 @@
-Engine.define('RoomsList', (function () {
-    var RoomsChat = Engine.require('RoomsChat');
-    var Dom = Engine.require('Dom');
-    var Pagination = Engine.require('Pagination');
-    var Rest = Engine.require('Rest');
-    
+Engine.define('RoomsList', ['RoomsChat', 'Dom', 'Pagination', 'Rest'], 
+    (function (RoomsChat, Dom, Pagination, Rest) {
     
     function RoomsList(context, placeApplication) {
         this.container = null;
@@ -132,4 +128,4 @@ Engine.define('RoomsList', (function () {
     };
 
     return RoomsList;
-})());  
+}));  

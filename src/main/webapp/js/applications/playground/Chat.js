@@ -1,7 +1,5 @@
-Engine.define('Chat', (function () {
-
-    var Dom = Engine.require('Dom');
-
+Engine.define('Chat', 'Dom', (function (Dom) {
+    
     var Chat = function (playGround) {
         this.container = null;
         this.isTextareaShown = false;
@@ -148,4 +146,4 @@ Engine.define('Chat', (function () {
     };
 
     return Chat;
-})());
+}));

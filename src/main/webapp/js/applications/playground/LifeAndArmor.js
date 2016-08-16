@@ -1,4 +1,4 @@
-Engine.define('LifeAndArmor', (function () {
+Engine.define('LifeAndArmor', 'Dom', (function () {
 
     var Dom = Engine.require('Dom');
     
@@ -39,4 +39,4 @@ Engine.define('LifeAndArmor', (function () {
         }
     };
     return LifeAndArmor
-})());
+}));

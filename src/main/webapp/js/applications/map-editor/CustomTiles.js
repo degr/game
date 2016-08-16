@@ -1,8 +1,4 @@
-Engine.define('CustomTiles', (function () {
-    
-    var Dom = Engine.require('Dom');
-    var Rest = Engine.require('Rest');
-    var DomComponents = Engine.require('DomComponents');
+Engine.define('CustomTiles', ['Dom', 'Rest', 'DomComponents'], (function (Dom, Rest, DomComponents) {
     
     var CustomTiles = function (loadObjects) {
         this.container = null;
@@ -72,4 +68,4 @@ Engine.define('CustomTiles', (function () {
         Dom.addClass(this.container, 'hidden');
     };
     return CustomTiles;
-})());
+}));

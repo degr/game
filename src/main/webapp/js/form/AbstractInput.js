@@ -1,14 +1,11 @@
-Engine.define("AbstractInput", (function(){
-    
-    var Dom = Engine.require("Dom");
-    var StringUtils = Engine.require("StringUtils");
-    
+Engine.define("AbstractInput", ['Dom', 'StringUtils'], (function(Dom, StringUtils){
+        
     function AbstractInput(params) {
         if(!params.name)throw "Name is reqired for input";
         this.input = Dom.el(this.getElementType(), this.prepareAttributes(params), this.prepareContent(params));
         this.label = this.buildLabel(params);
         this.container = Dom.el('div', 'formfield-holder ' + (params.class || ''), [this.label, this.input]);
-    };
+    }
 
     
     AbstractInput.prototype.buildLabel = function(params) {
@@ -66,4 +63,4 @@ Engine.define("AbstractInput", (function(){
         return this.input.value;
     };
     return AbstractInput;
-})());
+}));

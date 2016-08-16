@@ -77,6 +77,30 @@ Engine.define('Dom', (function () {
             }
         }
     };
+    function iterateListeners(el, listeners, clb) {
+        for(var key in listeners) {
+            if(!listeners.hasOwnProperty(key))continue;
+            var wrapper = listeners[key];
+            if(typeof wrapper === "function") {
+                clb(el, wrapper)
+            } else {
+                for(var i = 0; i < wrapper.length; i++) {
+                    clb(el, wrapper[i]);
+                }
+            }
+        }
+    }
+    Dom.addListeners = function(el, listeners) {
+      iterateListeners(el, listeners, function(el, key, listener){
+          el.addEventListener(key, listener, false);
+      }) 
+    };
+    Dom.removeListeners = function(el, listeners) {
+        iterateListeners(el, listeners, function(el, key, listener){
+            el.removeEventListener(key, listener, false);
+        })
+    };
+
     Dom.calculateOffset = function (elem) {
         var top = 0, left = 0;
         if (elem.getBoundingClientRect) {
@@ -155,4 +179,4 @@ Engine.define('Dom', (function () {
         };
     };
     return Dom
-})());
+}));

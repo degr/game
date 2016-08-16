@@ -1,10 +1,7 @@
-Engine.define('RoomsChat', (function(){
-
-    var Dom = Engine.require('Dom');
-    var DomComponents = Engine.require('DomComponents');
-    var Rest = Engine.require('Rest');
-    var Greetings = Engine.require('Greetings');
-    var Context = Engine.require('Context');
+Engine.define(
+    'RoomsChat',
+    ['Dom', 'DomComponents', 'Rest', 'Greetings', 'Context'],
+    function(Dom, DomComponents, Rest, Greetings, Context) {
     
     function RoomsChat(context) {
         if(!(context instanceof Context)) {
@@ -105,4 +102,4 @@ Engine.define('RoomsChat', (function(){
     };
 
     return RoomsChat;
-})());
+});

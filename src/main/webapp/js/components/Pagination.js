@@ -1,6 +1,4 @@
-Engine.define('Pagination', (function () {
-    
-    var Dom = Engine.require('Dom');
+Engine.define('Pagination', ['Dom'], (function (Dom) {
     
     var Pagination = function (onOpenPage, pageNumber) {
         if (!onOpenPage || !pageNumber) {
@@ -66,4 +64,4 @@ Engine.define('Pagination', (function () {
         }
     };
     return Pagination;
-})());
+}));

@@ -1,5 +1,9 @@
-Engine.define('PlayGround', (function () {
+Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
+    'PersonActions', 'SoundUtils', 'ProjectilesActions', 'PersonTracker', 'ZoneActions', 
+    'WeaponActions', 'WeaponControl', 'LifeAndArmor', 'KeyboardSetup', 'GameStats', 'Score',
+    'ScoreOverview', 'TeamControl', 'WebSocketUtils', 'BloodActions', 'CGraphics', 'ScreenUtils'], (function () {
 
+    var ScreenUtils = Engine.require('ScreenUtils');
     var Person = Engine.require('Person');
     var Dom = Engine.require('Dom');
     var Controls = Engine.require('Controls');
@@ -25,7 +29,6 @@ Engine.define('PlayGround', (function () {
     var PlayGround = function () {
         this.radius = 20;
         this.gameStarted = false;
-        this.uploadPath = "upload.images/zones/";
         this.container = null;
         this.canvas = Dom.el('canvas', {width: 640, height: 480, id: 'playground'});
         this.context = this.canvas.getContext('2d');
@@ -143,24 +146,27 @@ Engine.define('PlayGround', (function () {
         canvas.addEventListener('mouseup', function(e){PersonActions.stopFire(e)});
         var background = localStorage.getItem('background');
         canvas.style.backgroundImage = background ? background : 'url(images/map/background/1.png)';
-        window.addEventListener('keydown', function(e){PersonActions.onKeyDown(e)}, false);
-        window.addEventListener('keydown', function(e){WeaponActions.changeWeapon(e)}, false);
-        window.addEventListener('keyup', function(e){PersonActions.stopMovement(e)}, false);
-        window.addEventListener('mousemove', function(e){PersonActions.updateMouseDirection(e)});
-        window.addEventListener('resize', function () {
-            me.updateCanvas(me.map)
-        });
-        window.addEventListener('focus', function () {
-            if (me.newPlayerInterval !== null) {
-                clearInterval(me.newPlayerInterval || 0);
-                me.newPlayerInterval = null;
+        this.windowListeners = {
+            keydown: [
+                function(e){PersonActions.onKeyDown(e)},
+                function(e){PersonActions.changeWeapon(e)}
+            ],
+            keyup: function(e){PersonActions.stopMovement(e)},
+            mousemove: function(e){PersonActions.updateMouseDirection(e)},
+            resize: function () {me.updateCanvas(me.map)},
+            focus: function () {
+                if (me.newPlayerInterval !== null) {
+                    clearInterval(me.newPlayerInterval || 0);
+                    me.newPlayerInterval = null;
+                }
+                me.windowInactive = false;
+                window.document.getElementsByTagName('title')[0].innerHTML = 'Kill Them All'
+            },
+            blur: function () {
+                me.windowInactive = true;
             }
-            me.windowInactive = false;
-            window.document.getElementsByTagName('title')[0].innerHTML = 'Kill Them All'
-        });
-        window.addEventListener('blur', function () {
-            me.windowInactive = true;
-        });
+        };
+        Dom.addListeners(window, this.windowListeners);
     };
     PlayGround.prototype.beforeOpen = function (directives) {
         var dto;
@@ -171,6 +177,9 @@ Engine.define('PlayGround', (function () {
             dto = directives.createGame;
             this.createGame(dto.name, dto.map);
         }
+    };
+    PlayGround.prototype.beforeClose = function () {
+        Dom.removeListeners(window, this.windowListeners);
     };
     PlayGround.prototype.createGame = function (name, map) {
         this.updateCanvas(map);
@@ -190,7 +199,6 @@ Engine.define('PlayGround', (function () {
         canvas.style.height = map.y + 'px';
         canvas.width = map.x;
         canvas.height = map.y;
-        var ScreenUtils = Engine.require('ScreenUtils');
         var win = ScreenUtils.window();
         if (map.x < win.width) {
             canvas.style.marginLeft = 'auto';
@@ -444,4 +452,4 @@ Engine.define('PlayGround', (function () {
     };
 
     return PlayGround;
-})());
+}));

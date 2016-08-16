@@ -1,9 +1,6 @@
-Engine.define('MapList', (function () {
-
-    var Dom = Engine.require('Dom');
-    var Pagination = Engine.require('Pagination');
-    var Rest = Engine.require('Rest');
-    var StringUtils = Engine.require('StringUtils');
+Engine.define('MapList', ['StringUtils', 'Dom', 'Pagination', 'Rest'],
+    (function (StringUtils, Dom, Pagination, Rest) {
+    
     
     function MapList(context, placeApplication) {
         this.container = null;
@@ -113,4 +110,4 @@ Engine.define('MapList', (function () {
     };
     
     return MapList;
-})());
+}));

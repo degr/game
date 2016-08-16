@@ -90,4 +90,4 @@ Engine.define('SoundUtils', (function () {
         }
     };
     return SoundUtils;
-})());
+}));

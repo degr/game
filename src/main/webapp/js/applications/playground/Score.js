@@ -1,6 +1,4 @@
-Engine.define('Score', (function () {
-
-    var Dom = Engine.require('Dom');
+Engine.define('Score', 'Dom', (function (Dom) {
     
     function Score(playGround) {
         this.container = null;
@@ -42,4 +40,4 @@ Engine.define('Score', (function () {
         return min + ":" + sec;
     };
     return Score;
-})());
+}));

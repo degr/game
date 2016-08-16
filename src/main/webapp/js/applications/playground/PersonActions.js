@@ -1,4 +1,4 @@
-Engine.define('PersonActions', (function () {
+Engine.define('PersonActions', ['SoundUtils', 'ZoneActions', 'Controls'], (function () {
 
     var SoundUtils = Engine.require('SoundUtils');
     var ZoneActions = Engine.require('ZoneActions');
@@ -475,4 +475,4 @@ Engine.define('PersonActions', (function () {
     PersonActions.flagBlue.src = 'images/teams/flag_blue.png';
 
     return PersonActions
-})());
+}));

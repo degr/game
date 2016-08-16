@@ -1,6 +1,7 @@
-Engine.define('ZoneActions', (function () {
+Engine.define('ZoneActions', ['Weapons', 'Config'], (function () {
 
     var Weapons = Engine.require("Weapons");
+    var Config = Engine.require("Config");
     
     var ZoneActions = {
         images: {},
@@ -98,7 +99,7 @@ Engine.define('ZoneActions', (function () {
                 case 'tiled':
                     if (!ZoneActions.images[zone.tileId]) {
                         var image = new Image();
-                        image.src = playGround.uploadPath + zone.customSprite;
+                        image.src = Config.uploadPath + zone.customSprite;
                         ZoneActions.images[zone.tileId] = image;
                     }
                     try {
@@ -146,6 +147,6 @@ Engine.define('ZoneActions', (function () {
         }
     };
     return ZoneActions
-})());
+}));
 
 

@@ -9,54 +9,29 @@
 
     <script src="js/Engine.js"></script>
 
-    <script src="js/utils/CGraphics.js"></script><!-- + -->
-    <script src="js/utils/KeyboardUtils.js"></script><!-- + -->
-    <script src="js/utils/ScreenUtils.js"></script><!-- + -->
-    <script src="js/utils/Ajax.js"></script><!-- + -->
-    <script src="js/utils/Rest.js"></script><!-- + -->
-    <script src="js/utils/StringUtils.js"></script><!-- + -->
+    <script type="application/javascript">
+        Engine.define('application', 'PathBuilder', function(PathBuilder){
+            Engine.pathBuilder = PathBuilder;
+            Engine.define(
+                "application",
+                ['Ajax', 'Rest', 'Context', 'Dispatcher'],
+                function (Ajax, Rest, Context, Dispatcher) {
+                    Ajax.headers = {
+                        Accept: "application/json,text/plain",
+                        'Content-Type': "application/json"
+                    };
 
-    <script src="js/utils/Dom.js"></script><!-- + -->
-    <script src="js/form/AbstractInput.js"></script><!-- + -->
-    <script src="js/form/Text.js"></script><!-- + -->
-    <script src="js/utils/DomComponents.js"></script><!-- + -->
-    <script src="js/utils/SoundUtils.js"></script><!-- + -->
-    <script src="js/utils/WebSocketUtils.js"></script><!-- + -->
-    <script src="js/components/Pagination.js"></script><!-- + -->
-    <script src="js/components/Tabs.js"></script><!-- + -->
+                    Rest.host = document.location.protocol + '//' + document.location.host + '/server/';
+                    var context = new Context();
 
-    <script src="js/applications/routing/Context.js"></script><!-- + -->
-    <script src="js/applications/routing/Dispatcher.js"></script><!-- + -->
+                    var dispatcher = new Dispatcher('application', context);
+                    dispatcher.placeApplication('Greetings')
+                }
+            );
+        });
 
-    <script src="js/applications/playground/Weapons.js"></script><!-- + -->
-    <script src="js/applications/playground/Controls.js"></script><!-- + -->
-    <script src="js/applications/Greetings.js"></script><!-- + -->
 
-    <script src="js/applications/map-editor/CustomTiles.js"></script><!-- + -->
-    <script src="js/applications/MapEditor.js"></script>
-
-    <script src="js/applications/playground/Chat.js"></script><!-- + -->
-
-    <script src="js/applications/rooms-list/RoomsChat.js"></script><!-- + -->
-    <script src="js/applications/RoomsList.js"></script><!-- + -->
-    <script src="js/applications/MapList.js"></script><!-- + -->
-
-    <script src="js/applications/playground/WeaponControl.js"></script><!-- + -->
-    <script src="js/applications/playground/BloodActions.js"></script><!-- +- -->
-    <script src="js/applications/playground/PersonTracker.js"></script><!-- + -->
-    <script src="js/applications/playground/WeaponActions.js"></script><!-- + -->
-    <script src="js/applications/playground/LifeAndArmor.js"></script><!-- + -->
-    <script src="js/applications/playground/ScoreOverview.js"></script><!-- + -->
-    <script src="js/applications/playground/TeamControl.js"></script><!-- + -->
-    <script src="js/applications/playground/GameStats.js"></script><!-- + -->
-    <script src="js/applications/playground/ZoneActions.js"></script><!-- +- -->
-    <script src="js/applications/playground/Person.js"></script><!-- + -->
-    <script src="js/applications/playground/Score.js"></script>
-    <script src="js/applications/playground/PersonActions.js"></script><!-- +- -->
-    <script src="js/applications/playground/ProjectilesActions.js"></script><!-- +- -->
-    <script src="js/applications/playground/KeyboardSetup.js"></script>
-
-    <script src="js/applications/PlayGround.js"></script>
+    </script>
 
     <title>Kill Them All</title>
     <meta charset="utf-8"/>
@@ -64,41 +39,5 @@
 </head>
 <body>
 <div id="application"></div>
-<div id="appstore"></div>
-<script type="application/javascript">
-    (function () {
-         Engine.require('Ajax').headers = {
-         Accept: "application/json,text/plain",
-         'Content-Type': "application/json"
-         };
-
-         Engine.require('Rest').host = document.location.protocol + '//' + document.location.host + '/server/';
-         var Context = Engine.require('Context');
-         var context = new Context();
-
-         var Dispatcher = Engine.require('Dispatcher');
-         var dispatcher = new Dispatcher('appstore', 'application', context);
-
-         var MapEditor = Engine.require('MapEditor');
-         MapEditor.dispatcher = dispatcher;
-
-         var RoomList = Engine.require('RoomsList');
-
-         var MapList = Engine.require('MapList');
-         MapList.dispatcher = dispatcher;
-
-         var PlayGround = Engine.require('PlayGround');
-         var playGround = new PlayGround();
-         MapEditor.playGround = playGround;
-         MapList.playGround = playGround;
-
-         dispatcher.initApplication(Engine.require('Greetings'), 'Greetings');
-         dispatcher.initApplication(MapList, 'MapList');
-         dispatcher.initApplication(RoomList, 'RoomsList');
-         dispatcher.initApplication(playGround, 'PlayGround');
-         dispatcher.initApplication(MapEditor, 'MapEditor');
-         dispatcher.placeApplication('Greetings')
-    })();
-</script>
 </body>
 </html>

@@ -1,16 +1,13 @@
-Engine.define('Dispatcher', (function () {
-
-    var Dom = Engine.require('Dom');
-
-    var Dispatcher = function(appstore, application, context){
-        this.appStore = Dom.id(appstore);
+Engine.define('Dispatcher', ['Dom'], (function (Dom) {
+    
+    var Dispatcher = function(application, context){
         this.app = Dom.id(application);
         this.context = context;
         this.applications = {};
         this.activeApplication = null;
     };
     
-    Dispatcher.prototype.initApplication = function (contructor, name) {
+    Dispatcher.prototype.initApplication = function (contructor) {
         var application;
         if(typeof contructor == "function") {
             var me = this;
@@ -19,39 +16,46 @@ Engine.define('Dispatcher', (function () {
             });
         } else {
             application = contructor;
+            if(application.init) {
+                application.init(this.context);
+            }
         }
-        if(application.init) {
-            application.init(this.context);
-        }
-        if (!this.applications[name]) {
-            this.applications[name] = application;
-        } else {
-            throw 'Application with name ' + name + " already was initialized";
-        }
-        this.appStore.appendChild(application.container);
+        return application;
     };
     Dispatcher.prototype.placeApplication = function (applicationName, directives) {
-        var application = this.applications[applicationName];
-        if (!application) {
-            throw "Undefined application " + applicationName;
-        }
-        if (this.activeApplication) {
-            if (this.activeApplication.beforeClose) {
-                this.activeApplication.beforeClose();
+        var me = this;
+        var application = me.applications[applicationName];
+        var callback = function(application) {
+            var app = me.initApplication(application);
+            if (!application) {
+                throw "Undefined application " + applicationName;
             }
-            this.appStore.appendChild(this.activeApplication.container);
-            if (this.activeApplication.afterClose) {
-                this.activeApplication.afterClose();
+            if (me.activeApplication) {
+                if (me.activeApplication.beforeClose) {
+                    me.activeApplication.beforeClose();
+                }
+                me.app.innerHTML = '';
+                if (me.activeApplication.afterClose) {
+                    me.activeApplication.afterClose();
+                }
             }
-        }
-        this.activeApplication = application;
-        if (application.beforeOpen) {
-            application.beforeOpen(directives);
-        }
-        this.app.appendChild(application.container);
-        if (application.afterOpen) {
-            application.afterOpen();
+            me.activeApplication = app;
+            if (app.beforeOpen) {
+                app.beforeOpen(directives);
+            }
+            me.app.appendChild(app.container);
+            if (app.afterOpen) {
+                app.afterOpen();
+            }
+        };
+        if(application) {
+            callback(application);
+        } else {
+            Engine.load(applicationName, function() {
+                me.applications[applicationName] = Engine.require(applicationName);
+                me.placeApplication(applicationName, directives);
+            })
         }
     };
     return Dispatcher;
-})());
+}));

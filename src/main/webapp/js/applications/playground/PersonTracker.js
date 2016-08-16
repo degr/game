@@ -71,4 +71,4 @@ Engine.define('PersonTracker', (function () {
         }
     };
     return PersonTracker;
-})());
+}));

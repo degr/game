@@ -24,4 +24,4 @@ Engine.define("Context", (function () {
         return 'Context instance';
     };
     return Context;
-})());
+}));
