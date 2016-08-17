@@ -1,6 +1,4 @@
-Engine.define('DomComponents', (function () {
-    
-    var Dom = Engine.require('Dom');
+Engine.define('DomComponents', ['Dom'], (function (Dom) {
     
     var DomComponents = {};
 
@@ -91,4 +89,4 @@ Engine.define('DomComponents', (function () {
         Dom.addClass(element, 'over');
     };
     return DomComponents;
-})());
+}));

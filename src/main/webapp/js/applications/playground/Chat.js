@@ -1,7 +1,5 @@
-Engine.define('Chat', (function () {
-
-    var Dom = Engine.require('Dom');
-
+Engine.define('Chat', 'Dom', (function (Dom) {
+    
     var Chat = function (playGround) {
         this.container = null;
         this.isTextareaShown = false;
@@ -16,9 +14,10 @@ Engine.define('Chat', (function () {
          */
         this.playGround = playGround;
         var me = this;
-        window.addEventListener('keyup', function (e) {
-            me.onChatKeyup(e)
-        }, false);
+        this.listners = {
+            keyup: function (e) {me.onChatKeyup(e)}
+        };
+        Dom.addListeners(this.listners);
         try {
             var value = localStorage.getItem('chat');
             if (value) {
@@ -62,6 +61,10 @@ Engine.define('Chat', (function () {
                 me.wasMoved = !me.wasMoved;
             }
         };
+    };
+
+    Chat.prototype.removeListeners = function() {
+        Dom.removeListeners(this.listners);
     };
 
     Chat.prototype.save = function () {
@@ -148,4 +151,4 @@ Engine.define('Chat', (function () {
     };
 
     return Chat;
-})());
+}));

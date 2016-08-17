@@ -117,4 +117,4 @@ Engine.define('Weapons', (function () {
             return out;
         }
     };
-})());
+}));

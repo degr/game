@@ -36,4 +36,4 @@ Engine.define('BloodActions', (function () {
     BloodActions.blood[1].src = 'images/map/blood2.png';
     BloodActions.blood[2].src = 'images/map/blood3.png';
     return BloodActions
-})());
+}));

@@ -1,7 +1,4 @@
-Engine.define('Text', (function() {
-    var Dom = Engine.require('Dom');
-    var AbstractInput = Engine.require('AbstractInput');
-    
+Engine.define('Text', ['Dom', 'AbstractInput'], function(Dom, AbstractInput) {
     function Text(name) {
         AbstractInput.apply(this, arguments);
     }
@@ -14,4 +11,4 @@ Engine.define('Text', (function() {
     };
     Text.prototype.constructor = Text;
     return Text;
-})());
+});

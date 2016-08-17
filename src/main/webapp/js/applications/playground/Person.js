@@ -15,4 +15,4 @@ Engine.define('Person', (function () {
         return this.y;
     };
     return Person
-})());
+}));

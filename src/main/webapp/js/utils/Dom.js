@@ -77,6 +77,44 @@ Engine.define('Dom', (function () {
             }
         }
     };
+    function iterateListeners(el, listeners, clb) {
+        for(var key in listeners) {
+            if(!listeners.hasOwnProperty(key))continue;
+            var wrapper = listeners[key];
+            var listnerName = key.indexOf('on') === 0 ? key.substring(2) : key;
+            if(typeof wrapper === "function") {
+                clb(el, listnerName, wrapper)
+            } else {
+                for(var i = 0; i < wrapper.length; i++) {
+                    clb(el, listnerName, wrapper[i]);
+                }
+            }
+        }
+    }
+    Dom.addListeners = function(el, listeners) {
+        if(!listeners) {
+            listeners = el;
+            el = window;
+        }
+        iterateListeners(el, listeners, function(el, key, listener){
+            el.addEventListener(key, listener, false);
+        })
+    };
+    /**
+     * Remove event listners
+     * @param el Node|object
+     * @param listeners object|null
+     */
+    Dom.removeListeners = function(el, listeners) {
+        if(!listeners) {
+            listeners = el;
+            el = window;
+        }
+        iterateListeners(el, listeners, function(el, key, listener){
+            el.removeEventListener(key, listener, false);
+        })
+    };
+
     Dom.calculateOffset = function (elem) {
         var top = 0, left = 0;
         if (elem.getBoundingClientRect) {
@@ -155,4 +193,4 @@ Engine.define('Dom', (function () {
         };
     };
     return Dom
-})());
+}));

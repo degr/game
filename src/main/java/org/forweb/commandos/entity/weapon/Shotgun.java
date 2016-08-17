@@ -32,7 +32,7 @@ public class Shotgun extends AbstractWeapon<Shot> {
     public Projectile getProjectile(Person person, double angle) {
         int subShotsCount = getBulletsPerShot();
         Shot out = new Shot(person, person.getAngle());
-        double spread = 15d;
+        double spread = 20d;
         double shift = spread / getBulletsPerShot();
         double initialAngle = angle - spread / 2;
         List<SubShot> list = new ArrayList<>(subShotsCount);

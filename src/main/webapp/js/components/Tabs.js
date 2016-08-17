@@ -1,7 +1,5 @@
-Engine.define('Tabs', (function() {
+Engine.define('Tabs', ['Dom'], (function(Dom) {
 
-    var Dom = Engine.require('Dom');
-    
     var Tabs = function () {
         this.header = Dom.el('div', 'tabs-header');
         this.content = Dom.el('div', 'tabs-body');
@@ -35,4 +33,4 @@ Engine.define('Tabs', (function() {
         tab.body.remove(true);
     };
     return Tabs;
-})());
+}));

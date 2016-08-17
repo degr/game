@@ -1,4 +1,4 @@
-Engine.define('ProjectilesActions', (function () {
+Engine.define('ProjectilesActions', 'SoundUtils', (function () {
 
     var SoundUtils = Engine.require('SoundUtils');
 
@@ -299,4 +299,4 @@ Engine.define('ProjectilesActions', (function () {
 
     };
     return ProjectilesActions
-})());
+}));
