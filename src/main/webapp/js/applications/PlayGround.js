@@ -18,7 +18,7 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
     var WeaponControl = Engine.require('WeaponControl');
     var LifeAndArmor = Engine.require('LifeAndArmor');
     var KeyboardSetup = Engine.require('KeyboardSetup');
-    var GameStats = Engine.modules.GameStats;
+    var GameStats = Engine.require('GameStats');
     var Score = Engine.require('Score');
     var ScoreOverview = Engine.require('ScoreOverview');
     var TeamControl = Engine.require('TeamControl');

@@ -187,7 +187,6 @@ Engine.define('Dom', (function () {
                 return Dom.animate(el, values, time, frame, clb, timeToWait);
             },
             then: function (clb) {
-                console.log(timeToWait);
                 setTimeout(function(){clb()}, timeToWait);
             }
         };
