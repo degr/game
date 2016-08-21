@@ -280,8 +280,8 @@ public class Room {
         x = x / PersonWebSocketEndpoint.CLUSTER_SIZE;
         y = y / PersonWebSocketEndpoint.CLUSTER_SIZE;
         out.add(clusteredMap[y][x]);
-        boolean backX = x - 1 > 0;
-        boolean backY = y - 1 > 0;
+        boolean backX = x - 1 >= 0;
+        boolean backY = y - 1 >= 0;
         boolean forwardX = clusteredMap[0].length > x + 1;
         boolean forwardY = clusteredMap.length > y + 1;
         if(backX) {

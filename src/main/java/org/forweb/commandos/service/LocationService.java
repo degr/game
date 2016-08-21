@@ -110,6 +110,7 @@ public class LocationService {
         );
         List<Interactive> itemsToPick = null;
         Set<AbstractZone> set = new HashSet<>();
+
         for(List<AbstractZone> zones : room.getClusterZonesFor(player)) {
             for (AbstractZone zone : zones) {
                 if(set.contains(zone)) {
