@@ -407,7 +407,7 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
 
     PlayGround.prototype.draw = function () {
         this.context.clearRect(0, 0, this.map.x, this.map.y);
-
+        
         var blood = this.blood;
         if (blood && blood.length) {
             for (var bloodId = 0; bloodId < blood.length; bloodId++) {

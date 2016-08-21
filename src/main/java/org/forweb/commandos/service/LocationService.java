@@ -17,9 +17,7 @@ import org.forweb.geometry.shapes.Rectangle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class LocationService {
@@ -111,20 +109,28 @@ public class LocationService {
                 PersonWebSocketEndpoint.PERSON_RADIUS
         );
         List<Interactive> itemsToPick = null;
-        for (AbstractZone zone : room.getMap().getZones()) {
-            Rectangle rectangle = GeometryService.getRectangle(zone);
-            Point[] point = GeometryService.circleIntersectRectangle(playerCircle, rectangle);
-
-            if (!point.equals(PointService.EMPTY)) {
-                if (zone.isPassable()) {
-                    if (zone instanceof Interactive) {
-                        if (itemsToPick == null) {
-                            itemsToPick = new ArrayList<>();
-                        }
-                        itemsToPick.add((Interactive) zone);
-                    }
+        Set<AbstractZone> set = new HashSet<>();
+        for(List<AbstractZone> zones : room.getClusterZonesFor(player)) {
+            for (AbstractZone zone : zones) {
+                if(set.contains(zone)) {
+                    continue;
                 } else {
-                    return point;
+                    set.add(zone);
+                }
+                Rectangle rectangle = zone.getRectangle();
+                Point[] point = GeometryService.circleIntersectRectangle(playerCircle, rectangle);
+
+                if (point != PointService.EMPTY) {
+                    if (zone.isPassable()) {
+                        if (zone instanceof Interactive) {
+                            if (itemsToPick == null) {
+                                itemsToPick = new ArrayList<>();
+                            }
+                            itemsToPick.add((Interactive) zone);
+                        }
+                    } else {
+                        return point;
+                    }
                 }
             }
         }

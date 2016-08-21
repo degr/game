@@ -167,7 +167,7 @@ public class SpringDelegationService {
                             room.setDumpMap(false);
                         }
                     }
-                } catch (RuntimeException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     System.out.println("Caught to prevent timer from shutting down" + e.getMessage());
                 }

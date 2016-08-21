@@ -1,9 +1,16 @@
 package org.forweb.commandos.entity;
 
+import org.forweb.commandos.controller.PersonWebSocketEndpoint;
+import org.forweb.commandos.entity.ammo.Explosion;
+import org.forweb.commandos.entity.ammo.Flame;
 import org.forweb.commandos.entity.ammo.Projectile;
+import org.forweb.commandos.entity.ammo.Rocket;
 import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.entity.zone.interactive.FlagBlue;
 import org.forweb.commandos.entity.zone.interactive.FlagRed;
+import org.forweb.commandos.service.GeometryService;
+import org.forweb.geometry.services.PointService;
+import org.forweb.geometry.shapes.Bounds;
 
 import javax.websocket.Session;
 import java.beans.Transient;
@@ -255,5 +262,87 @@ public class Room {
 
     public boolean isDumpMap() {
         return dumpMap;
+    }
+
+    List<AbstractZone>[][] clusteredMap = null;
+
+    public List<List<AbstractZone>> getClusterZonesFor(Person player) {
+        return getClusterZonesFor((int)player.getX(), (int)player.getY());
+    }
+
+    public void setClusteredMap(List<AbstractZone>[][] clusteredMap) {
+        this.clusteredMap = clusteredMap;
+    }
+
+
+    public List<List<AbstractZone>> getClusterZonesFor(int x, int y) {
+        List<List<AbstractZone>> out = new ArrayList<>();
+        x = x / PersonWebSocketEndpoint.CLUSTER_SIZE;
+        y = y / PersonWebSocketEndpoint.CLUSTER_SIZE;
+        out.add(clusteredMap[y][x]);
+        boolean backX = x - 1 > 0;
+        boolean backY = y - 1 > 0;
+        boolean forwardX = clusteredMap[0].length > x + 1;
+        boolean forwardY = clusteredMap.length > y + 1;
+        if(backX) {
+            int xBack = x - 1;
+            out.add(clusteredMap[y][xBack]);
+            if(backY) {
+                out.add(clusteredMap[y - 1][xBack]);
+            }
+            if(forwardY) {
+                out.add(clusteredMap[y + 1][xBack]);
+            }
+        }
+        if(forwardX) {
+            int xForward = x + 1;
+            out.add(clusteredMap[y][xForward]);
+            if(backY) {
+                out.add(clusteredMap[y - 1][xForward]);
+            }
+            if(forwardY) {
+                out.add(clusteredMap[y + 1][xForward]);
+            }
+        }
+        if(backY) {
+            out.add(clusteredMap[y - 1][x]);
+        }
+        if(forwardY) {
+            out.add(clusteredMap[y + 1][x]);
+        }
+        if(y - 1 > 0) {
+            out.add(clusteredMap[y-1][x]);
+        }
+        return out;
+    }
+
+    public List<List<AbstractZone>> getClusterZonesFor(Projectile projectile) {
+        if(projectile instanceof Flame || projectile instanceof Rocket) {
+            return getClusterZonesFor((int)projectile.getxStart(), (int)projectile.getyStart());
+        } else {
+            Bounds projectileBounds = new Bounds(
+                    Math.min(projectile.getxStart(), projectile.getxEnd()),
+                    Math.min(projectile.getyStart(), projectile.getyEnd()),
+                    Math.abs(projectile.getxEnd() - projectile.getxStart()),
+                    Math.abs(projectile.getyEnd() - projectile.getyStart())
+            );
+            List<List<AbstractZone>> out = new ArrayList<>();
+            int xStart = (int)(projectileBounds.getX() / PersonWebSocketEndpoint.CLUSTER_SIZE);
+            int yStart = (int)projectileBounds.getY() / PersonWebSocketEndpoint.CLUSTER_SIZE;
+            int xEnd = (int)(projectileBounds.getX() + projectileBounds.getWidth()) / PersonWebSocketEndpoint.CLUSTER_SIZE;
+            int yEnd = (int)(projectileBounds.getY() + projectileBounds.getHeight()) / PersonWebSocketEndpoint.CLUSTER_SIZE;
+            for(;yStart <= yEnd; yStart++) {
+                for(int i = xStart; i <= xEnd; i++) {
+                    if(yStart < 0 || i < 0 || yStart >= clusteredMap.length || i >= clusteredMap[0].length) {
+                        System.out.println("condition not met: " + yStart + " " + i);
+                        continue;
+                    } else {
+                        System.out.println("condition met: " + yStart + " " + i);
+                        out.add(clusteredMap[yStart][i]);
+                    }
+                }
+            }
+            return out;
+        }
     }
 }

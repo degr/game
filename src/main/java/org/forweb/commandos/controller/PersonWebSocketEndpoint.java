@@ -40,6 +40,8 @@ public class PersonWebSocketEndpoint {
     public static final double MOVEMENT_SPEED = 2;
     public static final int SKIP_FRAMES = 1;
 
+    public static final int CLUSTER_SIZE = 100;
+
     @Autowired
     private SpringDelegationService springDelegationService;
     @Autowired

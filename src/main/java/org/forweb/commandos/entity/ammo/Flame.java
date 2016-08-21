@@ -6,6 +6,8 @@ import java.util.Random;
 
 public class Flame extends Projectile {
 
+    public static final int RADIUS = 250;
+
     private boolean isStoped;
 
     private static final Random r = new Random();
@@ -21,7 +23,7 @@ public class Flame extends Projectile {
             this.setLifeTime((long)new Random().nextInt(3000) + 2000L );
         }
 
-        this.setRadius(250);
+        this.setRadius(RADIUS);
         setStoped(false);
     }
 

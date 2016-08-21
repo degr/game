@@ -1,11 +1,13 @@
 package org.forweb.commandos.entity.zone;
 
 import org.forweb.geometry.shapes.Bounds;
+import org.forweb.geometry.shapes.Rectangle;
 
 public abstract class AbstractZone {
 
     private Integer id;
     private float angle;
+    private Rectangle rectangle;
 
     public AbstractZone(String type, Bounds bounds, float angle) {
         this.type = type;
@@ -114,5 +116,12 @@ public abstract class AbstractZone {
 
     public float getAngle() {
         return angle;
+    }
+
+    public Rectangle getRectangle() {
+        if(rectangle == null) {
+            rectangle = new Rectangle(new Bounds(getX(), getY(), getWidth(), getHeight()), getAngle());
+        }
+        return rectangle;
     }
 }
