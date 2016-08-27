@@ -18,7 +18,7 @@ public class AppInitializer implements WebApplicationInitializer {
     static final String BASE_PACKAGE = "org.forweb.commandos";
     static final String WORD_PACKAGE = "org.forweb.word";
     public static String ROOT;
-    public static Boolean DEV = true;
+    public static Boolean DEV = false;
     @Override
     public void onStartup(ServletContext container) {
         if(DEV) {
