@@ -1,8 +1,9 @@
 Engine.define('Text', ['Dom', 'AbstractInput'], function(Dom, AbstractInput) {
-    function Text(name) {
+    function Text(params) {
         AbstractInput.apply(this, arguments);
     }
     Text.prototype = Object.create(AbstractInput.prototype);
+    
     Text.prototype.getElementType = function() {
         return 'input'
     };

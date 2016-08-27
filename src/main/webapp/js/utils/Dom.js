@@ -142,6 +142,28 @@ Engine.define('Dom', (function () {
             return {top: top, left: left}
         }
     };
+    Dom.insert = function(el, content, before) {
+        if(el.innerHTML === '') {
+            Dom.append(el, content);
+            return;
+        }
+        if(!before)before = el.childNodes[0];
+
+        if (content) {
+            if (typeof content === 'string' || typeof content === 'number') {
+                el.insertBefore(document.createTextNode(content + ""), before);
+            } else if (content.length && content.push && content.pop) {
+                for (var i = 0; i < content.length; i++) {
+                    var child = content[i];
+                    if (child) {
+                        Dom.insert(el, child, before);
+                    }
+                }
+            } else {
+                el.insertBefore(content, before);
+            }
+        }
+    };
     Dom.animate = function (el, values, time, frame, clb, timeToWait) {
         if (!timeToWait)timeToWait = 0;
         if (!frame)frame = 10;

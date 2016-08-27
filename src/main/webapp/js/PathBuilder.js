@@ -1,6 +1,5 @@
 Engine.define("PathBuilder", function(){
-    return function (module) {
-        var seed = "?v=1";
+    return function PathBuilder(module) {
         var path;
         switch (module) {
             case 'Ajax':
@@ -51,9 +50,11 @@ Engine.define("PathBuilder", function(){
                 path = 'js/applications/playground/' + module + '.js';
                 break;
             case 'CustomTiles':
-                path = "js/applications/map-editor/CustomTiles.js";
+            case 'ControlButton':
+                path = "js/applications/map-editor/" + module + ".js";
                 break;
             case 'Text':
+            case 'Checkbox':
             case 'AbstractInput':
                 path = 'js/form/' + module + '.js';
                 break;
@@ -66,6 +67,6 @@ Engine.define("PathBuilder", function(){
             default:
                 throw "Unkown class - " + module;
         }
-        return path + seed;
+        return (path ? path + PathBuilder.seed : '');
     };
 });

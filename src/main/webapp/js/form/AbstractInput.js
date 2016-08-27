@@ -38,7 +38,7 @@ Engine.define("AbstractInput", ['Dom', 'StringUtils'], (function(Dom, StringUtil
     };
     AbstractInput.prototype.prepareAttributes = function(params) {
         var out = {
-            value: params.value,
+            value: params.value || "",
             name: params.name,
             type: this.getInputType(),
             id: params.id
@@ -61,6 +61,9 @@ Engine.define("AbstractInput", ['Dom', 'StringUtils'], (function(Dom, StringUtil
     
     AbstractInput.prototype.getValue = function() {
         return this.input.value;
+    };
+    AbstractInput.prototype.setValue = function(value) {
+        this.input.value = value;
     };
     return AbstractInput;
 }));

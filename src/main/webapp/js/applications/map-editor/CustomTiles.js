@@ -1,5 +1,10 @@
-Engine.define('CustomTiles', ['Dom', 'Rest', 'DomComponents'], (function (Dom, Rest, DomComponents) {
-    
+Engine.define('CustomTiles', ['Dom', 'Rest', 'DomComponents', 'Text', 'Checkbox'], (function () {
+    var Dom = Engine.require('Dom');
+    var Rest = Engine.require('Rest');
+    var DomComponents = Engine.require('DomComponents');
+    var Text = Engine.require('Text');
+    var Checkbox = Engine.require('Checkbox');
+
     var CustomTiles = function (loadObjects) {
         this.container = null;
         this.isOnSubmit = false;
@@ -8,14 +13,12 @@ Engine.define('CustomTiles', ['Dom', 'Rest', 'DomComponents'], (function (Dom, R
         var title = Dom.el('h3', null, 'Create custom tile');
         var fileupload = Dom.el('input', {type: 'file', name: 'fileupload', id: 'tile_fileupload'});
         var labelFileupload = Dom.el('label', {for: 'tile_fileupload'}, 'Tile image');
-        var tileTitle = Dom.el('input', {type: 'text', id: 'tile_title', name: 'title'});
-        var labelTileTitle = Dom.el('label', {for: 'tile_title'}, 'Tile title');
-        var x = Dom.el('input', {type: 'text', id: 'tile_x', name: 'width', value: 40});
-        var labelX = Dom.el('label', {for: 'tile_x'}, 'Tile width');
-        var y = Dom.el('input', {type: 'text', id: 'tile_y', name: 'height', value: 40});
-        var tileSet = Dom.el('input', {type: 'checkbox', id: 'is_tileset', name: 'is_tileset'});
-        var tileSetLabel = Dom.el('label', {'for': 'is_tileset'}, [tileSet, 'Is tile set (pack of same sized images)']);
-        var labelY = Dom.el('label', {for: 'tile_y'}, 'Tile height');
+        var tileTitle = new Text({id: 'tile_title', label: 'Tile tile', name: 'title'});
+        var x = new Text({name: 'width', id: 'tile_x', value: 40});
+        var y = new Text({id: 'tile_y', name: 'height', value: 40});
+
+        var tileSet = new Checkbox({id: 'is_tileset', name: 'is_tileset', label: 'Is tile set (pack of same sized images)'});
+
         var submit = Dom.el('input', {type: 'submit', value: 'Create tile'});
         var target = Dom.el('iframe', {id: 'custom_tile_iframe', name: 'custom_tile_iframe'});
         var hide = Dom.el('input', {type: 'button', value: 'Close'});
@@ -46,11 +49,11 @@ Engine.define('CustomTiles', ['Dom', 'Rest', 'DomComponents'], (function (Dom, R
             },
             [
                 title,
-                labelTileTitle, tileTitle, Dom.el('br'),
+                tileTitle.container,
                 labelFileupload, fileupload, Dom.el('br'),
-                labelX, x, Dom.el('br'),
-                labelY, y, Dom.el('br'),
-                tileSetLabel, Dom.el('br'),
+                x.container,
+                y.container,
+                tileSet.container,
                 submit, hide, target
             ]
         );
