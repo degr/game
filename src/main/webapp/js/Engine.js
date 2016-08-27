@@ -4,6 +4,42 @@ var Engine = (function(){
     var afterModuleLoad = {};
     var loaded = {};
 
+    function Notification(message, type, time) {
+        if(!document.body) {
+            console.log(message);
+            return;
+        }
+        if(!type)type = 'S';
+        if(!time)time = 3000;
+        var container = document.createElement('div');
+        var style = "padding:10px;margin:5px;border-radius: 3px;";
+        switch (type) {
+            case 'S':
+                style += 'color:#3c763d;background-color:#dff0d8;border-color:#d6e9c6;';
+                break;
+            case 'E':
+                style += 'color:#a94442;background-color:#f2dede;border-color:#ebccd1;';
+                break;
+            default:
+                throw 'Undefined message type: ' + type;
+        }
+        container.setAttribute('style', style);
+        container.innerHTML = message;
+        Notification.container.appendChild(container);
+        if(Notification.container.parentNode == null) {
+            document.body.appendChild(Notification.container);
+        }
+        setTimeout(function(){
+            container.remove();
+            if(Notification.container.innerHTML === '') {
+                Notification.container.remove();
+            }
+        }, time)
+    }
+    Notification.container = document.createElement('div');
+    Notification.container.setAttribute('style', 'position: fixed; right: 0; top: 0; width: 200px;');
+
+
     var Engine = {
         pathBuilder: null,
         limit: 500,
@@ -71,9 +107,9 @@ var Engine = (function(){
                 return modules[name];
             }
         },
-        console: function (message) {
+        console: function (message, type) {
             if (Engine.log) {
-                console.log(message);
+                new Notification(message, type);
             }
         }
     };
@@ -89,7 +125,7 @@ var Engine = (function(){
         if (!path) {
             throw "Can't load module " + module + " because path is undefined ";
         } else {
-            Engine.console('Resolving dependency: ' + module + " using path: " + path);
+            Engine.console('Resolving dependency: ' + module + " using path: " + path, 'S');
             var script = document.createElement('script');
             script.onload = clb;
             script.src = path;
@@ -116,7 +152,7 @@ var Engine = (function(){
         }
     }
     function _loadClasses (parentName, requirements, callback) {
-        Engine.console('resolve dependencies for ' + parentName);
+        Engine.console('Resolve dependencies for ' + parentName, 'S');
         Engine.limit--;
         if (Engine.limit < 1) {
             throw "Something wrong, too much modules in project! It look like circular dependency. Othervise, please change Engine.limit property";
@@ -139,18 +175,18 @@ var Engine = (function(){
                     deferredCallbacks: []
                 };
                 _load(module, function () {
-                    Engine.console("Script " + module + " was loaded as dependency for: " + parentName);
+                    Engine.console("Script " + module + " was loaded as dependency for: " + parentName, 'S');
                     loaded[module].afterLoad();
                 });
 
             } else if (modules[module]) {
-                Engine.console('Dependency ' + module + ' already loaded');
+                Engine.console('Dependency ' + module + ' already loaded', 'S');
                 dependencyCallback();
             } else if (loaded[module].callers.indexOf(parentName) === -1) {
                 loaded[module].callers.push(parentName);
                 loaded[module].deferredCallbacks.push(dependencyCallback);
             } else {
-                Engine.console("Skipped dependency " + module + " load for " + parentName);
+                Engine.console("Skipped dependency " + module + " load for " + parentName, 'S');
             }
         }
     }

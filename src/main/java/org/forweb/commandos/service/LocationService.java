@@ -140,6 +140,16 @@ public class LocationService {
                 itemService.onGetItem(item, player, room);
                 if(item.isTemporary()) {
                     List<AbstractZone> zones = room.getMap().getZones();
+                    AbstractZone zone = (AbstractZone)item;
+                    List<List<AbstractZone>> clusteredZones = room.getClusterZonesFor(zone.getX() + zone.getWidth() / 2, zone.getY() + zone.getHeight() / 2);
+
+                    for (List<AbstractZone> zones1 : clusteredZones) {
+                        for (int j = zones1.size(); j > 0; j--) {
+                            if (zones1.get(j - 1) == item) {
+                                zones1.remove(j - 1);
+                            }
+                        }
+                    }
                     int length = zones.size();
                     for(int i = length - 1; i >= 0; i--) {
                         if(zones.get(i) == item) {

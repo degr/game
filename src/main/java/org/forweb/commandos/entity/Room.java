@@ -334,10 +334,8 @@ public class Room {
             for(;yStart <= yEnd; yStart++) {
                 for(int i = xStart; i <= xEnd; i++) {
                     if(yStart < 0 || i < 0 || yStart >= clusteredMap.length || i >= clusteredMap[0].length) {
-                        System.out.println("condition not met: " + yStart + " " + i);
                         continue;
                     } else {
-                        System.out.println("condition met: " + yStart + " " + i);
                         out.add(clusteredMap[yStart][i]);
                     }
                 }
