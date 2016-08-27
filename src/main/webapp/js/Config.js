@@ -1,3 +1,3 @@
 Engine.define("Config", {
-    uploadPath: "images/zones/",
+    uploadPath: "upload.images/zones/",
 });
