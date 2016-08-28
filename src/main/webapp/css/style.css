@@ -1,8 +1,11 @@
 body, html {
-    font: 13.3333px Arial;
+    font: 13px Arial;
 }
 body.no-overflow {
     overflow: hidden;
+}
+.error {
+    color: rgba(218, 0, 0, 0.85);
 }
 a {
     color: #337ab7;

@@ -33,8 +33,10 @@ public class SpringConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .authorizeRequests().antMatchers("/protected/**").access("hasRole('ROLE_ADMIN')")
-                .and()
-                .formLogin().defaultSuccessUrl("/", false);
+                .headers().frameOptions().disable()
+                .headers().xssProtection().disable()
+                .headers().httpStrictTransportSecurity().disable()
+
+                .authorizeRequests().antMatchers("/protected/**").access("hasRole('ROLE_ADMIN')");
     }
 }

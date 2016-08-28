@@ -27,7 +27,12 @@ Engine.define('Ajax', (function () {
         return xhr;
     };
     out.process = function (xhr, t) {
-        return t === 'text' ? xhr.responseText : JSON.parse(xhr.responseText);
+        var response = xhr.responseText;
+        if(t === 'text' || !response) {
+            return response; 
+        } else {
+            return JSON.parse(xhr.responseText);
+        }
     };
     /**
      * @returns XMLHttpRequest
