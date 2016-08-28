@@ -1,10 +1,13 @@
-Engine.define('Dispatcher', ['Dom'], (function (Dom) {
+Engine.define('Dispatcher', ['Dom'], function () {
+    
+    var Dom = Engine.require('Dom');
     
     var Dispatcher = function(application, context){
         this.app = Dom.id(application);
         this.context = context;
         this.applications = {};
         this.activeApplication = null;
+        this.history = history;
     };
     
     Dispatcher.prototype.initApplication = function (contructor) {
@@ -39,6 +42,25 @@ Engine.define('Dispatcher', ['Dom'], (function (Dom) {
                     me.activeApplication.afterClose();
                 }
             }
+            var url;
+            if(app.getUrl) {
+                url = app.getUrl();
+            } else if (app.URL || app.url) {
+                url = app.URL || app.url;
+            } else {
+                url = '';
+            }
+            var title;
+            if(app.getTitle) {
+                title = app.getTitle();
+            } else if (app.TITLE || app.title) {
+                title = app.TITLE || app.title;
+            } else {
+                title = '';
+            }
+            var hash = document.location.hash;
+            this.history.pushState({}, title, url + (hash ? hash : ''));
+            
             me.activeApplication = app;
             if (app.beforeOpen) {
                 app.beforeOpen(directives);
@@ -58,4 +80,4 @@ Engine.define('Dispatcher', ['Dom'], (function (Dom) {
         }
     };
     return Dispatcher;
-}));
+});

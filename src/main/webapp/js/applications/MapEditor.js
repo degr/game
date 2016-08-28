@@ -2,6 +2,10 @@ Engine.define('MapEditor', ['Dom', 'Text', 'CustomTiles', 'DomComponents', 'Rest
     (function (Dom, Text, CustomTiles, DomComponents, Rest, ControlButton, Weapons, Config) {
 
         function MapEditor(context, placeApplication) {
+
+            this.TITLE = 'Map Editor';
+            this.URL = 'map-editor';
+            
             this.container = null;
             this.placeApplication = placeApplication;
             this.gridSize = 1;

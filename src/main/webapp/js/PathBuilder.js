@@ -13,6 +13,7 @@ Engine.define("PathBuilder", function(){
             case 'SoundUtils':
             case 'StringUtils':
             case 'WebSocketUtils':
+            case 'UrlResolver':
                 path = 'js/utils/' + module + '.js';
                 break;
             case 'Greetings':
@@ -54,6 +55,8 @@ Engine.define("PathBuilder", function(){
                 path = "js/applications/map-editor/" + module + ".js";
                 break;
             case 'Text':
+            case 'Radio':
+            case 'Password':
             case 'Checkbox':
             case 'AbstractInput':
                 path = 'js/form/' + module + '.js';

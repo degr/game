@@ -44,6 +44,7 @@ var Engine = (function(){
         pathBuilder: null,
         limit: 500,
         log: true,
+        modules: {},
         load: function (module, clb) {
             if (modules[module]) {
                 clb();
@@ -125,7 +126,6 @@ var Engine = (function(){
         if (!path) {
             throw "Can't load module " + module + " because path is undefined ";
         } else {
-            Engine.console('Resolving dependency: ' + module + " using path: " + path, 'S');
             var script = document.createElement('script');
             script.onload = clb;
             script.src = path;
@@ -152,7 +152,6 @@ var Engine = (function(){
         }
     }
     function _loadClasses (parentName, requirements, callback) {
-        Engine.console('Resolve dependencies for ' + parentName, 'S');
         Engine.limit--;
         if (Engine.limit < 1) {
             throw "Something wrong, too much modules in project! It look like circular dependency. Othervise, please change Engine.limit property";
@@ -180,13 +179,12 @@ var Engine = (function(){
                 });
 
             } else if (modules[module]) {
-                Engine.console('Dependency ' + module + ' already loaded', 'S');
                 dependencyCallback();
             } else if (loaded[module].callers.indexOf(parentName) === -1) {
                 loaded[module].callers.push(parentName);
                 loaded[module].deferredCallbacks.push(dependencyCallback);
             } else {
-                Engine.console("Skipped dependency " + module + " load for " + parentName, 'S');
+                //Engine.console("Skipped dependency " + module + " load for " + parentName, 'S');
             }
         }
     }

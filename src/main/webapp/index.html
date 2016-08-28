@@ -16,8 +16,8 @@
             PathBuilder.seed = "?v=2";
             Engine.define(
                 "application",
-                ['Ajax', 'Rest', 'Context', 'Dispatcher'],
-                function (Ajax, Rest, Context, Dispatcher) {
+                ['Ajax', 'Rest', 'Context', 'Dispatcher', 'UrlResolver', 'UrlResolver'],
+                function (Ajax, Rest, Context, Dispatcher, UrlResolver) {
                     Ajax.headers = {
                         Accept: "application/json,text/plain",
                         'Content-Type': "application/json"
@@ -27,7 +27,7 @@
                     var context = new Context();
 
                     var dispatcher = new Dispatcher('application', context);
-                    dispatcher.placeApplication('Greetings')
+                    dispatcher.placeApplication(UrlResolver.findApplication())
                 }
             );
         });

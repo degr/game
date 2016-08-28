@@ -43,10 +43,10 @@ Engine.define("AbstractInput", ['Dom', 'StringUtils'], (function(Dom, StringUtil
             type: this.getInputType(),
             id: params.id
         };
-        if(params.params) {
-            for(var key in params.params) {
-                if(params.params.hasOwnProperty(key)) {
-                    out[key] = params.params[key];
+        if(params.attr) {
+            for(var key in params.attr) {
+                if(params.attr.hasOwnProperty(key)) {
+                    out[key] = params.attr[key];
                 }
             } 
         }
