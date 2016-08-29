@@ -23,11 +23,11 @@ public class MovementService {
     public void onMove(Person person, Room room){
 
         Direction direction = person.getDirection();
-        double factor = MOVEMENT_SPEED;
+        double speed = MOVEMENT_SPEED;
         if(person.getWeapon() instanceof Minigun) {
-            factor *= 0.6;
+            speed *= 0.6;
         } else if(person.getWeapon() instanceof RocketLauncher) {
-            factor *= 0.8;
+            speed *= 0.8;
         }
         if (direction != null) {
             switch (direction) {
@@ -35,45 +35,45 @@ public class MovementService {
                 case SOUTH_EAST:
                 case NORTH_WEST:
                 case NORTH_EAST:
-                    factor = factor * factor / Math.sqrt(Math.pow(factor, 2) * 2);
+                    speed = speed * speed / Math.sqrt(Math.pow(speed, 2) * 2);
                     break;
             }
             int onOx;
             switch (direction) {
                 case EAST:
-                    onGoEast(person, room, factor, true);
+                    onGoEast(person, room, speed, true);
                     break;
                 case WEST:
-                    onGoWest(person, room, factor, true);
+                    onGoWest(person, room, speed, true);
                     break;
                 case NORTH:
-                    onGoNorth(person, room, factor, 0);
+                    onGoNorth(person, room, speed, 0);
                     break;
                 case SOUTH:
-                    onGoSouth(person, room, factor, 0);
+                    onGoSouth(person, room, speed, 0);
                     break;
                 case SOUTH_WEST:
-                    onOx = onGoSouth(person, room, factor, -1);
+                    onOx = onGoSouth(person, room, speed, -1);
                     if(onOx == 0) {
-                        onGoWest(person, room, factor, false);
+                        onGoWest(person, room, speed, false);
                     }
                     break;
                 case SOUTH_EAST:
-                    onOx = onGoSouth(person, room, factor, 1);
+                    onOx = onGoSouth(person, room, speed, 1);
                     if(onOx == 0) {
-                        onGoEast(person, room, factor, false);
+                        onGoEast(person, room, speed, false);
                     }
                     break;
                 case NORTH_WEST:
-                    onOx = onGoNorth(person, room, factor, -1);
+                    onOx = onGoNorth(person, room, speed, -1);
                     if(onOx == 0) {
-                        onGoWest(person, room, factor, false);
+                        onGoWest(person, room, speed, false);
                     }
                     break;
                 case NORTH_EAST:
-                    onOx = onGoNorth(person, room, factor, 1);
+                    onOx = onGoNorth(person, room, speed, 1);
                     if(onOx == 0) {
-                        onGoEast(person, room, factor, false);
+                        onGoEast(person, room, speed, false);
                     }
                     break;
                 default:

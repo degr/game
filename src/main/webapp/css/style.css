@@ -1,8 +1,11 @@
 body, html {
-    font: 13.3333px Arial;
+    font: 13px Arial;
 }
 body.no-overflow {
     overflow: hidden;
+}
+.error {
+    color: rgba(218, 0, 0, 0.85);
 }
 a {
     color: #337ab7;
@@ -24,7 +27,9 @@ a:focus {
     display: block;
     box-shadow: 0 0 20px rgba(0,0,0,0.5);
 }
-
+.formfield-holder {
+    margin-bottom: 15px;
+}
 #appstore {
     display: none;
 }

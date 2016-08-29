@@ -1,5 +1,6 @@
 Engine.define("PathBuilder", function(){
-    return function (module) {
+    return function PathBuilder(module) {
+        var path;
         switch (module) {
             case 'Ajax':
             case 'CGraphics':
@@ -12,19 +13,24 @@ Engine.define("PathBuilder", function(){
             case 'SoundUtils':
             case 'StringUtils':
             case 'WebSocketUtils':
-                return 'js/utils/' + module + '.js';
+            case 'UrlResolver':
+                path = 'js/utils/' + module + '.js';
+                break;
             case 'Greetings':
             case 'MapEditor':
             case 'MapList':
             case 'PlayGround':
             case 'RoomsList':
-                return 'js/applications/' + module + '.js';
+                path = 'js/applications/' + module + '.js';
+                break;
             case 'Dispatcher':
             case 'Context':
-                return 'js/applications/routing/' + module + '.js';
+                path = 'js/applications/routing/' + module + '.js';
+                break;
             case 'Pagination':
             case 'Tabs':
-                return 'js/components/' + module + '.js';
+                path = 'js/components/' + module + '.js';
+                break;
             case 'Weapons':
             case 'Controls':
             case 'WeaponControl':
@@ -42,18 +48,28 @@ Engine.define("PathBuilder", function(){
             case 'ProjectilesActions':
             case 'KeyboardSetup':
             case 'Chat':
-                return 'js/applications/playground/' + module + '.js';
+                path = 'js/applications/playground/' + module + '.js';
+                break;
             case 'CustomTiles':
-                return "js/applications/map-editor/CustomTiles.js";
+            case 'ControlButton':
+                path = "js/applications/map-editor/" + module + ".js";
+                break;
             case 'Text':
+            case 'Radio':
+            case 'Password':
+            case 'Checkbox':
             case 'AbstractInput':
-                return 'js/form/' + module + '.js';
+                path = 'js/form/' + module + '.js';
+                break;
             case 'RoomsChat':
-                return "js/applications/rooms-list/RoomsChat.js";
+                path = "js/applications/rooms-list/RoomsChat.js";
+                break;
             case 'Config':
-                return "js/Config.js";
+                path =  "js/Config.js";
+                break;
             default:
                 throw "Unkown class - " + module;
         }
+        return (path ? path + PathBuilder.seed : '');
     };
 });

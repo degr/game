@@ -7,7 +7,7 @@ public class SniperBullet extends Projectile {
         super(person, angle);
         this.setLifeTime(100L);
         setPiercing(true);
-        this.setRadius(700);
+        this.setRadius(750);
     }
 
     @Override

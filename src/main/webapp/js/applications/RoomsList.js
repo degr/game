@@ -2,6 +2,10 @@ Engine.define('RoomsList', ['RoomsChat', 'Dom', 'Pagination', 'Rest'],
     (function (RoomsChat, Dom, Pagination, Rest) {
     
     function RoomsList(context, placeApplication) {
+        
+        this.TITLE = 'Room List';
+        this.URL = 'room-list';
+        
         this.container = null;
         this.content = Dom.el('ul', {'class': 'games'});
         this.pageNumber = 1;

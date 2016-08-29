@@ -1,7 +1,11 @@
-Engine.define('MapEditor', ['Dom', 'Text', 'CustomTiles', 'DomComponents', 'Rest', 'Weapons', 'Config'],
-    (function (Dom, Text, CustomTiles, DomComponents, Rest, Weapons, Config) {
+Engine.define('MapEditor', ['Dom', 'Text', 'CustomTiles', 'DomComponents', 'Rest', 'ControlButton', 'Weapons', 'Config'],
+    (function (Dom, Text, CustomTiles, DomComponents, Rest, ControlButton, Weapons, Config) {
 
         function MapEditor(context, placeApplication) {
+
+            this.TITLE = 'Map Editor';
+            this.URL = 'map-editor';
+            
             this.container = null;
             this.placeApplication = placeApplication;
             this.gridSize = 1;
@@ -370,7 +374,9 @@ Engine.define('MapEditor', ['Dom', 'Text', 'CustomTiles', 'DomComponents', 'Rest
                                     if (zone.type === 'tiled') {
                                         zone.stepX = zone.shiftX / zone.width;
                                         zone.stepY = zone.shiftY / zone.height;
-                                        zone.tileId = zone.tileId + "_" + (zone.shiftX) + "x" + (zone.shiftY);
+                                        if(zone.tileset) {
+                                            zone.tileId = zone.tileId + "_" + (zone.shiftX) + "x" + (zone.shiftY);
+                                        }
                                     }
                                     var mounting = {
                                         type: zone.type,
@@ -658,15 +664,14 @@ Engine.define('MapEditor', ['Dom', 'Text', 'CustomTiles', 'DomComponents', 'Rest
                 case "flamethrower":
                     drawZoneImage('flame.png');
                     break;
-                case 'tiles':
+                case 'tiled':
                     (function (zone, rect) {
-                        image.src = Config.uploadPath + zone.customSprite;
-                        image.onload = function () {
-                            if (zone.tileset) {
-                                context.drawImage(image, zone.stepX * rect.width, zone.stepY * rect.height, rect.width, rect.height, rect.x, rect.y, rect.width, rect.height);
-                            } else {
-                                drawZoneImage(image);
-                            }
+                        var imagePath = Config.uploadPath + zone.customSprite;
+                        image.src = imagePath;
+                        if (zone.tileset) {
+                            context.drawImage(image, zone.stepX * rect.width, zone.stepY * rect.height, rect.width, rect.height, rect.x, rect.y, rect.width, rect.height);
+                        } else {
+                            drawZoneImage(imagePath, true);
                         }
                     })(zone, rect);
                     break;
@@ -813,17 +818,23 @@ Engine.define('MapEditor', ['Dom', 'Text', 'CustomTiles', 'DomComponents', 'Rest
                 image.onload = function () {
                     var width = this.width;
                     var height = this.height;
+                    container.setAttribute('style', 'width: ' + width + 'px');
                     var zWidth = parseInt(zone.width);
                     var zHeight = parseInt(zone.height);
                     header.innerText = zone.tileName + ' ' + zWidth + "x" + zHeight;
                     if (zWidth < 1 || zHeight < 1) {
                         return;
                     }
+                    var maxWidth = -1;
                     var stepY = 0;
                     while (stepY * zHeight <= height) {
                         var stepX = 0;
                         var row = Dom.el('div');
                         while (stepX * zWidth <= width) {
+                            var currentWidth = stepX * zWidth;
+                            if(currentWidth > maxWidth) {
+                                maxWidth = currentWidth;
+                            }
                             var tileId = zone.tileId + "_" + (stepX * zWidth) + "x" + (stepY * zHeight);
                             row.appendChild(doInput({
                                 id: zone.id,
@@ -847,6 +858,7 @@ Engine.define('MapEditor', ['Dom', 'Text', 'CustomTiles', 'DomComponents', 'Rest
                         container.appendChild(row);
                         stepY++;
                     }
+                    container.style.width = (maxWidth + zWidth) + 'px';
                 };
                 image.src = Config.uploadPath + "/" + zone.customSprite;
                 return out;
@@ -939,128 +951,18 @@ Engine.define('MapEditor', ['Dom', 'Text', 'CustomTiles', 'DomComponents', 'Rest
             return this.console;
         };
         MapEditor.prototype.appendControlButton = function (obj) {
-            var ts = new Date().getTime();
-            var me = this;
             var type = obj.type;
             var key = type == 'tiled' ? obj.tileId : type;
             var zone = this.zones[key];
-            var isStaticSize = zone.staticSize;
-            var out = Dom.el('div');
-            var x = new Text({
-                type: 'text', name: 'x', id: 'x_' + ts, value: obj.pointA.x, onkeyup: function (e) {
-                    if (e.keyCode === 9) {
-                        return;
-                    }
-                    var oldX = obj.pointA.x;
-                    obj.pointA.x = parseInt(this.value);
-                    if (isStaticSize) {
-                        obj.pointB.x = obj.pointA.x + zone.width
-                    } else {
-                        obj.pointB.x = obj.pointB.x + (obj.pointA.x - oldX);
-                    }
-                    me.render();
-                }
-            });
-
-            var y = new Text({
-                type: 'text', name: 'y', id: 'y_' + ts, value: obj.pointA.y, onkeyup: function (e) {
-                    if (e.keyCode === 9) {
-                        return;
-                    }
-                    var oldY = obj.pointA.y;
-                    obj.pointA.y = parseInt(this.value);
-                    if (isStaticSize) {
-                        obj.pointB.y = obj.pointA.y + zone.height
-                    } else {
-                        obj.pointB.y = obj.pointB.y + (obj.pointA.y - oldY);
-                    }
-                    me.render();
-                }
-            });
-            var coordinates = Dom.el('div', 'coordinates', [x.container, y.container]);
-
-            var coordinatesWh = null;
-            if (!isStaticSize) {
-                var width = new Text({
-                    type: 'text',
-                    name: 'width',
-                    id: 'width_' + ts,
-                    value: Math.abs(obj.pointB.x - obj.pointA.x),
-                    onkeyup: function (e) {
-                        if (e.keyCode === 9) {
-                            return;
-                        }
-                        obj.pointB.x = parseInt(this.value) + obj.pointA.x;
-                        me.render();
-                    }
-                });
-
-                var height = new Text({
-                    type: 'text',
-                    name: 'height',
-                    id: 'height_' + ts,
-                    value: Math.abs(obj.pointB.x - obj.pointA.x),
-                    onkeyup: function (e) {
-                        if (e.keyCode === 9) {
-                            return;
-                        }
-                        obj.pointB.y = parseInt(this.value) + obj.pointA.y;
-                        me.render();
-                    }
-                });
-                coordinatesWh = Dom.el('div', 'coordinates', [width.container, height.container]);
-            }
-            var delButton = Dom.el('input', {type: 'button', value: 'delete'});
-
-            delButton.onclick = function () {
-                for (var i = 0; i < me.mountedObjects.length; i++) {
-                    if (me.mountedObjects[i] == obj) {
-                        me.mountedObjects.splice(i, 1);
-                        out.remove();
-                        me.render();
-                    }
-                }
-            };
-            var angle = new Text({
-                name: 'angle', class: 'angle', id: "angle_" + ts, value: 0, onkeyup: function () {
-                    obj.angle = Math.PI * parseInt(this.value) / 180;
-                    me.render();
-                }
-            });
-
-
-            var highlight = Dom.el('input', {type: 'checkbox', id: 'h_' + ts});
-            highlight.onchange = function () {
-                obj.highlight = this.checked;
-                if (obj.highlight) {
-                    for (var i = 0; i < me.mountedObjects.length; i++) {
-                        var otherObj = me.mountedObjects[i];
-                        if (otherObj.highlight && otherObj != obj) {
-                            otherObj.highlight = false;
-                            otherObj.component.update()
-                        }
-                    }
-                }
-                me.render();
-            };
-            var highLightLabel = Dom.el('label', {'for': 'h_' + ts}, [highlight, 'highlight']);
-            var label = Dom.el('p', "controls", [type, delButton, angle.container, highLightLabel]);
-            Dom.append(out, [label, coordinates, coordinatesWh]);
+            var controlButton = new ControlButton(obj, zone, this);
+            
             obj.component = {
-                dom: out,
+                dom: controlButton.container,
                 update: function () {
-                    x.input.value = obj.pointA.x;
-                    y.input.value = obj.pointA.y;
-                    if (coordinatesWh != null) {
-                        width.input.value = Math.abs(obj.pointA.x - obj.pointB.x);
-                        height.input.value = Math.abs(obj.pointA.y - obj.pointB.y);
-                    }
-                    highlight.checked = obj.highlight;
-                    var newAngle = obj.angle * 180 / Math.PI;
-                    angle.input.value = Math.round((newAngle >= 0 ? newAngle : 360 + newAngle) * 100) / 100;
+                    controlButton.update();
                 }
             };
-            me.updateMountedObjects();
+            this.updateMountedObjects();
         };
         MapEditor.prototype.updateMountedObjects = function () {
             var me = this;
@@ -1073,6 +975,5 @@ Engine.define('MapEditor', ['Dom', 'Text', 'CustomTiles', 'DomComponents', 'Rest
                 }
             }
         };
-
         return MapEditor;
     }));

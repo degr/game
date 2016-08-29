@@ -13,13 +13,14 @@ import org.forweb.commandos.service.projectile.ExplosionThread;
 import org.forweb.geometry.services.CircleService;
 import org.forweb.geometry.services.LineService;
 import org.forweb.geometry.services.PointService;
-import org.forweb.geometry.shapes.*;
+import org.forweb.geometry.shapes.Circle;
+import org.forweb.geometry.shapes.Line;
+import org.forweb.geometry.shapes.Point;
+import org.forweb.geometry.shapes.Rectangle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -72,15 +73,23 @@ public class ProjectileService {
         }
         Circle flameCircle = new Circle(flame.getxStart(), flame.getyStart(), PersonWebSocketEndpoint.FIRE_RADIUS);
         if (!flame.isStoped()) {
-            for (AbstractZone zone : room.getMap().getZones()) {
-                if (!zone.isShootable()) {
-                    Point[] point = GeometryService.circleIntersectRectangle(
-                            flameCircle,
-                            new Rectangle(new Bounds(zone.getX(), zone.getY(), zone.getWidth(), zone.getHeight()), zone.getAngle())
-                    );
-                    if (point.length > 0) {
-                        flame.setStoped(true);
-                        break;
+            Set<AbstractZone> zoneSet = new HashSet<>();
+            for (List<AbstractZone> zones : room.getClusterZonesFor(flame)) {
+                for (AbstractZone zone : zones) {
+                    if (zoneSet.contains(zone)) {
+                        continue;
+                    } else {
+                        zoneSet.add(zone);
+                    }
+                    if (!zone.isShootable()) {
+                        Point[] point = GeometryService.circleIntersectRectangle(
+                                flameCircle,
+                                zone.getRectangle()
+                        );
+                        if (point.length > 0) {
+                            flame.setStoped(true);
+                            break;
+                        }
                     }
                 }
             }
@@ -99,7 +108,7 @@ public class ProjectileService {
                 if (point.length > 0) {
                     Person shooter = room.getPersons().get(flame.getPersonId());
                     boolean isKilled = onDamage(shooter, flame.getDamage(), person, room);
-                    if(isKilled) {
+                    if (isKilled) {
                         room.getMessages().add("0:" + shooter.getName() + " fried " + person.getName());
                     }
                     room.getProjectiles().remove(flameBathcId);
@@ -121,13 +130,13 @@ public class ProjectileService {
         if (rocket.getxStart() <= 0 || rocket.getxStart() >= map.getX() ||
                 rocket.getyStart() <= 0 || rocket.getyStart() >= map.getY()) {
             Person shooter = room.getPersons().get(rocket.getPersonId());
-            if(shooter != null) {
-                int xStart = rocket.getxStart() <= 0 ? 0 : (int)rocket.getxStart();
-                if(xStart > map.getX()) {
+            if (shooter != null) {
+                int xStart = rocket.getxStart() <= 0 ? 0 : (int) rocket.getxStart();
+                if (xStart > map.getX()) {
                     xStart = map.getX();
                 }
-                int yStart = rocket.getyStart() <= 0 ? 0 : (int)rocket.getyStart();
-                if(yStart > map.getY()) {
+                int yStart = rocket.getyStart() <= 0 ? 0 : (int) rocket.getyStart();
+                if (yStart > map.getY()) {
                     yStart = map.getY();
                 }
 
@@ -135,18 +144,26 @@ public class ProjectileService {
             }
         }
         if (explosion == null) {
-            for (AbstractZone zone : room.getMap().getZones()) {
-                if (!zone.isShootable()) {
-                    Point[] point = GeometryService.circleIntersectRectangle(
-                            rocketCircle,
-                            new Rectangle(new Bounds(zone.getX(), zone.getY(), zone.getWidth(), zone.getHeight()), zone.getAngle())
-                    );
-                    if (point.length > 0) {
-                        Person shooter = room.getPersons().get(rocket.getPersonId());
-                        if(shooter != null) {
-                            explosion = new Explosion((int)point[0].getX(), (int)point[0].getY(), shooter);
+            Set<AbstractZone> zoneSet = new HashSet<>();
+            for (List<AbstractZone> zones : room.getClusterZonesFor(rocket)) {
+                for (AbstractZone zone : zones) {
+                    if (zoneSet.contains(zone)) {
+                        continue;
+                    } else {
+                        zoneSet.add(zone);
+                    }
+                    if (!zone.isShootable()) {
+                        Point[] point = GeometryService.circleIntersectRectangle(
+                                rocketCircle,
+                                zone.getRectangle()
+                        );
+                        if (point.length > 0) {
+                            Person shooter = room.getPersons().get(rocket.getPersonId());
+                            if (shooter != null) {
+                                explosion = new Explosion((int) point[0].getX(), (int) point[0].getY(), shooter);
+                            }
+                            break;
                         }
-                        break;
                     }
                 }
             }
@@ -165,10 +182,10 @@ public class ProjectileService {
                     );
                     if (point.length > 0) {
                         Person shooter = room.getPersons().get(rocket.getPersonId());
-                        if(shooter != null) {
-                            explosion = new Explosion((int)point[0].getX(), (int)point[0].getY(), shooter);
+                        if (shooter != null) {
+                            explosion = new Explosion((int) point[0].getX(), (int) point[0].getY(), shooter);
                             boolean isKilled = onDamage(shooter, rocket.getDamage(), person, room);
-                            if(isKilled) {
+                            if (isKilled) {
                                 room.getMessages().add("0:" + shooter.getName() + " explode " + person.getName());
                             }
                         }
@@ -200,7 +217,7 @@ public class ProjectileService {
                     double damage = explosion.getDamage() + damageFactor * explosion.getDamageFactor();
                     shiftPersonAfterExplosion(person, explosion, room);
                     boolean isKilled = onDamage(shooter, (int) damage, person, room);
-                    if(isKilled) {
+                    if (isKilled) {
                         room.getMessages().add("0:" + person.getName() + " was ripped by " + shooter.getName() + " explosion ");
                     }
                 }
@@ -231,29 +248,37 @@ public class ProjectileService {
         Person closestPerson = null;
         Point closestPoint = null;
 
+        Set<AbstractZone> set = new HashSet<>();
+        for (List<AbstractZone> zones : room.getClusterZonesFor(projectile)) {
+            for (AbstractZone zone : zones) {
+                if (set.contains(zone)) {
+                    continue;
+                } else {
+                    set.add(zone);
+                }
 
-        for (AbstractZone zone : room.getMap().getZones()) {
-            if (zone.isShootable()) {
-                continue;
-            }
-            Rectangle zoneBounds = GeometryService.getRectangle(zone);
-            Point[] zoneIntersection = GeometryService.lineBoundsIntersections(
-                    new Line(
-                            new Point(shooter.getX(), shooter.getY()),
-                            new Point(projectile.getxEnd(), projectile.getyEnd())
-                    ),
-                    zoneBounds
-            );
-            Point closest = isMoreClose(
-                    (int) projectile.getxStart(),
-                    (int) projectile.getyStart(),
-                    new Point(projectile.getxEnd(), projectile.getyEnd()),
-                    zoneIntersection
-            );
-            if (closest != null) {
-                closestPoint = closest;
-                projectile.setxEnd((int) closest.getX());
-                projectile.setyEnd((int) closest.getY());
+                if (zone.isShootable()) {
+                    continue;
+                }
+                Rectangle zoneBounds = zone.getRectangle();
+                Point[] zoneIntersection = GeometryService.lineBoundsIntersections(
+                        new Line(
+                                new Point(shooter.getX(), shooter.getY()),
+                                new Point(projectile.getxEnd(), projectile.getyEnd())
+                        ),
+                        zoneBounds
+                );
+                Point closest = isMoreClose(
+                        (int) projectile.getxStart(),
+                        (int) projectile.getyStart(),
+                        new Point(projectile.getxEnd(), projectile.getyEnd()),
+                        zoneIntersection
+                );
+                if (closest != null) {
+                    closestPoint = closest;
+                    projectile.setxEnd((int) closest.getX());
+                    projectile.setyEnd((int) closest.getY());
+                }
             }
         }
         for (Person person : room.getPersons().values()) {
@@ -280,7 +305,7 @@ public class ProjectileService {
                 if (closest != null) {
                     if (projectile.isPiercing()) {
                         boolean isKilled = onDamage(shooter, projectile.getDamage(), person, room);
-                        if(isKilled) {
+                        if (isKilled) {
                             room.getMessages().add("0:" + shooter.getName() + " accurately shot " + person.getName());
                         }
                     } else {
@@ -293,10 +318,10 @@ public class ProjectileService {
 
         if (closestPerson != null) {
             boolean isKilled = onDamage(shooter, projectile.getDamage(), closestPerson, room);
-            if(isKilled) {
-                if(projectile instanceof KnifeAmmo) {
+            if (isKilled) {
+                if (projectile instanceof KnifeAmmo) {
                     room.getMessages().add("0:" + shooter.getName() + " cut into pieces  " + closestPerson.getName());
-                } else if(projectile instanceof SubShot) {
+                } else if (projectile instanceof SubShot) {
                     room.getMessages().add("0:" + shooter.getName() + " shot " + closestPerson.getName() + " as a dog");
                 } else {
                     room.getMessages().add("0:" + shooter.getName() + " kill " + closestPerson.getName());
@@ -474,7 +499,7 @@ public class ProjectileService {
             int gunLimit = (int) (projectile.getRadius() + person.getY());
             projectile.setyEnd(gunLimit > room.getMap().getY() ? room.getMap().getY() : gunLimit);
         } else if (angle == 180) {
-            projectile.setyEnd((int)person.getY());
+            projectile.setyEnd((int) person.getY());
             int gunLimit = (int) person.getX() - (int) projectile.getRadius();
             projectile.setxEnd(gunLimit > 0 ? gunLimit : 0);
         } else if (angle == 270) {
@@ -482,7 +507,7 @@ public class ProjectileService {
             int gunLimit = (int) person.getY() - (int) projectile.getRadius();
             projectile.setyEnd(gunLimit > 0 ? gunLimit : 0);
         } else if (angle == 0) {
-            projectile.setyEnd((int)person.getY());
+            projectile.setyEnd((int) person.getY());
             int gunLimit = (int) person.getX() + (int) projectile.getRadius();
             projectile.setxEnd(gunLimit > room.getMap().getX() ? room.getMap().getX() : gunLimit);
         } else {

@@ -10,7 +10,6 @@
 
     <properties>
         <jackson>2.7.3</jackson>
-        <spring>4.2.5.RELEASE</spring>
     </properties>
 
     <repositories>
@@ -48,14 +47,20 @@
 
         <dependency>
             <groupId>com.github.degr</groupId>
-            <artifactId>springsupport</artifactId>
-            <version>e63533cd64</version>
+            <artifactId>SpringSupport</artifactId>
+            <version>02ca6f8c08</version>
         </dependency>
 
         <dependency>
             <groupId>com.github.degr</groupId>
             <artifactId>Word</artifactId>
             <version>44ae5c0adc</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.tuckey</groupId>
+            <artifactId>urlrewritefilter</artifactId>
+            <version>4.0.3</version>
         </dependency>
     </dependencies>
 

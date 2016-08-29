@@ -55,7 +55,6 @@ public class PersonService {
         int topY = (int)person.getY() - PersonWebSocketEndpoint.PERSON_RADIUS;
         List<AbstractZone> zones = room.getMap().getZones();
         if(weapon.getCurrentClip() > 0) {
-
             int id = room.getNewWeaponId();
             if(weapon instanceof Pistol) {
                 candidate = new PistolZone(topx, topY, id, 0);
@@ -74,6 +73,10 @@ public class PersonService {
             }
             if(candidate != null) {
                 candidate.setTemporary(true);
+                List<List<AbstractZone>> zonesList = room.getClusterZonesFor(candidate.getX() + candidate.getWidth() / 2, candidate.getY() + candidate.getHeight() / 2);
+                for(List<AbstractZone> list : zonesList) {
+                    list.add(candidate);
+                }
                 zones.add(candidate);
             }
         }

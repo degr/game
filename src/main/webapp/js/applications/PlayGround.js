@@ -18,7 +18,7 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
     var WeaponControl = Engine.require('WeaponControl');
     var LifeAndArmor = Engine.require('LifeAndArmor');
     var KeyboardSetup = Engine.require('KeyboardSetup');
-    var GameStats = Engine.modules.GameStats;
+    var GameStats = Engine.require('GameStats');
     var Score = Engine.require('Score');
     var ScoreOverview = Engine.require('ScoreOverview');
     var TeamControl = Engine.require('TeamControl');
@@ -27,6 +27,11 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
     var CGraphics = Engine.require('CGraphics');
 
     var PlayGround = function (context, placeApplication) {
+
+        this.TITLE = 'Playground';
+        this.URL = 'arena';
+        this.goToMapList = false;
+        
         this.radius = 20;
         this.gameStarted = false;
         this.container = null;
@@ -67,7 +72,8 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         this.rockets = [];
         /*rockets storage. For smoke visualisation*/
         this.playerName = '';
-
+        this.placeApplication = placeApplication;
+        
         this.chat = new Chat(this);
         this.personTracker = new PersonTracker(document.body, this);
         var canvas = this.canvas;
@@ -169,6 +175,11 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         };
         Dom.addListeners(this.windowListeners);
     };
+    PlayGround.prototype.afterOpen = function (directives) {
+        if(this.goToMapList) {
+            this.placeApplication("RoomList");
+        }
+    };
     PlayGround.prototype.beforeOpen = function (directives) {
         KeyboardSetup.addListeners();
         var dto;
@@ -178,6 +189,8 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         } else if(directives.createGame) {
             dto = directives.createGame;
             this.createGame(dto.name, dto.map);
+        } else {
+            this.goToMapList = true;
         }
     };
     PlayGround.prototype.beforeClose = function () {
@@ -407,7 +420,7 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
 
     PlayGround.prototype.draw = function () {
         this.context.clearRect(0, 0, this.map.x, this.map.y);
-
+        
         var blood = this.blood;
         if (blood && blood.length) {
             for (var bloodId = 0; bloodId < blood.length; bloodId++) {

@@ -17,9 +17,7 @@ import org.forweb.geometry.shapes.Rectangle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class LocationService {
@@ -111,20 +109,29 @@ public class LocationService {
                 PersonWebSocketEndpoint.PERSON_RADIUS
         );
         List<Interactive> itemsToPick = null;
-        for (AbstractZone zone : room.getMap().getZones()) {
-            Rectangle rectangle = GeometryService.getRectangle(zone);
-            Point[] point = GeometryService.circleIntersectRectangle(playerCircle, rectangle);
+        Set<AbstractZone> set = new HashSet<>();
 
-            if (!point.equals(PointService.EMPTY)) {
-                if (zone.isPassable()) {
-                    if (zone instanceof Interactive) {
-                        if (itemsToPick == null) {
-                            itemsToPick = new ArrayList<>();
-                        }
-                        itemsToPick.add((Interactive) zone);
-                    }
+        for(List<AbstractZone> zones : room.getClusterZonesFor(player)) {
+            for (AbstractZone zone : zones) {
+                if(set.contains(zone)) {
+                    continue;
                 } else {
-                    return point;
+                    set.add(zone);
+                }
+                Rectangle rectangle = zone.getRectangle();
+                Point[] point = GeometryService.circleIntersectRectangle(playerCircle, rectangle);
+
+                if (point != PointService.EMPTY) {
+                    if (zone.isPassable()) {
+                        if (zone instanceof Interactive) {
+                            if (itemsToPick == null) {
+                                itemsToPick = new ArrayList<>();
+                            }
+                            itemsToPick.add((Interactive) zone);
+                        }
+                    } else {
+                        return point;
+                    }
                 }
             }
         }
@@ -133,6 +140,16 @@ public class LocationService {
                 itemService.onGetItem(item, player, room);
                 if(item.isTemporary()) {
                     List<AbstractZone> zones = room.getMap().getZones();
+                    AbstractZone zone = (AbstractZone)item;
+                    List<List<AbstractZone>> clusteredZones = room.getClusterZonesFor(zone.getX() + zone.getWidth() / 2, zone.getY() + zone.getHeight() / 2);
+
+                    for (List<AbstractZone> zones1 : clusteredZones) {
+                        for (int j = zones1.size(); j > 0; j--) {
+                            if (zones1.get(j - 1) == item) {
+                                zones1.remove(j - 1);
+                            }
+                        }
+                    }
                     int length = zones.size();
                     for(int i = length - 1; i >= 0; i--) {
                         if(zones.get(i) == item) {

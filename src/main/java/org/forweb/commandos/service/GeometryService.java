@@ -8,9 +8,6 @@ import org.forweb.geometry.services.Utils;
 import org.forweb.geometry.shapes.*;
 
 public class GeometryService {
-    public static Rectangle getRectangle(AbstractZone zone) {
-        return new Rectangle(new Bounds(zone.getX(), zone.getY(), zone.getWidth(), zone.getHeight()), zone.getAngle());
-    }
 
     public static Point[] lineBoundsIntersections(Line line, Rectangle zoneBounds) {
         Point[] angles = zoneBounds.getPoints();
@@ -98,5 +95,38 @@ public class GeometryService {
             }
         }
         return point;
+    }
+
+    public static Point[] boundsRectangleIntersection(Rectangle rectangle, Bounds bounds) {
+        if(!BoundsService.isBoundsIntersectBounds(rectangle.getBounds(), bounds)) {
+            return PointService.EMPTY;
+        } else {
+            Point[] rectanglePoints = rectangle.getPoints();
+            Point[] out = LineService.lineBoundsIntersections(new Line(rectanglePoints[0], rectanglePoints[1]), bounds);
+            if(out != PointService.EMPTY) {
+                return out;
+            }
+            out = LineService.lineBoundsIntersections(new Line(rectanglePoints[1], rectanglePoints[2]), bounds);
+            if(out != PointService.EMPTY) {
+                return out;
+            }
+            out = LineService.lineBoundsIntersections(new Line(rectanglePoints[2], rectanglePoints[3]), bounds);
+            if(out != PointService.EMPTY) {
+                return out;
+            }
+            return LineService.lineBoundsIntersections(new Line(rectanglePoints[3], rectanglePoints[0]), bounds);
+        }
+    }
+
+    public static boolean rectangleInsideBounds(Rectangle rectangle, Bounds bounds) {
+        Point[] points = rectangle.getPoints();
+        double y1 = bounds.getY() + bounds.getHeight();
+        double x1 = bounds.getX() + bounds.getWidth();
+        for(Point point : points) {
+            if(point.getX() < bounds.getX() || point.getY() < bounds.getY() || point.getX() > x1 || point.getY() > y1) {
+                return false;
+            }
+        }
+        return true;
     }
 }

@@ -3,6 +3,9 @@ Engine.define('MapList', ['StringUtils', 'Dom', 'Pagination', 'Rest'],
     
     
     function MapList(context, placeApplication) {
+        this.TITLE = 'Map List';
+        this.URL = 'map-list';
+        
         this.container = null;
         this.content = Dom.el('div', 'maps');
         this.pageNumber = 1;

@@ -3,6 +3,7 @@ package org.forweb.geometry.shapes;
 public class Rectangle {
 
     private Point[] points;
+    private Bounds bounds;
 
     public Rectangle(Bounds bounds) {
         this(bounds, 0f);
@@ -33,6 +34,25 @@ public class Rectangle {
             points[2] = translate(center, pseudo[2], angle);
             points[3] = translate(center, pseudo[3], angle);
         }
+        double x = -1;
+        double y = -1;
+        double maxX = -1;
+        double maxY = -1;
+        for(Point point : points) {
+            if(x == -1 || x > point.getX()) {
+                x = point.getX();
+            }
+            if(maxX == -1 || maxX < point.getX()) {
+                maxX = point.getX();
+            }
+            if(y == -1 || y > point.getY()) {
+                y = point.getY();
+            }
+            if(maxY == -1 || maxY < point.getY()) {
+                maxY = point.getY();
+            }
+        }
+        this.bounds = new Bounds(x, y, maxX - x, maxY - y);
     }
 
     public Point[] getPoints() {
@@ -41,6 +61,10 @@ public class Rectangle {
     public Point getPoint(int index) {
         return points[index];
     }
+    public Bounds getBounds() {
+        return bounds;
+    }
+
 
     private Point translate(Point rotationCenter, Point point, Float angle){
         double x = (Math.cos(angle) * (point.getX() - rotationCenter.getX())) -
@@ -51,6 +75,9 @@ public class Rectangle {
                         rotationCenter.getY();
         return new Point(x, y);
     }
+
+
+
 
     @Override
     public String toString() {

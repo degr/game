@@ -38,15 +38,15 @@ Engine.define("AbstractInput", ['Dom', 'StringUtils'], (function(Dom, StringUtil
     };
     AbstractInput.prototype.prepareAttributes = function(params) {
         var out = {
-            value: params.value,
+            value: params.value || "",
             name: params.name,
             type: this.getInputType(),
             id: params.id
         };
-        if(params.params) {
-            for(var key in params.params) {
-                if(params.params.hasOwnProperty(key)) {
-                    out[key] = params.params[key];
+        if(params.attr) {
+            for(var key in params.attr) {
+                if(params.attr.hasOwnProperty(key)) {
+                    out[key] = params.attr[key];
                 }
             } 
         }
@@ -61,6 +61,9 @@ Engine.define("AbstractInput", ['Dom', 'StringUtils'], (function(Dom, StringUtil
     
     AbstractInput.prototype.getValue = function() {
         return this.input.value;
+    };
+    AbstractInput.prototype.setValue = function(value) {
+        this.input.value = value;
     };
     return AbstractInput;
 }));
