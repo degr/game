@@ -7,9 +7,11 @@ import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
-import org.tuckey.web.filters.urlrewrite.UrlRewriteFilter;
 
-import javax.servlet.*;
+import javax.servlet.Servlet;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRegistration;
+import javax.servlet.SessionTrackingMode;
 import java.util.EnumSet;
 
 public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
@@ -19,6 +21,7 @@ public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
     static final String WORD_PACKAGE = "org.forweb.word";
     public static String ROOT;
     public static Boolean DEV = true;
+
 
     @Override
     public void afterSpringSecurityFilterChain(ServletContext servletContext) {
@@ -37,14 +40,11 @@ public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
         addServlet(new DispatcherServlet(rootContext), "dispatcher", "/server/*", servletContext);
         servletContext.addListener(new ContextLoaderListener(rootContext));
         servletContext.addListener(new RequestContextListener());
+
+        servletContext.setSessionTrackingModes(EnumSet.of(SessionTrackingMode.COOKIE));
         //addFilter("UrlRewriteFilter", new UrlRewriteFilter(), servletContext);
     }
 
-    private <T extends Filter> void addFilter(String filterName, Filter filterP, ServletContext servletContext) {
-        servletContext.addFilter(filterName, filterP);
-        FilterRegistration f = servletContext.getFilterRegistration(filterName);
-        f.addMappingForUrlPatterns(EnumSet.of(DispatcherType.FORWARD), true, "/*");
-    }
 
     //
     private void addServlet(Servlet servlet, String servletName, String mapping, ServletContext container) {

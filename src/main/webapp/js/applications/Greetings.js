@@ -81,19 +81,16 @@ Engine.define('Greetings', ['Dom', 'Radio', 'Text', 'Password', 'Rest'], (functi
         var pass = this.getPassword();
         var toggler = this.toggler.getValue();
         var me = this;
+        var user = {username: name, password: pass};
         switch (toggler) {
             case 'L':
-                Rest.doPost('user/login', {username: name, password: pass}).then(
-                    function(r){
-                        me.onLoginCheck(r);
-                    }
-                );
+                this.performLogin(user);
                 break;
             case 'R':
-                Rest.doPost('user/create', {username: name, password: pass}).then(
+                Rest.doPost('user/create', user).then(
                     function(r){
                         if(r.success) {
-                            me.onLoginCheck(r.userId);
+                            me.performLogin(user);
                         } else {
                             me.showError('User with this login already registered');
                         }
@@ -106,13 +103,29 @@ Engine.define('Greetings', ['Dom', 'Radio', 'Text', 'Password', 'Rest'], (functi
         }
         this.context.set('toggler', toggler);
     };
-    Greetings.prototype.onLoginCheck = function(userId) {
-        if(userId) {
-            this.context.set('userId', userId);
-            this.placeApplication('RoomsList');
+    Greetings.prototype.performLogin = function(user) {
+        var iFrameName = 'loginIframe';
+        var form = Dom.el('form', {method: 'post', action: 'server/login', target: iFrameName}, [
+            Dom.el('input', {name: 'username', value: user.username}),
+            Dom.el('input', {name: 'password', value: user.password})
+        ]);
+        var me = this;
+        var iFrame = Dom.el('iframe', {name: iFrameName, src:"about:blank", style: 'display: none'});
+        document.body.appendChild(iFrame);
+        var onLoad = {load: function(){me.readIframeResponse(this)}};
+        Dom.addListeners(iFrame, onLoad);
+        form.submit();
+    };
+    Greetings.prototype.readIframeResponse = function(iFrame) {
+        var doc = iFrame.contentDocument || iFrame.contentWindow.document;
+        var content = doc.body.innerText;
+        if(content == "OK") {
+            this.context.set("logged", true);
+            this.placeApplication("RoomsList");
         } else {
-            this.showError('Invalid username or password!');
+            this.showError("Invalid username or password");
         }
+        iFrame.remove();
     };
     Greetings.prototype.showError = function(message) {
         this.errorMessage.innerText = message;
