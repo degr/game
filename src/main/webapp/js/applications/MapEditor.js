@@ -1,6 +1,17 @@
-Engine.define('MapEditor', ['Dom', 'Text', 'CustomTiles', 'DomComponents', 'Rest', 'ControlButton', 'Weapons', 'Config'],
-    (function (Dom, Text, CustomTiles, DomComponents, Rest, ControlButton, Weapons, Config) {
+Engine.define('MapEditor', ['MainMenu', 'Dom', 'Text', 'CustomTiles', 'DomComponents', 'Rest', 'ControlButton', 'Weapons', 'Config'],
+    (function () {
 
+        var MainMenu = Engine.require('MainMenu');
+        var Dom = Engine.require('Dom');
+        var Text = Engine.require('Text');
+        var CustomTiles = Engine.require('CustomTiles');
+        var DomComponents = Engine.require('DomComponents');
+        var Rest = Engine.require('Rest');
+        var ControlButton = Engine.require('ControlButton');
+        var Weapons = Engine.require('Weapons');
+        var Config = Engine.require('Config');
+        
+        
         function MapEditor(context, placeApplication) {
 
             this.TITLE = 'Map Editor';
@@ -42,7 +53,7 @@ Engine.define('MapEditor', ['Dom', 'Text', 'CustomTiles', 'DomComponents', 'Rest
             this.customTiles = new CustomTiles(function () {
                 me.loadObjects();
             });
-
+            var mainMenu = new MainMenu(context, placeApplication); 
             DomComponents.doModal(this.zonesButtons);
             this.zoneTypeHolder = Dom.el('div', {'class': 'mounted'});
             var filter = Dom.el('input', {type: 'text', placeholder: 'Filter by zone name'});
@@ -54,8 +65,12 @@ Engine.define('MapEditor', ['Dom', 'Text', 'CustomTiles', 'DomComponents', 'Rest
             DomComponents.doModal(zoneTypeWrapper);
             this.map = Dom.el('canvas', {width: this.x, height: this.y});
             this.container = Dom.el('div', {'class': 'editor'}, [
+                mainMenu.container,
                 this.customTiles.container,
-                this.doMapControl(), this.zonesButtons, zoneTypeWrapper, Dom.el('div', 'map-editor-wrapper', this.map)
+                this.doMapControl(), 
+                this.zonesButtons,
+                zoneTypeWrapper,
+                Dom.el('div', 'map-editor-wrapper', this.map)
             ]);
             this.map.onclick = function (e) {
                 me.onClick(e)

@@ -1,10 +1,12 @@
-Engine.define('Greetings', ['Dom', 'Radio', 'Text', 'Password', 'Rest'], (function () {
+Engine.define('Greetings', ['Context', 'Dom', 'Radio', 'Text', 'Password', 'Rest', 'MainMenu'], (function () {
 
     var Dom = Engine.require('Dom');
     var Radio = Engine.require('Radio');
     var Text = Engine.require('Text');
     var Password = Engine.require('Password');
     var Rest = Engine.require('Rest');
+    var Context = Engine.require('Context');
+    var MainMenu = Engine.require('MainMenu');
 
     var OPTIONS = [
         {value: 'A', label: 'Short session'},
@@ -18,7 +20,6 @@ Engine.define('Greetings', ['Dom', 'Radio', 'Text', 'Password', 'Rest'], (functi
      * @constructor
      */
     var Greetings = function(context, placeApplication) {
-
         this.TITLE = 'Greetings';
         this.URL = 'greetings';
         
@@ -26,7 +27,7 @@ Engine.define('Greetings', ['Dom', 'Radio', 'Text', 'Password', 'Rest'], (functi
         this.context = context;
         this.placeApplication = placeApplication;
         var me = this;
-        var name = this.context.get('personName') || '';
+        var name = this.context.get('username') || '';
         var toggler = this.context.get('toggler') || 'A';
         this.errorMessage = Dom.el('div', 'error');
         this.name = new Text({noLabel: true, name: 'name', attr: {placeholder: 'Your name'}, value: name});
@@ -54,6 +55,12 @@ Engine.define('Greetings', ['Dom', 'Radio', 'Text', 'Password', 'Rest'], (functi
             Dom.el('p', null, 'Online browser game. No registration, just fun')]);
         this.container = Dom.el('div', {'class': 'overlay'}, win);
     };
+    Greetings.prototype.afterOpen = function() {
+        if(this.context.get('logged')) {
+            this.placeApplication('RoomsList');
+        }
+    };
+    
     Greetings.prototype.getName = function () {
         return this.name.getValue();
     };
@@ -98,8 +105,9 @@ Engine.define('Greetings', ['Dom', 'Radio', 'Text', 'Password', 'Rest'], (functi
                 );
                 break;
             default:
+                this.context.set('username', name);
+                MainMenu.init(this.context, this.placeApplication);
                 this.placeApplication('RoomsList');
-                this.context.set('personName', name);
         }
         this.context.set('toggler', toggler);
     };
@@ -112,15 +120,18 @@ Engine.define('Greetings', ['Dom', 'Radio', 'Text', 'Password', 'Rest'], (functi
         var me = this;
         var iFrame = Dom.el('iframe', {name: iFrameName, src:"about:blank", style: 'display: none'});
         document.body.appendChild(iFrame);
-        var onLoad = {load: function(){me.readIframeResponse(this)}};
+        var onLoad = {load: function(){me.readIframeResponse(this, user.username)}};
         Dom.addListeners(iFrame, onLoad);
         form.submit();
     };
-    Greetings.prototype.readIframeResponse = function(iFrame) {
+    Greetings.prototype.readIframeResponse = function(iFrame, username) {
         var doc = iFrame.contentDocument || iFrame.contentWindow.document;
         var content = doc.body.innerText;
         if(content == "OK") {
             this.context.set("logged", true);
+            this.context.set("username", username);
+            Greetings.sessionExist = true;
+            MainMenu.init(this.context, this.placeApplication);
             this.placeApplication("RoomsList");
         } else {
             this.showError("Invalid username or password");
@@ -133,6 +144,27 @@ Engine.define('Greetings', ['Dom', 'Radio', 'Text', 'Password', 'Rest'], (functi
     Greetings.prototype.toString = function (e) {
         return "Greetings application";
     };
+    
+    Greetings.isLogged = function (context, clb) {
+        var isLogged = context.get('logged');
+        if(isLogged) {//data from localstorage
+            if(Greetings.sessionExist) {//data from current browser session
+                clb(true);
+            } else {
+                Rest.doGet('users/is-logged').then(
+                    function(response) {
+                        Greetings.sessionExist = response;
+                        clb(response);
+                    }
+                )
+            }
+        } else {
+            Greetings.sessionExist = false;
+            clb(false);
+        }
+    };
+    Greetings.sessionExist = false;
+    
     return Greetings;
 
 }));

@@ -1,11 +1,14 @@
-Engine.define('KeyboardSetup', ['Dom', 'Controls', 'Tabs', 'PersonActions', 'SoundUtils', 'KeyboardUtils'], (function () {
+Engine.define(
+    'KeyboardSetup',
+    ['Dom', 'Controls', 'Tabs', 'PersonActions', 'SoundUtils', 'KeyboardUtils', 'Checkbox'], (function () {
 
     var Dom = Engine.require('Dom');
     var Controls = Engine.require('Controls');
     var Tabs = Engine.require('Tabs');
     var PersonActions = Engine.require('PersonActions');
     var SoundUtils = Engine.require('SoundUtils');
-    
+    var Checkbox = Engine.require('Checkbox');
+
     var KeyboardSetup = {
         container: null,
         isActive: false,
@@ -16,6 +19,7 @@ Engine.define('KeyboardSetup', ['Dom', 'Controls', 'Tabs', 'PersonActions', 'Sou
          * @var PlayGround
          */
         playGround: null,
+        context: null,
         /**
          * @var Chat
          */
@@ -29,22 +33,7 @@ Engine.define('KeyboardSetup', ['Dom', 'Controls', 'Tabs', 'PersonActions', 'Sou
             Dom.addClass(KeyboardSetup.container, 'hidden');
         },
         init: function () {
-            var oldConfig = localStorage.getItem('keyboard');
-            if (oldConfig) {
-                try {
-                    var obj = JSON.parse(oldConfig);
-                    if (obj) {
-                        for (var k in obj) {
-                            if(obj.hasOwnProperty(k)) {
-                                Controls[k] = obj[k];
-                            }
-                        }
-                    }
-                } catch (e) {
-                    console.log('something wrong with keyboard config');
-                    localStorage.removeItem('keyboard');
-                }
-            }
+            
             var title = Dom.el('h3', null, 'Keyboard settings');
             var tabs = new Tabs();
             tabs.addTab('Movement', KeyboardSetup.buildMovementSettings());
@@ -67,6 +56,11 @@ Engine.define('KeyboardSetup', ['Dom', 'Controls', 'Tabs', 'PersonActions', 'Sou
         removeListeners: function() {
             Dom.removeListeners(this.listeners);
         },
+        clearBackgrounds: function() {
+            KeyboardSetup.playGround.canvas.style.backgroundImage = null;
+            document.body.style.background = null;
+        },
+
         addListeners: function() {
             Dom.addListeners(this.listeners);
         },
@@ -78,7 +72,7 @@ Engine.define('KeyboardSetup', ['Dom', 'Controls', 'Tabs', 'PersonActions', 'Sou
             });
             var me = this;
             chatToggler.onclick = function () {
-                if (this.chat.isHidden) {
+                if (me.chat.isHidden) {
                     me.chat.show();
                     chatToggler.value = KeyboardSetup.hideChatMessage;
                 } else {
@@ -180,12 +174,13 @@ Engine.define('KeyboardSetup', ['Dom', 'Controls', 'Tabs', 'PersonActions', 'Sou
         },
         buildHudSettings: function () {
             return [
-                KeyboardSetup.buildBackgounds(),
+                KeyboardSetup.buildBackgrounds(),
                 KeyboardSetup.buildDrawBounds(),
                 KeyboardSetup.buildShowNames(),
                 KeyboardSetup.buildChatToggler(),
                 KeyboardSetup.buildScoreButton(),
                 KeyboardSetup.buildMuteButton(),
+                KeyboardSetup.buildMuteMusicButton(),
                 KeyboardSetup.buildHightLightButton(),
                 KeyboardSetup.buildBloodTime()
             ];
@@ -226,7 +221,7 @@ Engine.define('KeyboardSetup', ['Dom', 'Controls', 'Tabs', 'PersonActions', 'Sou
             }
             checkbox.onclick = function () {
                 playGround.highlightOwner = checkbox.checked;
-                if (SoundUtils.mute) {
+                if (playGround.highlightOwner) {
                     localStorage.setItem('highlightOwner', '1');
                 } else {
                     localStorage.removeItem('highlightOwner');
@@ -234,36 +229,47 @@ Engine.define('KeyboardSetup', ['Dom', 'Controls', 'Tabs', 'PersonActions', 'Sou
             };
             return Dom.el('div', null, Dom.el('label', {'for': 'highlight_checkbox'}, [checkbox, 'Highligh person']));
         },
+        buildMuteMusicButton: function () {
+            var muteMusic = KeyboardSetup.context.get('muteMusic');
+            if (muteMusic == 1) {
+                SoundUtils.setMuteMusic(true);
+            }
+            var checkbox = new Checkbox({name: 'muteMusic', value: SoundUtils.muteMusic, onchange: function(){
+                muteMusic = checkbox.getValue();
+                KeyboardSetup.context.set('muteMusic', muteMusic ? 1 : 0);
+                if(muteMusic) {
+                    SoundUtils.setMuteMusic(true);
+                } else {
+                    SoundUtils.setMuteMusic(false);
+                }
+            }});
+            return checkbox.container;
+        },
         buildMuteButton: function () {
-            var mute = localStorage.getItem('mute');
-            if (mute == '1') {
+            var mute = KeyboardSetup.context.get('mute');
+            if (mute == 1) {
                 SoundUtils.setMute(true);
             }
-            var checkbox = Dom.el('input', {type: 'checkbox', id: 'mute_checkbox'});
-            if (SoundUtils.mute) {
-                checkbox.checked = true;
-            }
-            checkbox.onclick = function () {
-                SoundUtils.setMute(checkbox.checked);
+            var checkbox = new Checkbox({name: 'muteSounds', value: SoundUtils.mute, onchange: function(){
+                SoundUtils.setMute(checkbox.getValue());
                 if (SoundUtils.mute) {
-                    localStorage.setItem('mute', '1');
+                    KeyboardSetup.context.set('mute', 1);
                 } else {
-                    localStorage.removeItem('mute');
+                    KeyboardSetup.context.remove('mute');
                 }
-            };
-            return Dom.el('div', null, Dom.el('label', {'for': 'mute_checkbox'}, [checkbox, 'Mute (no sound)']));
+            }});
+            return checkbox.container;
         },
         buildScoreButton: function () {
             return KeyboardSetup.createInput('score');
         },
-        buildBackgounds: function () {
+        buildBackgrounds: function () {
             var playGround = KeyboardSetup.playGround;
             var buttons = ["Background: "];
             var back = localStorage.getItem('background');
             var setBackground = function (i) {
                 try {
                     var background = 'url(images/map/background/' + i + '.png)';
-                    localStorage.setItem('background', background);
                     playGround.canvas.style.backgroundImage = background;
                     document.body.style.background = background;
                     localStorage.setItem('background', i);

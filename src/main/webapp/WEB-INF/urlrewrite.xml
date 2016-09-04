@@ -28,4 +28,12 @@
         <from>/arena$</from>
         <to type="forward">/index.html</to>
     </rule>
+    <rule>
+        <from>/account$</from>
+        <to type="forward">/index.html</to>
+    </rule>
+    <rule>
+        <from>/logout$</from>
+        <to type="forward">/index.html</to>
+    </rule>
 </urlrewrite>

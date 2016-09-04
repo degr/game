@@ -71,7 +71,7 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         this.statsShown = false;
         this.rockets = [];
         /*rockets storage. For smoke visualisation*/
-        this.playerName = '';
+        this.playerName = context.get('username');
         this.placeApplication = placeApplication;
         
         this.chat = new Chat(this);
@@ -84,6 +84,7 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         this.gameStats = new GameStats(this, this.personTracker, this.teamControl);
         KeyboardSetup.playGround = this;
         KeyboardSetup.chat = this.chat;
+        KeyboardSetup.context = context;
         PersonActions.playGround = this;
         ProjectilesActions.playGround = this;
         this.score = new Score(this);
@@ -102,7 +103,7 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
             if (me.gameStarted) {
                 if (!me.musicStarted) {
                     me.musicStarted = true;
-                    /*SoundUtils.music([
+                   /* SoundUtils.music([
                      "sound/music/04.ogg",
                      "sound/music/05.ogg"
                      ]);*/
@@ -150,13 +151,14 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         CGraphics.context = this.context;
         canvas.addEventListener('mousedown', function(e){PersonActions.startFire(e)});
         canvas.addEventListener('mouseup', function(e){PersonActions.stopFire(e)});
-        var background = localStorage.getItem('background');
-        canvas.style.backgroundImage = background ? background : 'url(images/map/background/1.png)';
+        
         this.windowListeners = {
             keydown: [
                 function(e){PersonActions.onKeyDown(e)},
                 function(e){WeaponActions.changeWeapon(e)},
-                function(e){if(e.keyCode === 27){placeApplication("Greetings")}}
+                function(e){if(e.keyCode === 27 && !(KeyboardSetup.isActive || me.chat.active)){
+                    placeApplication("Greetings")
+                }}
             ],
             keyup: function(e){PersonActions.stopMovement(e)},
             mousemove: function(e){PersonActions.updateMouseDirection(e)},
@@ -198,8 +200,10 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         this.scoreOverview.removeListeners();
         this.chat.removeListeners();
         KeyboardSetup.removeListeners();
+        KeyboardSetup.clearBackgrounds();
         this.stopGameLoop();
         this.socket.close();
+
     };
     PlayGround.prototype.createGame = function (name, map) {
         this.updateCanvas(map);

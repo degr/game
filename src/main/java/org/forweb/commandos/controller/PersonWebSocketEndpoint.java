@@ -116,22 +116,22 @@ public class PersonWebSocketEndpoint {
                 break;
             case MESSAGE_CREATE:
                 String roomName;
-                String personName;
+                String username;
                 if (parts.length < 4) {
                     Random r = new Random();
-                    personName = "player-" + (r.nextInt(998) + 1);
+                    username = "player-" + (r.nextInt(998) + 1);
                     if (parts.length < 3) {
                         roomName = "unnamed-room-" + (r.nextInt(998) + 1);
                     } else {
                         roomName = parts[2];
                     }
                 } else {
-                    personName = parts[3];
+                    username = parts[3];
                     roomName = parts[2];
                 }
                 roomId = springDelegationService.createRoom(Integer.parseInt(parts[1]), roomName);
                 initPersonId(roomId);
-                springDelegationService.onJoin(session, id, roomId, personName);
+                springDelegationService.onJoin(session, id, roomId, username);
                 break;
             case MESSAGE_JOIN:
                 String personNameJoin;

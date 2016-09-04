@@ -77,6 +77,8 @@ Engine.define('Chat', 'Dom', (function (Dom) {
                 this.textarea.value = '';
                 this.sendMessage(message);
             }
+        } else if(e.keyCode == 27) {
+            Dom.addClass(this.textarea, 'hidden');
         }
     };
     Chat.prototype.sendMessage = function (message) {

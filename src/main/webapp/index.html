@@ -16,17 +16,16 @@
             PathBuilder.seed = "?v=2";
             Engine.define(
                 "application",
-                ['Ajax', 'Rest', 'Context', 'Dispatcher', 'UrlResolver', 'UrlResolver'],
-                function (Ajax, Rest, Context, Dispatcher, UrlResolver) {
+                ['Ajax', 'Rest', 'Context', 'Dispatcher', 'UrlResolver', 'MainMenu'],
+                function (Ajax, Rest, Context, Dispatcher, UrlResolver, MainMenu) {
                     Ajax.headers = {
                         Accept: "application/json,text/plain",
                         'Content-Type': "application/json"
                     };
-
                     Rest.host = document.location.protocol + '//' + document.location.host + '/server/';
                     var context = new Context();
-
-                    var dispatcher = new Dispatcher('application', context);
+                    var dispatcher = new Dispatcher('application', context, UrlResolver);
+                    dispatcher.addListener('afterOpen', MainMenu.updateActive);
                     dispatcher.placeApplication(UrlResolver.findApplication())
                 }
             );

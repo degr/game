@@ -4,20 +4,10 @@ import org.forweb.commandos.dto.CreateUserDto;
 import org.forweb.commandos.entity.Authority;
 import org.forweb.commandos.entity.User;
 import org.forweb.commandos.service.UserService;
+import org.forweb.commandos.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
@@ -47,9 +37,47 @@ public class UserController {
         return out;
     }
 
+    @RequestMapping("/update-username")
+    public Boolean updateUsername(@RequestBody String username) {
+        UserDetails userDetails = UserUtils.getUser();
+        if(userDetails != null) {
+            User check = (User)userService.loadUserByUsername(username);
+            if(check == null) {
+                User user = (User) userDetails;
+                user.setUsername(username);
+                userService.save(user);
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    @RequestMapping("/update-password")
+    public Boolean updatePasswordUsername(@RequestBody String password) {
+        UserDetails userDetails = UserUtils.getUser();
+        if(userDetails != null) {
+            User user = (User) userDetails ;
+            user.setPassword(password);
+            userService.save(user);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     @RequestMapping("/is-exist")
-    public Boolean isExist(@RequestBody User user) {
-        User check = (User)userService.loadUserByUsername(user.getUsername());
+    public Boolean isExist(@RequestBody String username) {
+        User check = (User)userService.loadUserByUsername(username);
         return check == null;
     }
+
+    @RequestMapping("/is-logged")
+    public Boolean isLogged() {
+        return UserUtils.getUser() != null;
+    }
+
+
 }

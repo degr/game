@@ -10,6 +10,10 @@ Engine.define('UrlResolver', {
                 return 'MapEditor';
             case 'room-list':
                 return 'RoomsList';
+            case 'account':
+                return 'Account';
+            case 'logout':
+                return 'Logout';
             default:
                 return 'Greetings';
         }

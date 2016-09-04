@@ -1,5 +1,5 @@
-Engine.define('MapList', ['StringUtils', 'Dom', 'Pagination', 'Rest'],
-    (function (StringUtils, Dom, Pagination, Rest) {
+Engine.define('MapList', ['MainMenu', 'StringUtils', 'Dom', 'Pagination', 'Rest'],
+    (function (MainMenu, StringUtils, Dom, Pagination, Rest) {
     
     
     function MapList(context, placeApplication) {
@@ -14,28 +14,24 @@ Engine.define('MapList', ['StringUtils', 'Dom', 'Pagination', 'Rest'],
         this.mapForeground = '#000000';
         this.mapWidth = 200;
         this.placeApplication = placeApplication;
+
+        this.mainMenu = new MainMenu(context, placeApplication);
+        
         var me = this;
-        var controlPanel = new Pagination(
+        var pagination = new Pagination(
             function(page){me.openPage(page)},
             this.pageNumber
         );
-        var joinGame = Dom.el('input', {type: 'button', value: 'Join to existing room'});
-        joinGame.onclick = function () {
-            placeApplication('RoomsList')
-        };
-        var createMap = Dom.el('input', {type: 'button', value: 'Create new map'});
-        createMap.onclick = function () {
-            placeApplication('MapEditor')
-        };
+
         this.container = Dom.el(
             'div',
             {'class': 'map-list'},
             [
+                this.mainMenu.container,
                 Dom.el('h1', null, 'Select map to create game'),
-                joinGame, createMap, controlPanel.container, this.content]
+                pagination.container, this.content]
         );
     }
-
     MapList.prototype.beforeOpen = function () {
         if (!this.mapsLoaded) {
             this.openPage(this.pageNumber);

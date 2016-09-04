@@ -20,6 +20,10 @@ Engine.define("Context", (function () {
         this.storage[name] = value;
         localStorage.setItem(this.contextName, JSON.stringify(this.storage));
     };
+    Context.prototype.remove = function (name) {
+        delete(this.storage[name]);
+        localStorage.setItem(this.contextName, JSON.stringify(this.storage));
+    };
     Context.prototype.toString = function() {
         return 'Context instance';
     };

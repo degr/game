@@ -564,3 +564,25 @@ input[button], input[submit], button {
 .clearfix:after {
      clear: both;
 }
+.pagination {
+    margin-bottom: 15px;
+}
+.main-menu {
+    min-height: 50px;
+    margin-bottom: 20px;
+    background-color: #f8f8f8;
+    border: 1px solid #e7e7e7;
+}
+.formfield-errors {
+    color: #f6221d;
+}
+.main-menu > a{
+    padding: 15px;
+    line-height: 20px;
+    color: #777;
+    display: inline-block;
+}
+.main-menu > a.active{
+    color: #555;
+    background-color: #e7e7e7;
+}

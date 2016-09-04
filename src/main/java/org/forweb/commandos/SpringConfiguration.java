@@ -14,6 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
@@ -50,6 +51,13 @@ public class SpringConfiguration extends WebSecurityConfigurerAdapter {
         };
     }
 
+    private LogoutSuccessHandler successLogoutHandler() {
+        return (httpServletRequest, httpServletResponse, e) -> {
+            httpServletResponse.getWriter().append("true");
+            httpServletResponse.setStatus(200);
+        };
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
@@ -58,26 +66,26 @@ public class SpringConfiguration extends WebSecurityConfigurerAdapter {
                 .headers().httpStrictTransportSecurity().disable()
                // .addFilterBefore(usernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .httpBasic().disable()
-
-                .formLogin()
-                .loginProcessingUrl("/server/login")
-                .successHandler(successHandler())
-                .failureHandler(failureHandler())
+                    .formLogin()
+                    .loginProcessingUrl("/server/login")
+                    .successHandler(successHandler())
+                    .failureHandler(failureHandler())
                 .and()
-                .sessionManagement()
-                .sessionFixation().migrateSession()
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                    .sessionManagement()
+                    .sessionFixation().migrateSession()
+                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
 
                 .and()
-                .logout()
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
-                .invalidateHttpSession(true)
-                .deleteCookies("auth")
+                    .logout()
+                    .logoutUrl("/server/logout")
+                    .deleteCookies("JSESSIONID")
+                    .logoutSuccessHandler(successLogoutHandler())
+                    .invalidateHttpSession(true)
                 .and()
 
                 .authorizeRequests().antMatchers("/protected/**").access("hasRole('ROLE_ADMIN')");
     }
+
 
 
     @Bean

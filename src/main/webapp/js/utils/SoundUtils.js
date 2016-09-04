@@ -1,19 +1,30 @@
 Engine.define('SoundUtils', (function () {
     var SoundUtils = {
         mute: false,
-        musicPlayed: false,
+        muteMusic: false,
         currentMusic: null,
         stack: []
     };
     SoundUtils.setMute = function (value) {
         SoundUtils.mute = value;
-        if (value && SoundUtils.musicPlayed) {
-            SoundUtils.musicPlayed.pause();
-        } else if (!value && SoundUtils.musicPlayed && SoundUtils.currentMusic !== null) {
+        if (value && SoundUtils.muteMusic) {
+            SoundUtils.currentMusic.pause();
+        } else if (!value && SoundUtils.muteMusic && SoundUtils.currentMusic !== null) {
             SoundUtils.currentMusic.play();
         }
     };
-
+    SoundUtils.setMuteMusic = function(muteMusic) {
+        SoundUtils.muteMusic = muteMusic;
+        if(muteMusic && SoundUtils.currentMusic !== null) {
+            SoundUtils.currentMusic.pause();
+        } else if(!muteMusic) {
+            if(SoundUtils.currentMusic) {
+                SoundUtils.currentMusic.play();
+            } else {
+                SoundUtils.nextMusic();
+            }
+        }
+    };
     SoundUtils.play = function (path, isMusic) {
         var audio = new Audio(path);
         isMusic = isMusic || false;
@@ -34,8 +45,8 @@ Engine.define('SoundUtils', (function () {
         if (!SoundUtils.mute) {
             if (!isMusic) {
                 audio.play();
-            } else if (!SoundUtils.musicPlayed) {
-                SoundUtils.musicPlayed = true;
+            } else if (!SoundUtils.muteMusic) {
+                SoundUtils.muteMusic = true;
                 audio.play();
             }
         }

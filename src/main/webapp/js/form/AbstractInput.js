@@ -5,8 +5,34 @@ Engine.define("AbstractInput", ['Dom', 'StringUtils'], (function(Dom, StringUtil
         this.input = Dom.el(this.getElementType(), this.prepareAttributes(params), this.prepareContent(params));
         this.label = this.buildLabel(params);
         this.container = Dom.el('div', 'formfield-holder ' + (params.class || ''), [this.label, this.input]);
+        this.errors = null;
+        this.errorsData = null;
     }
-
+    
+    AbstractInput.prototype.addError = function(errors) {
+        if(this.errors === null) {
+            this.errors = Dom.el('div', 'formfield-errors');
+            this.container.appendChild(this.errors);
+            this.errorsData = {};
+        } else {
+            this.errors.innerHTML = '';
+        }
+        if(typeof errors === 'string') {
+            this.errorsData.custom = errors;
+        } else {
+            for(var ek in errors) {
+                if(errors.hasOwnProperty(ek)) {
+                    this.errorsData[ek] = errors[ek];
+                }
+            }
+        }
+        
+        for(var k in this.errorsData) {
+            if(this.errorsData.hasOwnProperty(k) && this.errorsData[k]) {
+                this.errors.appendChild(Dom.el('div', 'err', this.errorsData[k]));
+            }
+        }
+    };
     
     AbstractInput.prototype.buildLabel = function(params) {
         var content;
@@ -41,7 +67,7 @@ Engine.define("AbstractInput", ['Dom', 'StringUtils'], (function(Dom, StringUtil
             value: params.value || "",
             name: params.name,
             type: this.getInputType(),
-            id: params.id
+            id: params.id || StringUtils.unique()
         };
         if(params.attr) {
             for(var key in params.attr) {

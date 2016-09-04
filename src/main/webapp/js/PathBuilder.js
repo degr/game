@@ -16,6 +16,8 @@ Engine.define("PathBuilder", function(){
             case 'UrlResolver':
                 path = 'js/utils/' + module + '.js';
                 break;
+            case 'Account':
+            case 'Logout':
             case 'Greetings':
             case 'MapEditor':
             case 'MapList':
@@ -62,13 +64,16 @@ Engine.define("PathBuilder", function(){
                 path = 'js/form/' + module + '.js';
                 break;
             case 'RoomsChat':
-                path = "js/applications/rooms-list/RoomsChat.js";
+                path = 'js/applications/rooms-list/RoomsChat.js';
                 break;
             case 'Config':
                 path =  "js/Config.js";
                 break;
+            case 'MainMenu':
+                path =  'js/project-components/' + module + ".js";
+                break;
             default:
-                throw "Unkown class - " + module;
+                throw 'Unkown class - ' + module;
         }
         return (path ? path + PathBuilder.seed : '');
     };

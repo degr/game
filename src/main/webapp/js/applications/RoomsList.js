@@ -1,5 +1,5 @@
-Engine.define('RoomsList', ['RoomsChat', 'Dom', 'Pagination', 'Rest'], 
-    (function (RoomsChat, Dom, Pagination, Rest) {
+Engine.define('RoomsList', ['MainMenu', 'RoomsChat', 'Dom', 'Pagination', 'Rest', 'Controls', 'KeyboardUtils'], 
+    (function (MainMenu, RoomsChat, Dom, Pagination, Rest, Controls, KeyboardUtils) {
     
     function RoomsList(context, placeApplication) {
         
@@ -20,18 +20,16 @@ Engine.define('RoomsList', ['RoomsChat', 'Dom', 'Pagination', 'Rest'],
          * @var RoomChat
          */
         this.roomsChat = new RoomsChat(context);
-
+        this.mainMenu = new MainMenu(context, placeApplication);
+        
         var me = this;
 
-        var controlPanel = new Pagination(function (page) {
+        var pagination = new Pagination(function (page) {
             me.openPage(page)
         }, this.pageNumber);
-        var createGame = Dom.el('input', {type: 'button', value: 'Create room'});
-        createGame.onclick = function () {
-            placeApplication('MapList')
-        };
+
         var info = Dom.el('div', 'clearfix', [
-            Dom.el('div', "hint", 'ASDW for movement, 1-7 for weapon switch, mouse click for shoot'),
+            Dom.el('div', "hint", this.buildMovementHint()),
             Dom.el('div', "hint", 'Customize your controls in game, right-bottom corner, gear icon')
         ]);
 
@@ -39,14 +37,25 @@ Engine.define('RoomsList', ['RoomsChat', 'Dom', 'Pagination', 'Rest'],
             'div',
             {'class': 'games-list'},
             [
+                this.mainMenu.container,
                 Dom.el('h1', null, 'Select game to play'),
                 info,
-                createGame, controlPanel.container,
+                pagination.container,
                 this.roomsChat.container,
-                this.content]
+                this.content
+            ]
         );
     }
 
+    RoomsList.prototype.buildMovementHint = function () {
+        var out = '';
+        var buttons = ['left', 'top', 'right', 'bottom'];
+        for(var i = 0; i < buttons.length; i++ ) {
+            var key = Controls[buttons[i]];
+            out += KeyboardUtils.translateButton(key);
+        }
+        return out + ' for movement, 1-7 for weapon switch, mouse click for shoot'; 
+    };
     RoomsList.prototype.openPage = function (page) {
         this.pageNumber = page;
         var me = this;

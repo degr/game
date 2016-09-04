@@ -2,6 +2,8 @@ Engine.define('Checkbox', ['Dom', 'AbstractInput'], function(Dom, AbstractInput)
     function Checkbox(params) {
         AbstractInput.apply(this, arguments);
         Dom.insert(this.label, this.input);
+        this.input.checked = this._initChecked;
+        delete(this._initChecked);
     }
     Checkbox.prototype = Object.create(AbstractInput.prototype);
     
@@ -17,7 +19,7 @@ Engine.define('Checkbox', ['Dom', 'AbstractInput'], function(Dom, AbstractInput)
     };
     Checkbox.prototype.prepareAttributes = function(params) {
         var out = AbstractInput.prototype.prepareAttributes.apply(this, arguments);
-        out.checked = !!params.value;
+        this._initChecked = !!params.value;
         delete out.value;
         return out;
     };
