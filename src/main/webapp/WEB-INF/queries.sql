@@ -48,3 +48,11 @@ password VARCHAR (255),
 authority VARCHAR (255),
 primary key(id)
 );
+create table game_profile (
+id integer(11) auto_increment not null,
+username varchar(255),
+user int(11),
+arena bit(1),
+primary key(id)
+);
+delete from user where id not in (select user from game_profile)

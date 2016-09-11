@@ -96,7 +96,7 @@ Engine.define('Greetings', ['Context', 'Dom', 'Radio', 'Text', 'Password', 'Rest
             case 'R':
                 Rest.doPost('user/create', user).then(
                     function(r){
-                        if(r.success) {
+                        if(r) {
                             me.performLogin(user);
                         } else {
                             me.showError('User with this login already registered');
@@ -127,13 +127,14 @@ Engine.define('Greetings', ['Context', 'Dom', 'Radio', 'Text', 'Password', 'Rest
     Greetings.prototype.readIframeResponse = function(iFrame, username) {
         var doc = iFrame.contentDocument || iFrame.contentWindow.document;
         var content = doc.body.innerText;
-        if(content == "OK") {
+        try {
+            var dto = JSON.parse(content);
             this.context.set("logged", true);
-            this.context.set("username", username);
+            this.context.set("username", dto.arenaUserName);
             Greetings.sessionExist = true;
             MainMenu.init(this.context, this.placeApplication);
             this.placeApplication("RoomsList");
-        } else {
+        } catch (e){
             this.showError("Invalid username or password");
         }
         iFrame.remove();

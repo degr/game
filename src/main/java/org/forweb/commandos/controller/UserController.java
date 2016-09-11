@@ -1,8 +1,8 @@
 package org.forweb.commandos.controller;
 
-import org.forweb.commandos.dto.CreateUserDto;
 import org.forweb.commandos.entity.Authority;
 import org.forweb.commandos.entity.User;
+import org.forweb.commandos.service.GameProfileService;
 import org.forweb.commandos.service.UserService;
 import org.forweb.commandos.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,16 +16,17 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private GameProfileService gameProfileService;
+
     @RequestMapping("/create")
-    public CreateUserDto createUser(@RequestBody User user) {
-        CreateUserDto out = new CreateUserDto();
+    public Boolean createUser(@RequestBody User user) {
         if(user.getUsername() == null) {
-            out.setSuccess(false);
-            return out;
+            return false;
         }
-        out.setSuccess(null == userService.loadUserByUsername(user.getUsername()));
-        if(!out.getSuccess()) {
-            return out;
+        ;
+        if(null != userService.loadUserByUsername(user.getUsername())) {
+            return false;
         }
 
         User userToSave = new User();
@@ -33,8 +34,8 @@ public class UserController {
         userToSave.setPassword(user.getPassword());
         userToSave.setAuthority(Authority.USER.toString());
         userToSave = userService.save(userToSave);
-        out.setUserId(userToSave.getId());
-        return out;
+        gameProfileService.createProfile(userToSave.getId(), userToSave.getUsername(), true);
+        return true;
     }
 
     @RequestMapping("/update-username")

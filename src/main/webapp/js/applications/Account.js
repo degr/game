@@ -11,7 +11,7 @@ Engine.define('Account', ['MainMenu', 'Dom', 'Rest', 'Text', 'Password'], functi
         this.TITLE = 'Account';
         var user = {
             username: context.get('username'),
-            password: context.get('password')
+            password: ''
         };
         var name = new Text({name: 'username', value: context.get('username'), onkeyup: function(){
             Rest.doPost(

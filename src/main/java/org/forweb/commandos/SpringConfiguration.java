@@ -1,5 +1,10 @@
 package org.forweb.commandos;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.forweb.commandos.dto.CreateUserDto;
+import org.forweb.commandos.entity.GameProfile;
+import org.forweb.commandos.entity.User;
+import org.forweb.commandos.service.GameProfileService;
 import org.forweb.commandos.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +18,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
@@ -33,13 +37,23 @@ public class SpringConfiguration extends WebSecurityConfigurerAdapter {
     UserService userService;
 
     @Autowired
+    GameProfileService gameProfileService;
+
+    @Autowired
     public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userService);
     }
 
     private AuthenticationSuccessHandler successHandler() {
         return (httpServletRequest, httpServletResponse, authentication) -> {
-            httpServletResponse.getWriter().append("OK");
+            User user = (User) authentication.getAuthorities().iterator().next();
+            CreateUserDto out = new CreateUserDto();
+            out.setUserId(user.getId());
+            out.setUserName(user.getUsername());
+            GameProfile profile = gameProfileService.findArenaProfile(user.getId());
+            out.setArenaUserName(profile.getUsername());
+            ObjectMapper mapper = new ObjectMapper();
+            httpServletResponse.getWriter().append(mapper.writeValueAsString(out));
             httpServletResponse.setStatus(200);
         };
     }
