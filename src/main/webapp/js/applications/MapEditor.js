@@ -43,7 +43,7 @@ Engine.define('MapEditor', ['MainMenu', 'Dom', 'Text', 'CustomTiles', 'DomCompon
             this.context = null;
             this.mounted = null;
             this.mountedObjects = [];
-            this.zonesButtons = Dom.el('div', {'class': 'zones panel'});
+            this.zonesButtons = Dom.el('div', {'class': 'zones my-panel'});
             this.zonesButtonsData = null;
             this.objectOnResize = null;
             this.objectOnDrag = null;
@@ -61,7 +61,7 @@ Engine.define('MapEditor', ['MainMenu', 'Dom', 'Text', 'CustomTiles', 'DomCompon
                 me.filterValue = filter.value.toLowerCase();
                 me.updateMountedObjects();
             };
-            var zoneTypeWrapper = Dom.el('div', 'mounted-wrapper panel', [filter, this.zoneTypeHolder]);
+            var zoneTypeWrapper = Dom.el('div', 'mounted-wrapper my-panel', [filter, this.zoneTypeHolder]);
             DomComponents.doModal(zoneTypeWrapper);
             this.map = Dom.el('canvas', {width: this.x, height: this.y});
             this.container = Dom.el('div', {'class': 'editor'}, [
@@ -126,7 +126,7 @@ Engine.define('MapEditor', ['MainMenu', 'Dom', 'Text', 'CustomTiles', 'DomCompon
             createTile.onclick = function () {
                 me.customTiles.show();
             };
-            var mapControl = Dom.el('form', {'class': 'panel main-control'}, [
+            var mapControl = Dom.el('form', {'class': 'my-panel main-control'}, [
                 labelX, inputX, mapName, mapNameEror, labelGridSize, inputGridSize,
                 Dom.el('br'),
                 labelY, inputY,
@@ -145,9 +145,7 @@ Engine.define('MapEditor', ['MainMenu', 'Dom', 'Text', 'CustomTiles', 'DomCompon
             var me = this;
             for (var i = 0; i < me.mountedObjects.length; i++) {
                 var obj = me.mountedObjects[i];
-
                 if (obj.highlight) {
-
                     var center = me.getCenter(obj);
                     var rect = me.doRectangle(obj);
                     var angle = obj.angle;
@@ -288,10 +286,11 @@ Engine.define('MapEditor', ['MainMenu', 'Dom', 'Text', 'CustomTiles', 'DomCompon
         };
         MapEditor.prototype.inRectangle = function (rectangle, clientX, clientY, angle, rotationCenter) {
             if (!angle)angle = 0;
+            var offset = Dom.calculateOffset(this.map);
+            var P = {x: clientX + window.scrollX - offset.left, y: clientY + window.scrollY - offset.top };
             if (angle == 0) {
-                var point = {x: clientX, y: clientY};
-                if (rectangle.x <= point.x && rectangle.x + rectangle.width >= point.x) {
-                    if (rectangle.y <= point.y && rectangle.y + rectangle.height >= point.y) {
+                if (rectangle.x <= P.x && rectangle.x + rectangle.width >= P.x) {
+                    if (rectangle.y <= P.y && rectangle.y + rectangle.height >= P.y) {
                         return true;
                     }
                 }
@@ -299,11 +298,6 @@ Engine.define('MapEditor', ['MainMenu', 'Dom', 'Text', 'CustomTiles', 'DomCompon
             } else {
                 var me = this;
                 if (!rotationCenter)rotationCenter = me.getCenter(rectangle);
-
-                /**/
-
-                //var clickPoint = {x: clientX, y: clientY};
-                var P = {x: clientX, y: clientY};
                 var A = me.rotatePoint(rotationCenter, {x: rectangle.x, y: rectangle.y}, angle);
                 var B = me.rotatePoint(rotationCenter, {
                     x: rectangle.x + rectangle.width,

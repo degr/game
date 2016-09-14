@@ -137,7 +137,7 @@ public class PersonWebSocketEndpoint {
                 String personNameJoin;
                 if (parts.length < 3) {
                     Random r = new Random();
-                    personNameJoin = "player-" + r.nextInt(998) + 1;
+                    personNameJoin = "player-" + (r.nextInt(998) + 1);
                 } else {
                     personNameJoin = parts[2];
                 }

@@ -39,7 +39,7 @@ Engine.define(
             e.preventDefault();
             me.sendMessage();
         };
-        this.container = Dom.el('div', 'room-list-chat panel', [this.screen, terminal]);
+        this.container = Dom.el('div', 'room-list-chat my-panel', [this.screen, terminal]);
         DomComponents.doModal(this.container);
     }
     RoomsChat.prototype.onKeyUp = function (e) {

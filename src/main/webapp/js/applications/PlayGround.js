@@ -1,7 +1,7 @@
 Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
     'PersonActions', 'SoundUtils', 'ProjectilesActions', 'PersonTracker', 'ZoneActions', 
     'WeaponActions', 'WeaponControl', 'LifeAndArmor', 'KeyboardSetup', 'GameStats', 'Score',
-    'ScoreOverview', 'TeamControl', 'WebSocketUtils', 'BloodActions', 'CGraphics', 'ScreenUtils'], (function () {
+    'ScoreOverview', 'TeamControl', 'WebSocketUtils', 'BloodActions', 'CGraphics', 'ScreenUtils', 'Rest'], (function () {
 
     var ScreenUtils = Engine.require('ScreenUtils');
     var Person = Engine.require('Person');
@@ -25,6 +25,7 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
     var WebSocketUtils = Engine.require('WebSocketUtils');
     var BloodActions = Engine.require('BloodActions');
     var CGraphics = Engine.require('CGraphics');
+    var Rest = Engine.require('Rest');
 
     var PlayGround = function (context, placeApplication) {
 
@@ -71,7 +72,6 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         this.statsShown = false;
         this.rockets = [];
         /*rockets storage. For smoke visualisation*/
-        this.playerName = context.get('username');
         this.placeApplication = placeApplication;
         
         this.chat = new Chat(this);
@@ -91,6 +91,7 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         this.scoreOverview = new ScoreOverview(this);
         WeaponActions.playGround = this;
         ZoneActions.playGround = this;
+        this.gameContext = context;
 
         PersonActions.init();
         ProjectilesActions.init();
@@ -205,16 +206,40 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         this.socket.close();
 
     };
+
     PlayGround.prototype.createGame = function (name, map) {
         this.updateCanvas(map);
-        this.connect("create:" + map.id + ":" + encodeURIComponent(name) + ":" + encodeURIComponent(this.playerName))
+        var playerName;
+        var me = this;
+        var clb = function(playerName) {
+            me.connect("create:" + map.id + ":" + encodeURIComponent(name) + ":" + encodeURIComponent(playerName))
+        };
+        this.onJoinGame(clb);
+    };
+    PlayGround.prototype.onJoinGame = function (clb) {
+        var me = this;
+        if(this.gameContext.get('logged')) {
+            Rest.doPost('user/arena-profile').then(function(r){
+                if(r) {
+                    clb(r.username);
+                } else {
+                    me.placeApplication('Greetings');
+                }
+            })
+        } else {
+            clb(this.gameContext.get('username'));
+        }
     };
     PlayGround.prototype.writeMessage = function (message) {
         this.socket.send("message:\n" + message);
     };
     PlayGround.prototype.joinGame = function (map, gameId) {
         this.updateCanvas(map);
-        this.connect("join:" + gameId + ":" + encodeURIComponent(this.playerName))
+        var me = this;
+        var clb = function(playerName) {
+            me.connect("join:" + gameId + ":" + encodeURIComponent(playerName))
+        };
+        this.onJoinGame(clb);
     };
     PlayGround.prototype.updateCanvas = function (map) {
         this.map = map;

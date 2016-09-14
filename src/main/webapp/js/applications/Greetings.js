@@ -98,6 +98,7 @@ Engine.define('Greetings', ['Context', 'Dom', 'Radio', 'Text', 'Password', 'Rest
                     function(r){
                         if(r) {
                             me.performLogin(user);
+                            me.context.set('toggler', "L");
                         } else {
                             me.showError('User with this login already registered');
                         }
@@ -135,6 +136,7 @@ Engine.define('Greetings', ['Context', 'Dom', 'Radio', 'Text', 'Password', 'Rest
             MainMenu.init(this.context, this.placeApplication);
             this.placeApplication("RoomsList");
         } catch (e){
+            this.context.set("logged", false);
             this.showError("Invalid username or password");
         }
         iFrame.remove();

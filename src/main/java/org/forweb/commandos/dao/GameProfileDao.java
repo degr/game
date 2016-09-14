@@ -16,4 +16,6 @@ public interface GameProfileDao extends AbstractDao<GameProfile> {
     @Query("select p from GameProfile p where p.user = :userId and p.arena = true")
     GameProfile findArenaProfile(@Param("userId") Integer userId);
 
+    @Query("select p from GameProfile p where p.user = :userId")
+    List<GameProfile> findProfiles(@Param("userId") Integer userId);
 }

@@ -10,9 +10,9 @@
     <script src="js/Engine.js"></script>
 
     <script type="application/javascript">
+        Engine.log = false;
         Engine.define('application', 'PathBuilder', function(PathBuilder){
             Engine.pathBuilder = PathBuilder;
-            Engine.notify = true;
             PathBuilder.seed = "?v=2";
             Engine.define(
                 "application",
@@ -26,7 +26,24 @@
                     var context = new Context();
                     var dispatcher = new Dispatcher('application', context, UrlResolver);
                     dispatcher.addListener('afterOpen', MainMenu.updateActive);
-                    dispatcher.placeApplication(UrlResolver.findApplication())
+                    var app = UrlResolver.findApplication();
+                    dispatcher.placeApplication(app);
+                    Rest.doGet(
+                        'user/is-logged'
+                    ).then(function(r){
+                        var isLogged = context.get('logged');
+                        if(isLogged !== r) {
+                            context.set("logged", r);
+                            MainMenu.init(context);
+                            if(isLogged && app !== 'Greetings') {
+                                dispatcher.placeApplication('Greetings');
+                            }
+                        } else if(r && app === 'Greetings') {
+                            dispatcher.placeApplication('RoomsList');
+                        } else if(!r && !context.get('username')) {
+                            dispatcher.placeApplication('Greetings');
+                        }
+                    });
                 }
             );
         });

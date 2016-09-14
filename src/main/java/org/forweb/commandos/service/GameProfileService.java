@@ -2,6 +2,8 @@ package org.forweb.commandos.service;
 
 import org.forweb.commandos.dao.GameProfileDao;
 import org.forweb.commandos.entity.GameProfile;
+import org.forweb.commandos.entity.User;
+import org.forweb.commandos.utils.UserUtils;
 import org.forweb.database.AbstractService;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,17 @@ public class GameProfileService extends AbstractService<GameProfile, GameProfile
     }
 
     public GameProfile findArenaProfile(Integer userId) {
-        return dao.findArenaProfile(userId);
+        GameProfile out = dao.findArenaProfile(userId);
+        if (out == null) {
+            User user = UserUtils.getUser();
+            if(user != null) {
+                out = createProfile(userId, user.getUsername(), true);
+            }
+        }
+        return out;
+    }
+    public List<GameProfile> findProfiles(Integer userId) {
+        return dao.findProfiles(userId);
     }
 
     public GameProfile createProfile(Integer userId, String username, Boolean isArena) {

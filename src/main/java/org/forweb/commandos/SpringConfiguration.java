@@ -2,6 +2,7 @@ package org.forweb.commandos;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.forweb.commandos.dto.CreateUserDto;
+import org.forweb.commandos.dto.UserDetail;
 import org.forweb.commandos.entity.GameProfile;
 import org.forweb.commandos.entity.User;
 import org.forweb.commandos.service.GameProfileService;
@@ -46,7 +47,7 @@ public class SpringConfiguration extends WebSecurityConfigurerAdapter {
 
     private AuthenticationSuccessHandler successHandler() {
         return (httpServletRequest, httpServletResponse, authentication) -> {
-            User user = (User) authentication.getAuthorities().iterator().next();
+            UserDetail user = (UserDetail) authentication.getAuthorities().iterator().next();
             CreateUserDto out = new CreateUserDto();
             out.setUserId(user.getId());
             out.setUserName(user.getUsername());
@@ -94,13 +95,8 @@ public class SpringConfiguration extends WebSecurityConfigurerAdapter {
                     .logoutUrl("/server/logout")
                     .deleteCookies("JSESSIONID")
                     .logoutSuccessHandler(successLogoutHandler())
-                    .invalidateHttpSession(true)
-                .and()
-
-                .authorizeRequests().antMatchers("/protected/**").access("hasRole('ROLE_ADMIN')");
+                    .invalidateHttpSession(true);
     }
-
-
 
     @Bean
     public HttpSessionEventPublisher httpSessionEventPublisher() {

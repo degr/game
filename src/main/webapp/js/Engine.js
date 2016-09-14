@@ -109,9 +109,7 @@ var Engine = (function(){
             }
         },
         console: function (message, type) {
-            if (Engine.log) {
-                new Notification(message, type);
-            }
+            new Notification(message, type);
         }
     };
 
@@ -174,7 +172,9 @@ var Engine = (function(){
                     deferredCallbacks: []
                 };
                 _load(module, function () {
-                    Engine.console("Script " + module + " was loaded as dependency for: " + parentName, 'S');
+                    if(Engine.log) {
+                        Engine.console("Script " + module + " was loaded as dependency for: " + parentName, 'S');
+                    }
                     loaded[module].afterLoad();
                 });
 
@@ -183,8 +183,6 @@ var Engine = (function(){
             } else if (loaded[module].callers.indexOf(parentName) === -1) {
                 loaded[module].callers.push(parentName);
                 loaded[module].deferredCallbacks.push(dependencyCallback);
-            } else {
-                //Engine.console("Skipped dependency " + module + " load for " + parentName, 'S');
             }
         }
     }

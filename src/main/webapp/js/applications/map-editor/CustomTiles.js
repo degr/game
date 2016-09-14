@@ -43,7 +43,7 @@ Engine.define('CustomTiles', ['Dom', 'Rest', 'DomComponents', 'Text', 'Checkbox'
             {
                 method: 'post',
                 enctype: 'multipart/form-data',
-                'class': 'panel hidden',
+                'class': 'my-panel hidden',
                 onsubmit: function(){this.action = Rest.host + 'zones/create-zone'},
                 target: 'custom_tile_iframe'
             },
