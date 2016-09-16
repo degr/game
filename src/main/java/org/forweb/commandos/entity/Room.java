@@ -1,19 +1,15 @@
 package org.forweb.commandos.entity;
 
 import org.forweb.commandos.controller.PersonWebSocketEndpoint;
-import org.forweb.commandos.entity.ammo.Explosion;
 import org.forweb.commandos.entity.ammo.Flame;
 import org.forweb.commandos.entity.ammo.Projectile;
 import org.forweb.commandos.entity.ammo.Rocket;
 import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.entity.zone.interactive.FlagBlue;
 import org.forweb.commandos.entity.zone.interactive.FlagRed;
-import org.forweb.commandos.service.GeometryService;
-import org.forweb.geometry.services.PointService;
 import org.forweb.geometry.shapes.Bounds;
 
 import javax.websocket.Session;
-import java.beans.Transient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -50,6 +46,7 @@ public class Room {
     private ConcurrentHashMap<Integer, Session> sessionStorage = new ConcurrentHashMap<>();
     private Vote vote;
     private boolean dumpMap;
+    private boolean shootingDown = false;
 
     public ConcurrentHashMap<Integer, Session> getSessionStorage() {
         return sessionStorage;
@@ -342,5 +339,13 @@ public class Room {
             }
             return out;
         }
+    }
+
+    public boolean isShootingDown() {
+        return shootingDown;
+    }
+
+    public void setShootingDown(boolean shootingDown) {
+        this.shootingDown = shootingDown;
     }
 }

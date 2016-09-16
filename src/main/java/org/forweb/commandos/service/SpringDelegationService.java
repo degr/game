@@ -12,6 +12,7 @@ import org.forweb.commandos.response.Status;
 import org.forweb.commandos.response.Update;
 import org.forweb.commandos.response.dto.Stats;
 import org.forweb.commandos.service.person.TurnService;
+import org.forweb.commandos.thread.RoomShootDownThread;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -146,6 +147,14 @@ public class SpringDelegationService {
             @Override
             public void run() {
                 try {
+                    int personsCount = room.getPersons().size();
+                    if(personsCount < 1) {
+                        if(!room.isShootingDown()) {
+                            room.setShootingDown(true);
+                            (new RoomShootDownThread(room, gameContext.getRooms())).start();
+                        }
+                        return;
+                    }
                     tick(room);
                     if (current >= PersonWebSocketEndpoint.SKIP_FRAMES) {
                         responseService.broadcast(
@@ -170,6 +179,7 @@ public class SpringDelegationService {
                 } catch (Exception e) {
                     e.printStackTrace();
                     System.out.println("Caught to prevent timer from shutting down" + e.getMessage());
+                    room.setTotalPlayers(room.getPersons().size());
                 }
                 if (current > PersonWebSocketEndpoint.SKIP_FRAMES) {
                     current = 0;
