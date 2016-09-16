@@ -1,5 +1,7 @@
 package org.forweb.commandos.service;
 
+import com.sun.org.apache.xerces.internal.impl.dv.xs.BooleanDV;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.forweb.commandos.AppInitializer;
 import org.forweb.commandos.dao.TileDao;
 import org.forweb.commandos.dao.ZoneDao;
@@ -157,12 +159,24 @@ public class ZoneService extends AbstractService<Zone, ZoneDao> {
                 break;
             case Wall.TITLE:
                 out = new Wall(x, y, zone.getWidth(), zone.getHeight(), angle);
+                if(Boolean.TRUE.equals(zone.isPassable())) {
+                    out.setPassable(true);
+                }
+                if(Boolean.TRUE.equals(zone.getShootable())) {
+                    out.setShootable(true);
+                }
                 break;
             case TiledZone.TITLE:
                 if(tile != null) {
                     out = new TiledZone(x, y, zone, tile, angle);
                 } else {
                     out = new Wall(x, y, zone.getWidth(), zone.getHeight(), angle);
+                }
+                if(Boolean.TRUE.equals(zone.isPassable())) {
+                    out.setPassable(true);
+                }
+                if(Boolean.TRUE.equals(zone.getShootable())) {
+                    out.setShootable(true);
                 }
                 break;
             default:

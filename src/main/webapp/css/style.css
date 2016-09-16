@@ -182,8 +182,12 @@ body, html {
     background-image: url(../images/map/helm.png);
 }
 
+.editor .formfield-holder.check {
+    margin-bottom: 0;
+    margin-top: 6px;
+}
 .editor .mounted-wrapper {
-    width: 290px;
+    width: 320px;
     position: fixed;
     top: 10px;
     right: 10px;
@@ -225,6 +229,13 @@ body, html {
     bottom: 0;
     left: 489px;
 }
+.editor .hl{
+    margin: 4px 0 0 5px;
+}
+.editor .pseudo-controls > *{
+    float: left;
+}
+
 .editor .map-editor-wrapper {
     max-width: 78%;
     margin-right: 2%;
@@ -273,7 +284,13 @@ body, html {
     padding-left: 3px;
     border-left: 1px solid gray;
 }
-.weapon-holder.left {
+.left{
+    float: left;
+}
+.right{
+    float: right;
+}
+.weapon-holder.w-left {
     right: initial;
     left: 0;
     padding-left: 0;
@@ -556,6 +573,9 @@ input[button], input[submit], button {
     float: left;
     clear: left;
 }
+.clear{
+    clear: both;
+}
 
 .clearfix {
     *zoom: 1;
@@ -616,7 +636,7 @@ input[button], input[submit], button {
     box-shadow: 0 1px 2px rgba(0,0,0,.05);
     padding: 0 15px 15px;
 }
-.panel-heading button{
+button.small{
     padding: 3px 6px;
 }
 .panel-heading {

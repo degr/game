@@ -20,6 +20,9 @@ public class Zone extends AbstractEntity {
     private Integer tile;
     private String title;
 
+    private Boolean passable;
+    private Boolean shootable;
+
     public Integer getMap() {
         return map;
     }
@@ -112,4 +115,19 @@ public class Zone extends AbstractEntity {
         this.angle = angle;
     }
 
+    public Boolean isPassable() {
+        return passable;
+    }
+
+    public void setPassable(Boolean passable) {
+        this.passable = passable;
+    }
+
+    public Boolean getShootable() {
+        return shootable;
+    }
+
+    public void setShootable(Boolean shootable) {
+        this.shootable = shootable;
+    }
 }

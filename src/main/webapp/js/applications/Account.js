@@ -88,7 +88,7 @@ Engine.define('Account', ['MainMenu', 'Dom', 'Rest', 'Text', 'Password'], functi
     }
     Account.prototype.appendProfile = function(profile) {
         var me = this;
-        var deleteButton = Dom.el('button', {class: 'danger del', onclick: function(){
+        var deleteButton = Dom.el('button', {class: 'danger del small', onclick: function(){
             if(!profile.arena) {
                 if(confirm('Are you sure to delete this profile?')) {
                     for(var i = 0; i < me.profiles.length; i++) {

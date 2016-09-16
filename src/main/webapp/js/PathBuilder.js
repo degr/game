@@ -54,6 +54,7 @@ Engine.define("PathBuilder", function(){
                 break;
             case 'CustomTiles':
             case 'ControlButton':
+            case 'MapObject':
                 path = "js/applications/map-editor/" + module + ".js";
                 break;
             case 'Text':

@@ -1,7 +1,8 @@
-Engine.define('MapEditor', ['MainMenu', 'Dom', 'Text', 'CustomTiles', 'DomComponents', 'Rest', 'ControlButton', 'Weapons', 'Config'],
+Engine.define('MapEditor', ['MapObject', 'MainMenu', 'Dom', 'Text', 'CustomTiles', 'DomComponents', 'Rest', 'ControlButton', 'Weapons', 'Config'],
     (function () {
 
         var MainMenu = Engine.require('MainMenu');
+        var MapObject = Engine.require('MapObject');
         var Dom = Engine.require('Dom');
         var Text = Engine.require('Text');
         var CustomTiles = Engine.require('CustomTiles');
@@ -32,14 +33,7 @@ Engine.define('MapEditor', ['MainMenu', 'Dom', 'Text', 'CustomTiles', 'DomCompon
             this.mapName = '';
             this.console = Dom.el('p', {id: 'editor_console'});
             this.objectsLoaded = false;
-            this.mounting = {
-                type: null,
-                pointA: null,
-                pointB: null,
-                highlight: false,
-                customSprite: null,
-                angle: 0
-            };
+            this.mounting = new MapObject();
             this.context = null;
             this.mounted = null;
             this.mountedObjects = [];
@@ -221,8 +215,9 @@ Engine.define('MapEditor', ['MainMenu', 'Dom', 'Text', 'CustomTiles', 'DomCompon
             }
         };
         MapEditor.prototype.getAngle = function (x, y, clientX, clientY) {
-            var dy = (clientY + window.scrollY) - y;
-            var dx = (clientX + window.scrollX) - x;
+            var offset = Dom.calculateOffset(this.map);
+            var dy = (clientY + window.scrollY - offset.top) - y;
+            var dx = (clientX + window.scrollX - offset.left) - x;
             return Math.atan2(dy, dx);
         };
         MapEditor.prototype.onMouseUp = function (e) {
@@ -387,19 +382,17 @@ Engine.define('MapEditor', ['MainMenu', 'Dom', 'Text', 'CustomTiles', 'DomCompon
                                             zone.tileId = zone.tileId + "_" + (zone.shiftX) + "x" + (zone.shiftY);
                                         }
                                     }
-                                    var mounting = {
-                                        type: zone.type,
-                                        pointA: {x: zone.x, y: zone.y},
-                                        pointB: {x: zone.x + zone.width, y: zone.y + zone.height},
-                                        highlight: false,
-                                        angle: zone.angle || 0,
-                                        customSprite: zone.customSprite,
-                                        tileId: zone.tileId,
-                                        tileset: zone.tileset,
-                                        stepX: zone.stepX,
-                                        stepY: zone.stepY
-                                    };
-
+                                    var mounting = new MapObject(zone.type);
+                                    mounting.pointA = {x: zone.x, y: zone.y}; 
+                                    mounting.pointB = {x: zone.x + zone.width, y: zone.y + zone.height}; 
+                                    mounting.angle = zone.angle || 0;
+                                    mounting.customSprite = zone.customSprite;
+                                    mounting.tileId = zone.tileId;
+                                    mounting.tileset = zone.tileset;
+                                    mounting.stepX = zone.stepX;
+                                    mounting.stepY = zone.stepY;
+                                    mounting.passable = zone.passable || false;
+                                    mounting.shootable = zone.shootable || false;
                                     me.doMount(mounting);
                                 }
                             }
@@ -428,7 +421,10 @@ Engine.define('MapEditor', ['MainMenu', 'Dom', 'Text', 'CustomTiles', 'DomCompon
                 var zone = me.mountedObjects[i];
                 var rect = me.doRectangle(zone);
                 rect.type = zone.type;
-
+                if(zone.type === 'tiled' || zone.type === 'wall') {
+                    rect.passable = zone.passable;
+                    rect.shootable = zone.shootable;
+                }
                 if (zone.type === 'tiled') {
                     if (zone.tileset) {
                         var data = zone.tileId.split('_');
@@ -471,15 +467,7 @@ Engine.define('MapEditor', ['MainMenu', 'Dom', 'Text', 'CustomTiles', 'DomCompon
 
             this.mountedObjects.push(mounting);
             this.appendControlButton(mounting);
-            this.mounting = {
-                type: null,
-                pointA: null,
-                pointB: null,
-                highlight: false,
-                angle: 0,
-                customSprite: null,
-                tileId: 0
-            };
+            this.mounting = new MapObject();
             this.render();
             this.write("Object " + mounting.type + " was mounted.");
         };

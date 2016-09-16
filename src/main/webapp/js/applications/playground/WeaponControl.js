@@ -10,9 +10,9 @@ Engine.define('WeaponControl', ['Dom', 'Weapons'], (function(){
         var me = this;
         this.container.addEventListener('mouseover', function () {
             if (me.rightSide) {
-                Dom.addClass(me.container, 'left');
+                Dom.addClass(me.container, 'w-left');
             } else {
-                Dom.removeClass(me.container, 'left');
+                Dom.removeClass(me.container, 'w-left');
             }
             me.rightSide = !me.rightSide;
         }, false);

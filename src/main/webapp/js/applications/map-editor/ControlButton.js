@@ -38,7 +38,7 @@ Engine.define('ControlButton', ['Dom', 'Text', 'Checkbox'], function () {
 
             coordinatesWh = Dom.el('div', 'coordinates', [this.width.container, this.height.container]);
         }
-        var delButton = Dom.el('input', {type: 'button', value: 'delete'});
+        var delButton = Dom.el('button', {type: 'button', class: 'danger right small'}, 'delete');
 
         delButton.onclick = function () {
             for (var i = 0; i < mapEditor.mountedObjects.length; i++) {
@@ -50,7 +50,7 @@ Engine.define('ControlButton', ['Dom', 'Text', 'Checkbox'], function () {
             }
         };
         this.angle = new Text({
-            name: 'angle', class: 'angle', id: "angle_" + ts, value: 0, onkeyup: function (e) {
+            name: 'angle', class: 'angle', id: "angle_" + ts, value: '0', onkeyup: function (e) {
                 var onArrows = 0;
                 switch (e.keyCode) {
                     case 9:
@@ -74,9 +74,20 @@ Engine.define('ControlButton', ['Dom', 'Text', 'Checkbox'], function () {
                 mapEditor.render();
             }
         });
+        this.passable = null;
+        this.isShootable = null;
+        var controlContainer = Dom.el('div', 'pseudo-controls clearfix', this.angle.container);
+        if(type === 'tyled' || type === 'wall') {
+            this.passable = new Checkbox({name: 'passable', value: obj.passable,class: 'check', onchange: function(){
+                obj.passable = me.passable.getValue();
+            }});
+            this.shootable = new Checkbox({name: 'shootable', value: obj.shootable, class: 'check', onchange: function(){
+                obj.shootable = me.shootable.getValue();
+            }});
+            Dom.append(controlContainer, [this.passable.container, this.shootable.container]);
+        }
 
-
-        this.highlight = new Checkbox({name: 'highlight', id: 'h_' + ts, onchange: function () {
+        this.highlight = new Checkbox({name: 'highlight', class: 'right hl', id: 'h_' + ts, onchange: function () {
             obj.highlight = me.highlight.getValue();
             if (obj.highlight) {
                 for (var i = 0; i < mapEditor.mountedObjects.length; i++) {
@@ -89,8 +100,8 @@ Engine.define('ControlButton', ['Dom', 'Text', 'Checkbox'], function () {
             }
             mapEditor.render();
         }});
-        var label = Dom.el('p', "controls", [type, delButton, this.angle.container, this.highlight.container]);
-        Dom.append(this.container, [label, coordinates, coordinatesWh]);
+        var label = Dom.el('p', "controls", [this.highlight.container, type, delButton, Dom.el('br', 'clear'), controlContainer]);
+        Dom.append(this.container, [label, coordinates, coordinatesWh, Dom.el('hr', 'clear')]);
     }
 
     ControlButton.prototype.inputDimensionKeyPress = function(e) {

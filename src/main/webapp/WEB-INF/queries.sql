@@ -55,4 +55,7 @@ user int(11),
 arena bit(1),
 primary key(id)
 );
-delete from user where id not in (select user from game_profile)
+delete from user where id not in (select user from game_profile);
+
+alter TABLE zone add COLUMN passable BIT;
+alter TABLE zone add COLUMN shootable BIT;
