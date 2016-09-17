@@ -54,7 +54,7 @@ Engine.define(
             var me = this;
             Rest.doPost('chat/put', {
                 message: message,
-                sender: me.context.get('username')
+                sender: me.context.get('arena_name')
             }).then(
                 function (response) {
                     me.updateChat(response)

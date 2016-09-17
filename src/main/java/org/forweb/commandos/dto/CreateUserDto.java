@@ -6,6 +6,7 @@ public class CreateUserDto {
     private Boolean success;
     private String userName;
     private String arenaUserName;
+    private String authority;
 
     public Integer getUserId() {
         return userId;
@@ -38,5 +39,13 @@ public class CreateUserDto {
 
     public String getArenaUserName() {
         return arenaUserName;
+    }
+
+    public void setAuthority(String authorities) {
+        this.authority = authorities;
+    }
+
+    public String getAuthority() {
+        return authority;
     }
 }

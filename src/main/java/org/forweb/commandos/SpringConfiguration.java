@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.forweb.commandos.dto.CreateUserDto;
 import org.forweb.commandos.dto.UserDetail;
 import org.forweb.commandos.entity.GameProfile;
-import org.forweb.commandos.entity.User;
 import org.forweb.commandos.service.GameProfileService;
 import org.forweb.commandos.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -21,6 +21,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @Configuration
 @ComponentScan(basePackages = {
@@ -31,6 +32,7 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
         AppInitializer.WORD_PACKAGE,
 })
 @EnableWebSecurity
+@EnableSpringDataWebSupport
 @EnableJpaRepositories({AppInitializer.BASE_PACKAGE + ".dao", AppInitializer.WORD_PACKAGE + ".dao"})
 public class SpringConfiguration extends WebSecurityConfigurerAdapter {
 
@@ -51,6 +53,7 @@ public class SpringConfiguration extends WebSecurityConfigurerAdapter {
             CreateUserDto out = new CreateUserDto();
             out.setUserId(user.getId());
             out.setUserName(user.getUsername());
+            out.setAuthority(user.getAuthority());
             GameProfile profile = gameProfileService.findArenaProfile(user.getId());
             out.setArenaUserName(profile.getUsername());
             ObjectMapper mapper = new ObjectMapper();
@@ -95,11 +98,16 @@ public class SpringConfiguration extends WebSecurityConfigurerAdapter {
                     .logoutUrl("/server/logout")
                     .deleteCookies("JSESSIONID")
                     .logoutSuccessHandler(successLogoutHandler())
-                    .invalidateHttpSession(true);
+                    .invalidateHttpSession(true)
+                .and()
+                    .authorizeRequests()
+                    .antMatchers("/server/admin/**")
+                    .hasRole("ADMIN");
     }
 
     @Bean
     public HttpSessionEventPublisher httpSessionEventPublisher() {
         return new HttpSessionEventPublisher();
     }
+
 }

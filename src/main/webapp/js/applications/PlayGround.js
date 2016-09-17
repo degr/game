@@ -218,17 +218,23 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
     };
     PlayGround.prototype.onJoinGame = function (clb) {
         var me = this;
-        if(this.gameContext.get('logged')) {
-            Rest.doPost('user/arena-profile').then(function(r){
-                if(r) {
-                    clb(r.username);
-                } else {
-                    me.placeApplication('Greetings');
-                }
-            })
+        if(this.gameContext.has('arena_name')) {
+            clb(this.gameContext.get('arena_name'));
         } else {
-            clb(this.gameContext.get('username'));
+            if(this.gameContext.get('logged')) {
+                Rest.doPost('user/arena-profile').then(function(r){
+                    if(r) {
+                        me.gameContext.set('arena_name', r.username);
+                        clb(r.username);
+                    } else {
+                        me.placeApplication('Greetings');
+                    }
+                })
+            } else {
+                clb("");
+            }
         }
+
     };
     PlayGround.prototype.writeMessage = function (message) {
         this.socket.send("message:\n" + message);

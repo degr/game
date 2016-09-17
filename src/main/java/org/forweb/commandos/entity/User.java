@@ -1,21 +1,21 @@
 package org.forweb.commandos.entity;
 
+import org.forweb.commandos.entity.user.Authority;
 import org.forweb.database.AbstractEntity;
-import org.springframework.data.annotation.Transient;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 @Entity
 public class User extends AbstractEntity implements Cloneable {
 
     private String username;
     private String password;
-    private String authority;
+    @Column(columnDefinition = "enum('USER', 'ADMIN')")
+    @Enumerated(EnumType.STRING)
+    private Authority authority;
 
     public String getPassword() {
         return password;
@@ -33,11 +33,11 @@ public class User extends AbstractEntity implements Cloneable {
         this.username = username;
     }
 
-    public void setAuthority(String role) {
+    public void setAuthority(Authority role) {
         this.authority = role;
     }
 
-    public String getAuthority() {
+    public Authority getAuthority() {
         return authority;
     }
 

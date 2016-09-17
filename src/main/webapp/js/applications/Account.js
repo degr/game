@@ -14,8 +14,26 @@ Engine.define('Account', ['MainMenu', 'Dom', 'Rest', 'Text', 'Password'], functi
             username: '',
             password: ''
         };
+        this.context = context;
         this.profiles = [];
         this.profilesContainer = Dom.el('div', 'profiles');
+        var deleteProfile = Dom.el('button', {class: 'danger small right', onclick: function(e){
+            e.preventDefault();
+            var password = prompt("This action can't be undone. All profiles and all data related to this user will be removed. Please enter your password to confirm: "); 
+            if(password !== null) {
+                Rest.doPost(
+                    'user/delete', {password: password}
+                ).then(function(response){
+                    if(response) {
+                        Engine.console("Your account was deleted");
+                        placeApplication('Logout');
+                    } else {
+                        Engine.console("Wrong password, can't delete account");
+                    }
+                })
+            }
+        }}, 'Delete Account');
+        
         var name = new Text({name: 'username', onkeyup: function(){
             Rest.doPost(
                 "user/is-exist", name.getValue()
@@ -36,7 +54,7 @@ Engine.define('Account', ['MainMenu', 'Dom', 'Rest', 'Text', 'Password'], functi
                 })
             }
         }});
-        var password = new Password({name: 'password', attr: {onblur: function(){
+        var password = new Password({name: 'password', class: 'hidden', attr: {onblur: function(){
             var value = password.getValue();
             if(value != user.password) {
                 Rest.doPost(
@@ -48,7 +66,7 @@ Engine.define('Account', ['MainMenu', 'Dom', 'Rest', 'Text', 'Password'], functi
                 })
             }
         }}});
-        Dom.addClass(password.container, 'hidden');
+        
         this.mainMenu = new MainMenu(context, placeApplication);
         var changePass = Dom.el('a', {href: '#', onclick: function(e){
             e.preventDefault();
@@ -57,7 +75,7 @@ Engine.define('Account', ['MainMenu', 'Dom', 'Rest', 'Text', 'Password'], functi
         }}, 'Change Password');
         this.container = Dom.el('div', 'account-app', [
             this.mainMenu.container,
-            Dom.el('h1', null, 'Account'),
+            Dom.el('div', null, [deleteProfile, Dom.el('h1', null, 'Account')]),
             name.container,
             Dom.el('div', null, changePass),
             password.container,
@@ -128,9 +146,13 @@ Engine.define('Account', ['MainMenu', 'Dom', 'Rest', 'Text', 'Password'], functi
         ]))
     };
     Account.prototype.updateProfile = function(profile) {
+        var me = this;
         Rest.doPut('user/profile', profile).then(function(r){
             if(r.id) {
                 Engine.console('Profile was saved');
+                if(profile.arena) {
+                    me.context.set('arena_name', profile.username);
+                }
                 profile.id = r.id;
             } else {
                 Engine.console('Can\'t save profile due unknown reasons');

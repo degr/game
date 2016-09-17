@@ -1,12 +1,8 @@
 package org.forweb.commandos.service;
 
-import com.sun.org.apache.xerces.internal.impl.dv.xs.BooleanDV;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.forweb.commandos.AppInitializer;
 import org.forweb.commandos.dao.TileDao;
 import org.forweb.commandos.dao.ZoneDao;
-import org.forweb.commandos.entity.GameMap;
-import org.forweb.commandos.entity.Map;
 import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.entity.zone.Zone;
 import org.forweb.commandos.entity.zone.interactive.*;
@@ -15,13 +11,11 @@ import org.forweb.commandos.entity.zone.walls.Tile;
 import org.forweb.commandos.entity.zone.walls.TiledZone;
 import org.forweb.commandos.entity.zone.walls.Wall;
 import org.forweb.database.AbstractService;
-import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,7 +29,8 @@ import static org.forweb.commandos.AppInitializer.ROOT;
 @Service
 public class ZoneService extends AbstractService<Zone, ZoneDao> {
 
-    @Autowired private TileDao tileDao;
+    @Autowired
+    private TileDao tileDao;
 
     public boolean createCustomTile(String title, Integer width, Integer height, Boolean isTileSet, MultipartFile file) {
         try {
@@ -47,17 +42,17 @@ public class ZoneService extends AbstractService<Zone, ZoneDao> {
             tileDao.save(tile);
 
             String[] name = file.getOriginalFilename().trim().split("\\.");
-            String ext =  name[name.length - 1];
-            if(!isImage(ext)) {
+            String ext = name[name.length - 1];
+            if (!isImage(ext)) {
                 tileDao.delete(tile);
                 throw new RuntimeException("File must be an image with extension png, jpg, gif, jpeg.");
             }
             String filename = tile.getId() + "." + name[name.length - 1];
             tile.setImage(filename);
             tileDao.save(tile);
-            String dirStr = ROOT + (AppInitializer.DEV ? "/" : "/../upload." ) +"images/zones/";
+            String dirStr = ROOT + (AppInitializer.DEV ? "/" : "/../upload.") + "images/zones/";
             File dir = new File(dirStr);
-            if(!dir.isDirectory() && !dir.mkdirs()) {
+            if (!dir.isDirectory() && !dir.mkdirs()) {
                 tileDao.delete(tile);
                 throw new RuntimeException("Can't create folder for images store.");
             }
@@ -67,12 +62,12 @@ public class ZoneService extends AbstractService<Zone, ZoneDao> {
             FileCopyUtils.copy(file.getInputStream(), stream);
             stream.close();
             return true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
+
     public boolean isImage(String extension) {
         switch (extension) {
             case "png":
@@ -98,7 +93,7 @@ public class ZoneService extends AbstractService<Zone, ZoneDao> {
     }
 
     public List<AbstractZone> getZonesFormMap(Integer id) {
-        HashMap<Integer, List<AbstractZone>> zones = findZonesforMaps(new ArrayList<Integer>(1){{
+        HashMap<Integer, List<AbstractZone>> zones = findZonesforMaps(new ArrayList<Integer>(1) {{
             add(id);
         }});
         return zones.containsKey(id) ? zones.get(id) : null;
@@ -111,7 +106,7 @@ public class ZoneService extends AbstractService<Zone, ZoneDao> {
                 y = zone.getY(),
                 id = zone.getId();
         Float angle = zone.getAngle();
-        if(angle == null) {
+        if (angle == null) {
             angle = 0F;
         }
         switch (zone.getType()) {
@@ -159,23 +154,23 @@ public class ZoneService extends AbstractService<Zone, ZoneDao> {
                 break;
             case Wall.TITLE:
                 out = new Wall(x, y, zone.getWidth(), zone.getHeight(), angle);
-                if(Boolean.TRUE.equals(zone.isPassable())) {
+                if (Boolean.TRUE.equals(zone.isPassable())) {
                     out.setPassable(true);
                 }
-                if(Boolean.TRUE.equals(zone.getShootable())) {
+                if (Boolean.TRUE.equals(zone.getShootable())) {
                     out.setShootable(true);
                 }
                 break;
             case TiledZone.TITLE:
-                if(tile != null) {
+                if (tile != null) {
                     out = new TiledZone(x, y, zone, tile, angle);
                 } else {
                     out = new Wall(x, y, zone.getWidth(), zone.getHeight(), angle);
                 }
-                if(Boolean.TRUE.equals(zone.isPassable())) {
+                if (Boolean.TRUE.equals(zone.isPassable())) {
                     out.setPassable(true);
                 }
-                if(Boolean.TRUE.equals(zone.getShootable())) {
+                if (Boolean.TRUE.equals(zone.getShootable())) {
                     out.setShootable(true);
                 }
                 break;
@@ -189,7 +184,7 @@ public class ZoneService extends AbstractService<Zone, ZoneDao> {
     public HashMap<Integer, List<AbstractZone>> findZonesforMaps(List<Integer> mapIds) {
         int size = mapIds.size();
         HashMap<Integer, List<AbstractZone>> out = new HashMap<>(size);
-        if(size == 0) {
+        if (size == 0) {
             return out;
         }
 
@@ -199,9 +194,9 @@ public class ZoneService extends AbstractService<Zone, ZoneDao> {
                 .map(Zone::getTile)
                 .collect(Collectors.toList());
         List<Tile> tiles = integ.size() > 0 ? tileDao.findAll(integ) : null;
-        for(Zone zone : zones) {
+        for (Zone zone : zones) {
             Tile tile = null;
-            if(tiles != null) {
+            if (tiles != null) {
                 if ("tiled".equals(zone.getType())) {
                     for (Tile item : tiles) {
                         if (item.getId().equals(zone.getTile())) {
@@ -212,7 +207,7 @@ public class ZoneService extends AbstractService<Zone, ZoneDao> {
                 }
             }
             AbstractZone entity = getZone(zone, tile);
-            if(!out.containsKey(zone.getMap())) {
+            if (!out.containsKey(zone.getMap())) {
                 List<AbstractZone> list = new ArrayList<>();
                 list.add(entity);
                 out.put(zone.getMap(), list);
@@ -220,6 +215,14 @@ public class ZoneService extends AbstractService<Zone, ZoneDao> {
                 out.get(zone.getMap()).add(entity);
             }
         }
-        return  out;
+        return out;
+    }
+
+    public void replaceToWall(Tile tile) {
+        dao.replaceToWall(tile.getId());
+    }
+
+    public void deleteTile(Tile tile) {
+        tileDao.delete(tile);
     }
 }

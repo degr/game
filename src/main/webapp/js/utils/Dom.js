@@ -22,7 +22,7 @@ Engine.define('Dom', (function () {
         } else {
             el.className = clazz;
         }
-    }
+    };
     Dom.removeClass = function (el, clazz) {
         var cl = el.className;
         if (cl && cl.indexOf(clazz) > -1) {

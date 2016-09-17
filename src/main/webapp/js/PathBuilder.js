@@ -2,27 +2,31 @@ Engine.define("PathBuilder", function(){
     return function PathBuilder(module) {
         var path;
         switch (module) {
-            case 'Ajax':
-            case 'CGraphics':
             case 'Dom':
-            case 'DomComponents':
-            case 'GeometryService':
-            case 'KeyboardUtils':
+            case 'Ajax':
             case 'Rest':
-            case 'ScreenUtils':
+            case 'CGraphics':
             case 'SoundUtils':
+            case 'ScreenUtils':
             case 'StringUtils':
-            case 'WebSocketUtils':
             case 'UrlResolver':
+            case 'DomComponents':
+            case 'KeyboardUtils':
+            case 'WebSocketUtils':
+            case 'GeometryService':
                 path = 'js/utils/' + module + '.js';
                 break;
-            case 'Account':
+            case 'Maps':
+            case 'Users':
+            case 'Tiles':
             case 'Logout':
+            case 'Account':
+            case 'MapList':
             case 'Greetings':
             case 'MapEditor':
-            case 'MapList':
-            case 'PlayGround':
             case 'RoomsList':
+            case 'PlayGround':
+            case 'AbstractOverview':
                 path = 'js/applications/' + module + '.js';
                 break;
             case 'Dispatcher':
@@ -30,7 +34,10 @@ Engine.define("PathBuilder", function(){
                 path = 'js/applications/routing/' + module + '.js';
                 break;
             case 'Pagination':
+            case 'Popup':
+            case 'Modal':
             case 'Tabs':
+            case 'Grid':
                 path = 'js/components/' + module + '.js';
                 break;
             case 'Weapons':
@@ -61,6 +68,7 @@ Engine.define("PathBuilder", function(){
             case 'Radio':
             case 'Password':
             case 'Checkbox':
+            case 'GenericForm':
             case 'AbstractInput':
                 path = 'js/form/' + module + '.js';
                 break;

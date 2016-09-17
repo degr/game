@@ -16,7 +16,7 @@ public class UserDetail implements UserDetails, GrantedAuthority {
     }
     @Override
     public String getAuthority() {
-        return user.getAuthority();
+        return "ROLE_" + user.getAuthority().toString();
     }
 
 

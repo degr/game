@@ -2,9 +2,9 @@ package org.forweb.commandos.controller;
 
 import org.forweb.commandos.dto.AccountView;
 import org.forweb.commandos.dto.UserDetail;
-import org.forweb.commandos.entity.Authority;
 import org.forweb.commandos.entity.GameProfile;
 import org.forweb.commandos.entity.User;
+import org.forweb.commandos.entity.user.Authority;
 import org.forweb.commandos.service.GameProfileService;
 import org.forweb.commandos.service.UserService;
 import org.forweb.commandos.utils.UserUtils;
@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/user")
@@ -37,7 +40,7 @@ public class UserController {
         User userToSave = new User();
         userToSave.setUsername(user.getUsername());
         userToSave.setPassword(user.getPassword());
-        userToSave.setAuthority(Authority.USER.toString());
+        userToSave.setAuthority(Authority.USER);
         userToSave = userService.save(userToSave);
         gameProfileService.createProfile(userToSave.getId(), userToSave.getUsername(), true);
         return true;
@@ -48,8 +51,10 @@ public class UserController {
         User user = UserUtils.getUser();
         if (user != null) {
             UserDetail check = (UserDetail) userService.loadUserByUsername(username);
+            User userWithPass = userService.findOne(user.getId());
             if (check == null) {
                 user.setUsername(username);
+                user.setPassword(userWithPass.getPassword());
                 userService.save(user);
                 return true;
             } else {
@@ -127,6 +132,30 @@ public class UserController {
             return null;
         } else {
             return new AccountView(user, gameProfileService.findProfiles(user.getId()));
+        }
+    }
+
+    @RequestMapping("/delete")
+    public Boolean deleteAccount(@RequestBody User userToDelete, HttpServletRequest request) {
+        User user = UserUtils.getUser();
+        if (user == null) {
+            return false;
+        } else {
+            User userWithPassword = userService.findOne(user.getId());
+            String currentPass = userWithPassword.getPassword();
+            if (currentPass == null) {
+                currentPass = "";
+            }
+            if (currentPass.equals(userToDelete.getPassword())) {
+                userService.delete(user.getId());
+                try {
+                    request.logout();
+                } catch (ServletException e) {
+                }
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 }

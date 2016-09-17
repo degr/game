@@ -59,6 +59,11 @@ Engine.define('MainMenu', ['Dom', 'StringUtils', 'UrlResolver'], function(){
         if (context.get('logged')) {
             MainMenu.addButton('Account');
             MainMenu.addButton('Logout');
+            if(context.get('authority') === 'ROLE_ADMIN') {
+                MainMenu.addButton('Users');
+                MainMenu.addButton('Maps');
+                MainMenu.addButton('Tiles');
+            }
         } else {
             MainMenu.addButton('Greetings', 'Login');
         }

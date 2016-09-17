@@ -75,7 +75,7 @@ Engine.define('ControlButton', ['Dom', 'Text', 'Checkbox'], function () {
             }
         });
         this.passable = null;
-        this.isShootable = null;
+        this.shootable = null;
         var controlContainer = Dom.el('div', 'pseudo-controls clearfix', this.angle.container);
         if(type === "tiled" || type === 'wall') {
             this.passable = new Checkbox({name: 'passable', value: obj.passable,class: 'check', onchange: function(){

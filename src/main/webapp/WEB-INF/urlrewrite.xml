@@ -36,4 +36,16 @@
         <from>/logout$</from>
         <to type="forward">/index.html</to>
     </rule>
+    <rule>
+        <from>/users$</from>
+        <to type="forward">/index.html</to>
+    </rule>
+    <rule>
+        <from>/maps$</from>
+        <to type="forward">/index.html</to>
+    </rule>
+    <rule>
+        <from>/tiles$</from>
+        <to type="forward">/index.html</to>
+    </rule>
 </urlrewrite>

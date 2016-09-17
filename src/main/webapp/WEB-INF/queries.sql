@@ -59,3 +59,6 @@ delete from user where id not in (select user from game_profile);
 
 alter TABLE zone add COLUMN passable BIT;
 alter TABLE zone add COLUMN shootable BIT;
+alter TABLE map modify COLUMN game_type enum('dm', 'tdm', 'ctf', 'campaign') not null DEFAULT 'dm';
+insert into map (title, x, y, max_players, game_type, rating, map_hash) VALUES ('campaign', 1000000, 1000000, 1000000, 'campaign', 0, '');
+alter TABLE user modify COLUMN authority enum('USER', 'ADMIN') not null DEFAULT 'USER';

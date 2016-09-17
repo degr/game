@@ -20,4 +20,12 @@ public interface ZoneDao extends AbstractDao<Zone> {
 
     @Query("select z from Zone z where z.map in :ids")
     List<Zone> findAllZonesForMaps(@Param("ids") List<Integer> ids);
+
+
+    @Modifying
+    @Transactional
+    @Query("update Zone z " +
+            "set z.type = 'wall', z.tile = null, z.shiftX = null, z.shiftY = null " +
+            "where z.tile = :tileId")
+    void replaceToWall(@Param("tileId") Integer id);
 }

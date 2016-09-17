@@ -131,7 +131,9 @@ Engine.define('Greetings', ['Context', 'Dom', 'Radio', 'Text', 'Password', 'Rest
         try {
             var dto = JSON.parse(content);
             this.context.set("logged", true);
-            this.context.set("username", dto.arenaUserName);
+            this.context.set("username", username);
+            this.context.set("arena_name", dto.arenaUserName);
+            this.context.set('authority', dto.authority);
             Greetings.sessionExist = true;
             MainMenu.init(this.context, this.placeApplication);
             this.placeApplication("RoomsList");

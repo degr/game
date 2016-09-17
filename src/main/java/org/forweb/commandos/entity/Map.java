@@ -8,14 +8,14 @@ import javax.persistence.*;
 public class Map extends AbstractEntity {
 
     public enum GameType {
-        dm, tdm, ctf
+        dm, tdm, ctf, campaign
     }
     private String title;
     private Integer x;
     private Integer y;
     private Integer maxPlayers;
 
-    @Column(columnDefinition = "enum('dm','tdm','ctf')")
+    @Column(columnDefinition = "enum('dm','tdm','ctf','campaign')")
     @Enumerated(EnumType.STRING)
     private GameType gameType;
     private Integer rating;

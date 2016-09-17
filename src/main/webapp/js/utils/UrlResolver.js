@@ -14,6 +14,12 @@ Engine.define('UrlResolver', {
                 return 'Account';
             case 'logout':
                 return 'Logout';
+            case 'users':
+                return 'Users';
+            case 'maps':
+                return 'Maps';
+            case 'tiles':
+                return 'Tiles';
             default:
                 return 'Greetings';
         }
