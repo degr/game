@@ -107,6 +107,7 @@ Engine.define('Greetings', ['Context', 'Dom', 'Radio', 'Text', 'Password', 'Rest
                 break;
             default:
                 this.context.set('username', name);
+                this.context.set("arena_name", name);
                 MainMenu.init(this.context, this.placeApplication);
                 this.placeApplication('RoomsList');
         }

@@ -14,7 +14,7 @@ Engine.define("Context", (function () {
         return this.storage[name];
     };
     Context.prototype.has = function(name) {
-        return this.get(name) === undefined;
+        return this.get(name) !== undefined;
     };
     Context.prototype.set = function (name, value) {
         this.storage[name] = value;

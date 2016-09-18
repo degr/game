@@ -20,7 +20,7 @@ public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
     static final String BASE_PACKAGE = "org.forweb.commandos";
     static final String WORD_PACKAGE = "org.forweb.word";
     public static String ROOT;
-    public static Boolean DEV = false;
+    public static Boolean DEV = true;
 
 
     @Override
@@ -30,7 +30,7 @@ public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
         if (DEV) {
             HibernateSupport.init("127.0.0.1:3306", "root", "", "commandos", new String[]{BASE_PACKAGE + ".entity", WORD_PACKAGE});
         } else {
-            HibernateSupport.init("localhost", "root", "PG5ckEMZ", "commandos", new String[]{BASE_PACKAGE + ".entity", WORD_PACKAGE});
+            HibernateSupport.init("localhost", "root", "aU2nYwYV", "commandos", new String[]{BASE_PACKAGE + ".entity", WORD_PACKAGE});
         }
         HibernateSupport.setDebug(DEV);
 
