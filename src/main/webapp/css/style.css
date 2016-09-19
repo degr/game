@@ -478,6 +478,11 @@ table {
 a.tab-name.active {
     background: #C3CFF1;
 }
+.score-overview th, .score-overview td {
+    background: transparent;
+    border: none !important;
+    box-shadow: none !important;
+}
 .score-overview {
     background: rgba(0,0,0,0.4);
     color: white;
