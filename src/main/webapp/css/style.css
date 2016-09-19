@@ -621,7 +621,7 @@ input[button], input[submit], button {
     background-color: #5bc0de;
     border-color: #28a4c9;
 }
-.succes {
+.success {
     color: #fff;
     background-color: #5cb85c;
     border-color: #3e8f3e;
@@ -725,24 +725,34 @@ tr:last-of-type td:first-child {
 tr:last-of-type td:last-child {
     box-shadow: inset -1px -1px 0 #fff;
 }
-.modal{
-    position: fixed;
-    width: 468px;
-    left: 50%;
-    margin-left: -234px;
-    top: 30px;
+.modal.minimized .panel-body{
+    display: none;
 }
-.modal-close span{
+.modal{
+    position: absolute;
+    min-width: 100px;
+}
+.control-buttons button{
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+}
+.control-buttons {
+    float: right;
     position: relative;
-    top: -7px;
-    left: -2px;
+    top: -8px;
+    left: 11px;
+}
+.modal-close span, .modal-minimize span{
+    position: relative;
+    left: 0;
     font-weight: bold;
     font-size: 13px;
 }
-.modal-close {
-    border-radius: 50%;
-    float: right;
-    width: 16px;
-    height: 16px;
-    padding: 0px;
+.modal-close span{
+    top: -5px;
+}
+.modal-minimize span{
+    top: -9px;
 }

@@ -16,7 +16,7 @@ Engine.define('AbstractOverview', ['StringUtils', 'Dom', 'Rest', 'Grid', 'MainMe
         this.placeApplication = placeApplication;
         var me = this;
         this.page = 1;
-        this.editModal = new Popup(null, 'Edit ' + this.TITLE);
+        this.editModal = new Popup({withOverlay: false, title: 'Edit ' + this.TITLE});
 
         
         this.grid = new Grid({
