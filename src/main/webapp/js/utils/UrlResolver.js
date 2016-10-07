@@ -1,7 +1,8 @@
 Engine.define('UrlResolver', {
     regex: /(^\/)|(\/$)/,
+    strategy: 'path',//one of the following: [path, hash]
     findApplication: function () {
-        var path = document.location.pathname;
+        var path = this.strategy === 'path' ? document.location.pathname : document.location.hash;
         path = path.replace(this.regex, '');
         switch (path) {
             case 'map-list':
