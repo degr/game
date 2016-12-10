@@ -1,11 +1,11 @@
-Engine.define('Greetings', ['Context', 'Dom', 'Radio', 'Text', 'Password', 'Rest', 'MainMenu'], (function () {
+Engine.define('Greetings', ['Config', 'Dom', 'Radio', 'Text', 'Password', 'Rest', 'MainMenu'], (function () {
 
     var Dom = Engine.require('Dom');
     var Radio = Engine.require('Radio');
     var Text = Engine.require('Text');
     var Password = Engine.require('Password');
     var Rest = Engine.require('Rest');
-    var Context = Engine.require('Context');
+    var Config = Engine.require('Config');
     var MainMenu = Engine.require('MainMenu');
 
     var OPTIONS = [
@@ -13,22 +13,19 @@ Engine.define('Greetings', ['Context', 'Dom', 'Radio', 'Text', 'Password', 'Rest
         {value: 'L', label: 'Login'},
         {value: 'R', label: 'Register'}
     ];
-    
-    /**
-     * @param context Context
-     * @param placeApplication function
-     * @constructor
-     */
-    var Greetings = function(context, placeApplication) {
+
+    var Greetings = function(context) {
         this.TITLE = 'Greetings';
         this.URL = 'greetings';
-        
-        this.container = null;
         this.context = context;
-        this.placeApplication = placeApplication;
+        this.container = null;
+        this.config = context.config;
+        this.placeApplication = function(url, directives){
+            context.dispatcher.placeApplication(url, directives);
+        };
         var me = this;
-        var name = this.context.get('username') || '';
-        var toggler = this.context.get('toggler') || 'A';
+        var name = this.config.get('username') || '';
+        var toggler = this.config.get('toggler') || 'A';
         this.errorMessage = Dom.el('div', 'error');
         this.name = new Text({noLabel: true, name: 'name', attr: {placeholder: 'Your name'}, value: name});
         this.password = new Password({noLabel: true, type: 'password',
@@ -56,8 +53,8 @@ Engine.define('Greetings', ['Context', 'Dom', 'Radio', 'Text', 'Password', 'Rest
         this.container = Dom.el('div', {'class': 'overlay'}, win);
     };
     Greetings.prototype.afterOpen = function() {
-        if(this.context.get('logged')) {
-            this.placeApplication('RoomsList');
+        if(this.config.get('logged')) {
+            this.placeApplication('rooms-list');
         }
     };
     
@@ -98,7 +95,7 @@ Engine.define('Greetings', ['Context', 'Dom', 'Radio', 'Text', 'Password', 'Rest
                     function(r){
                         if(r) {
                             me.performLogin(user);
-                            me.context.set('toggler', "L");
+                            me.config.set('toggler', "L");
                         } else {
                             me.showError('User with this login already registered');
                         }
@@ -106,12 +103,12 @@ Engine.define('Greetings', ['Context', 'Dom', 'Radio', 'Text', 'Password', 'Rest
                 );
                 break;
             default:
-                this.context.set('username', name);
-                this.context.set("arena_name", name);
-                MainMenu.init(this.context, this.placeApplication);
-                this.placeApplication('RoomsList');
+                this.config.set('username', name);
+                this.config.set("arena_name", name);
+                MainMenu.init(this.context);
+                this.placeApplication('rooms-list');
         }
-        this.context.set('toggler', toggler);
+        this.config.set('toggler', toggler);
     };
     Greetings.prototype.performLogin = function(user) {
         var iFrameName = 'loginIframe';
@@ -131,15 +128,15 @@ Engine.define('Greetings', ['Context', 'Dom', 'Radio', 'Text', 'Password', 'Rest
         var content = doc.body.innerText;
         try {
             var dto = JSON.parse(content);
-            this.context.set("logged", true);
-            this.context.set("username", username);
-            this.context.set("arena_name", dto.arenaUserName);
-            this.context.set('authority', dto.authority);
+            this.config.set("logged", true);
+            this.config.set("username", username);
+            this.config.set("arena_name", dto.arenaUserName);
+            this.config.set('authority', dto.authority);
             Greetings.sessionExist = true;
-            MainMenu.init(this.context, this.placeApplication);
-            this.placeApplication("RoomsList");
+            MainMenu.init(this.config, this.placeApplication);
+            this.placeApplication("rooms-list");
         } catch (e){
-            this.context.set("logged", false);
+            this.config.set("logged", false);
             this.showError("Invalid username or password");
         }
         iFrame.remove();
@@ -151,8 +148,8 @@ Engine.define('Greetings', ['Context', 'Dom', 'Radio', 'Text', 'Password', 'Rest
         return "Greetings application";
     };
     
-    Greetings.isLogged = function (context, clb) {
-        var isLogged = context.get('logged');
+    Greetings.isLogged = function (config, clb) {
+        var isLogged = config.get('logged');
         if(isLogged) {//data from localstorage
             if(Greetings.sessionExist) {//data from current browser session
                 clb(true);

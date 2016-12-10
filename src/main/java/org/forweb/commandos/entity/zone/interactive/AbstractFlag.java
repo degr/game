@@ -13,6 +13,17 @@ public abstract class AbstractFlag extends AbstractZone implements Interactive {
     public abstract int getTeam();
 
     private boolean isAvailable = true;
+    private boolean shouldUpdate;
+
+    @Override
+    public boolean shouldUpdate() {
+        return shouldUpdate;
+    }
+
+    @Override
+    public void setUpdated() {
+        shouldUpdate = false;
+    }
 
     @Override
     public boolean isTemporary() {
@@ -42,16 +53,19 @@ public abstract class AbstractFlag extends AbstractZone implements Interactive {
                     if (isAvailable()) {
                         this.isAvailable = false;
                         person.setOpponentFlag(true);
+                        this.shouldUpdate = true;
                     }
                 } else {
                     if(isAvailable()) {
                         if(isTemporary()) {
                             person.setSelfFlag(true);
                             this.isAvailable = false;
+                            this.shouldUpdate = true;
                         } else {
                             if (person.isOpponentFlag()) {
                                 person.setOpponentFlag(false);
                                 room.updateFlag(getTeam());
+                                this.shouldUpdate = true;
                                 if (getTeam() == 1) {
                                     room.setTeam1Score(room.getTeam1Score() + 1);
                                 } else {
@@ -66,6 +80,7 @@ public abstract class AbstractFlag extends AbstractZone implements Interactive {
                         if (person.getSelfFlag()) {
                             person.setSelfFlag(false);
                             this.isAvailable = true;
+                            this.shouldUpdate = true;
                         }
                     }
                 }

@@ -1,13 +1,15 @@
-Engine.define('MainMenu', ['Dom', 'StringUtils', 'UrlResolver'], function(){
+Engine.define('MainMenu', ['Dom', 'StringUtils'], function(){
     
     var Dom = Engine.require('Dom');
     var StringUtils = Engine.require('StringUtils');
-    var UrlResolver = Engine.require('UrlResolver');
 
     var staticContainer = null;
     var staticButtons = null;
 
-    function MainMenu(context, placeApplication) {
+    function MainMenu(context) {
+        var placeApplication = function(url, directives){
+            context.dispatcher.placeApplication(url, directives);
+        };
         this.placeApplication = placeApplication;
         if(staticContainer === null) {
             MainMenu.init(context, placeApplication);
@@ -16,7 +18,7 @@ Engine.define('MainMenu', ['Dom', 'StringUtils', 'UrlResolver'], function(){
     }
     MainMenu.addButton = function (name, text) {
         if(!text)text = StringUtils.normalizeText(name);
-        var isActive = name === UrlResolver.findApplication();
+        var isActive = false;//@TODO name === UrlResolver.findApplication();
         var clazz = isActive ? 'active' : '';
         
         var a = Dom.el('a', {href: '#', class: clazz, onclick: function(e){
@@ -30,7 +32,7 @@ Engine.define('MainMenu', ['Dom', 'StringUtils', 'UrlResolver'], function(){
     MainMenu.placeApplication = null;
     
     MainMenu.updateActive = function() {
-        var app = UrlResolver.findApplication();
+        var app = "";//@TODO UrlResolver.findApplication();
         if(!staticButtons) {
             staticButtons = [];
         }
@@ -49,23 +51,25 @@ Engine.define('MainMenu', ['Dom', 'StringUtils', 'UrlResolver'], function(){
             }
         }
     };
-    MainMenu.init = function(context, placeApplication) {
-        MainMenu.placeApplication = placeApplication;
+    MainMenu.init = function(context) {
+        MainMenu.placeApplication = function(url, directives) {
+            context.dispatcher.placeApplication(url, directives)
+        };
         staticContainer = Dom.el('div', 'main-menu');
         staticButtons = [];
-        MainMenu.addButton('RoomsList');
-        MainMenu.addButton('MapList');
-        MainMenu.addButton('MapEditor');
-        if (context.get('logged')) {
-            MainMenu.addButton('Account');
-            MainMenu.addButton('Logout');
-            if(context.get('authority') === 'ROLE_ADMIN') {
-                MainMenu.addButton('Users');
-                MainMenu.addButton('Maps');
-                MainMenu.addButton('Tiles');
+        MainMenu.addButton('rooms-list');
+        MainMenu.addButton('map-list');
+        MainMenu.addButton('map-editor');
+        if (context.config.get('logged')) {
+            MainMenu.addButton('account');
+            MainMenu.addButton('logout');
+            if(context.config.get('authority') === 'ROLE_ADMIN') {
+                MainMenu.addButton('users');
+                MainMenu.addButton('maps');
+                MainMenu.addButton('tiles');
             }
         } else {
-            MainMenu.addButton('Greetings', 'Login');
+            MainMenu.addButton('greetings', 'Login');
         }
     };
 

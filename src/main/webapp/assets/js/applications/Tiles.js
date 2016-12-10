@@ -3,7 +3,7 @@ Engine.define('Tiles', ['AbstractOverview'], function(){
     var AbstractOverview = Engine.require('AbstractOverview');
     var Dom = Engine.require('Dom');
 
-    function Tiles(context, placeApplication) {
+    function Tiles(context) {
         AbstractOverview.apply(this, arguments);
     }
     Tiles.prototype = Object.create(AbstractOverview.prototype);

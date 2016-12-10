@@ -2,7 +2,7 @@ Engine.define('Maps', ['AbstractOverview'], function(){
 
     var AbstractOverview = Engine.require('AbstractOverview');
 
-    function Maps(context, placeApplication) {
+    function Maps(context) {
         AbstractOverview.apply(this, arguments);
     }
     Maps.prototype = Object.create(AbstractOverview.prototype);

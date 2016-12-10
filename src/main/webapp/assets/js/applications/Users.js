@@ -2,7 +2,7 @@ Engine.define('Users', ['AbstractOverview'] , function(){
 
     var AbstractOverview = Engine.require('AbstractOverview');
 
-    function Users(context, placeApplication) {
+    function Users(context) {
         AbstractOverview.apply(this, arguments);
     }
     Users.prototype = Object.create(AbstractOverview.prototype);

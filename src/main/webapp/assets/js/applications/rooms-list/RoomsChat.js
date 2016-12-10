@@ -1,11 +1,12 @@
 Engine.define(
     'RoomsChat',
-    ['Dom', 'DomComponents', 'Rest', 'Greetings', 'Context'],
-    function(Dom, DomComponents, Rest, Greetings, Context) {
+    ['Dom', 'DomComponents', 'Rest', 'Greetings', 'Config'],
+    function(Dom, DomComponents, Rest, Greetings, Config) {
     
     function RoomsChat(context) {
-        if(!(context instanceof Context)) {
-            throw "Rooms chat require Context instance";
+        var config = context.config;
+        if(!(config instanceof Config)) {
+            throw "Rooms chat require Config` instance";
         }
         this.container = null;
         this.textarea = Dom.el('textarea');
@@ -14,10 +15,7 @@ Engine.define(
         this.wasScrolled = false;
         this.scrollActive = false;
         this.interval = null;
-        /**
-         * @var context Context
-         */
-        this.context = context;
+        this.config = config;
 
         var me = this;
         this.screen.onscroll = function () {
@@ -54,7 +52,7 @@ Engine.define(
             var me = this;
             Rest.doPost('chat/put', {
                 message: message,
-                sender: me.context.get('arena_name')
+                sender: me.config.get('arena_name')
             }).then(
                 function (response) {
                     me.updateChat(response)

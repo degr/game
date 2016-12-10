@@ -27,8 +27,10 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
     var CGraphics = Engine.require('CGraphics');
     var Rest = Engine.require('Rest');
 
-    var PlayGround = function (context, placeApplication) {
-
+    var PlayGround = function (context) {
+        var placeApplication = function(url, directives){
+            context.dispatcher.placeApplication(url, directives);
+        };
         this.TITLE = 'Playground';
         this.URL = 'arena';
         this.goToMapList = false;
@@ -158,7 +160,7 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
                 function(e){PersonActions.onKeyDown(e)},
                 function(e){WeaponActions.changeWeapon(e)},
                 function(e){if(e.keyCode === 27 && !(KeyboardSetup.isActive || me.chat.active)){
-                    placeApplication("Greetings")
+                    placeApplication("greetings")
                 }}
             ],
             keyup: function(e){PersonActions.stopMovement(e)},
@@ -178,18 +180,18 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         };
         Dom.addListeners(this.windowListeners);
     };
-    PlayGround.prototype.afterOpen = function (directives) {
+    PlayGround.prototype.afterOpen = function () {
         if(this.goToMapList) {
-            this.placeApplication("RoomList");
+            this.placeApplication("rooms-list");
         }
     };
-    PlayGround.prototype.beforeOpen = function (directives) {
+    PlayGround.prototype.beforeOpen = function (params, directives) {
         KeyboardSetup.addListeners();
         var dto;
-        if(directives.joinGame) {
+        if(directives && directives.joinGame) {
             dto = directives.joinGame; 
             this.joinGame(dto.map, dto.roomId);
-        } else if(directives.createGame) {
+        } else if(directives && directives.createGame) {
             dto = directives.createGame;
             this.createGame(dto.name, dto.map);
         } else {
@@ -203,8 +205,9 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         KeyboardSetup.removeListeners();
         KeyboardSetup.clearBackgrounds();
         this.stopGameLoop();
-        this.socket.close();
-
+        if(this.socket) {
+            this.socket.close();
+        }
     };
 
     PlayGround.prototype.createGame = function (name, map) {
@@ -218,16 +221,16 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
     };
     PlayGround.prototype.onJoinGame = function (clb) {
         var me = this;
-        if(this.gameContext.has('arena_name')) {
-            clb(this.gameContext.get('arena_name'));
+        if(this.gameContext.config.has('arena_name')) {
+            clb(this.gameContext.config.get('arena_name'));
         } else {
-            if(this.gameContext.get('logged')) {
+            if(this.gameContext.config.get('logged')) {
                 Rest.doPost('user/arena-profile').then(function(r){
                     if(r) {
-                        me.gameContext.set('arena_name', r.username);
+                        me.gameContext.config.set('arena_name', r.username);
                         clb(r.username);
                     } else {
-                        me.placeApplication('Greetings');
+                        me.placeApplication('greetings');
                     }
                 })
             } else {
@@ -374,21 +377,26 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         this.weaponControl.update(owner);
         this.lifeAndArmor.update(owner.life, owner.armor);
         this.score.update(owner, packet.time);
-        for (var m = 0; m < packet.messages.length; m++) {
-            var message = packet.messages[m];
-            var mId = parseInt(message.substring(0, message.indexOf(":")));
-            var subject = message.substring(message.indexOf(':') + 1);
-            this.chat.update(mId, subject);
+        if(packet.messages) {
+            for (var m = 0; m < packet.messages.length; m++) {
+                var message = packet.messages[m];
+                var mId = parseInt(message.substring(0, message.indexOf(":")));
+                var subject = message.substring(message.indexOf(':') + 1);
+                this.chat.update(mId, subject);
+            }
         }
         var zones = this.map.zones;
-        for (var j = 0; j < zones.length; j++) {
-            var zone = zones[j];
-            zone.available = false;
+        if(packet.items) {
             for (var i = 0; i < packet.items.length; i++) {
                 var item = packet.items[i];
-                if (zone.id === item) {
-                    zone.available = true;
-                    break;
+                var itemId = parseInt(item.substring(0, item.length - 1));
+                var isItemAvailable = item.substring(item.length - 1) === '1';
+                for (var j = 0; j < zones.length; j++) {
+                    var zone = zones[j];
+                    if (zone.id === itemId) {
+                        zone.available = isItemAvailable;
+                        break;
+                    }
                 }
             }
         }

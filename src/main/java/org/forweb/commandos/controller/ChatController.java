@@ -1,10 +1,7 @@
 package org.forweb.commandos.controller;
 
 import org.forweb.commandos.dto.MessageDto;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,7 +14,7 @@ public class ChatController {
 
     int ids = 0;
 
-    @RequestMapping("/put")
+    @RequestMapping(value = "/put", method = RequestMethod.POST)
     public List<MessageDto> addMessage(@RequestBody MessageDto message) {
         message.setId(ids++);
         message.setTimestamp((new Date()).getTime());

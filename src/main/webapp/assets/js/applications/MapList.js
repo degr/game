@@ -2,7 +2,11 @@ Engine.define('MapList', ['MainMenu', 'StringUtils', 'Dom', 'Pagination', 'Rest'
     (function (MainMenu, StringUtils, Dom, Pagination, Rest) {
     
     
-    function MapList(context, placeApplication) {
+    function MapList(context) {
+
+        var placeApplication = function(url, directives){
+            context.dispatcher.placeApplication(url, directives);
+        };
         this.TITLE = 'Map List';
         this.URL = 'map-list';
         
@@ -59,7 +63,7 @@ Engine.define('MapList', ['MainMenu', 'StringUtils', 'Dom', 'Pagination', 'Rest'
                 "unnamed-" + StringUtils.unique()
             );
             if (name !== null) {
-                me.placeApplication("PlayGround", {createGame: {name: name, map: map}});
+                me.placeApplication("arena", {createGame: {name: name, map: map}});
             }
         };
         var descriptionLink;

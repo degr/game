@@ -1,17 +1,19 @@
 package org.forweb.commandos.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.forweb.commandos.entity.GameMap;
 import org.forweb.commandos.response.dto.OwnerDto;
 
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Update {
 
     private final String type = "update";
-    private long time;
+    private Long time;
     private int started;
     private OwnerDto owner;
-    private List<Integer> items;
+    private List<String> items;
     private List<String> persons;
     private List<String> projectiles;
     private List<String> messages;
@@ -19,7 +21,7 @@ public class Update {
     private List<String> blood;
     private String score;
     private GameMap map;
-    public Update(List<String> personDto, List<String> projectiles, List<Integer> itemDtos, List<String> messages,
+    public Update(List<String> personDto, List<String> projectiles, List<String> itemDtos, List<String> messages,
                   long time, boolean gameStarted, List<String> tempZones, String score, List<String> bloodList,
                   GameMap map
     ) {
@@ -67,12 +69,12 @@ public class Update {
         this.owner = owner;
     }
 
-    public List<Integer> getItems() {
-        return items;
+    public List<String> getItems() {
+        return items == null || items.isEmpty() ? null : items;
     }
 
-    public long getTime() {
-        return time;
+    public Long getTime() {
+        return time == 0 ? null : time;
     }
 
     public void setTime(long time) {
@@ -80,7 +82,7 @@ public class Update {
     }
 
     public List<String> getMessages() {
-        return messages;
+        return messages == null || messages.isEmpty() ? null : messages;
     }
 
 
@@ -89,6 +91,6 @@ public class Update {
     }
 
     public List<String> getBlood() {
-        return blood;
+        return blood == null || blood.isEmpty() ? null : blood;
     }
 }

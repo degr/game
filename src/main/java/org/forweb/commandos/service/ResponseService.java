@@ -172,15 +172,16 @@ public class ResponseService {
         return out;
     }
 
-    public List<Integer> mapItems(List<AbstractZone> zones) {
+    public List<String> mapItems(List<AbstractZone> zones) {
         Iterator<AbstractZone> iterator = zones.iterator();
-        List<Integer> out = new ArrayList<>();
+        List<String> out = new ArrayList<>();
         while (iterator.hasNext()) {
             AbstractZone zone = iterator.next();
             if (zone instanceof Interactive) {
                 Interactive item = (Interactive) zone;
-                if (item.isAvailable()) {
-                    out.add(item.getId());
+                if(item.shouldUpdate()) {
+                    out.add(item.getId() + (item.isAvailable()?"1":"0"));
+                    item.setUpdated();
                 }
             }
         }

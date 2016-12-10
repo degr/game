@@ -230,13 +230,13 @@ Engine.define(
             return Dom.el('div', null, Dom.el('label', {'for': 'highlight_checkbox'}, [checkbox, 'Highligh person']));
         },
         buildMuteMusicButton: function () {
-            var muteMusic = KeyboardSetup.context.get('muteMusic');
+            var muteMusic = KeyboardSetup.context.config.get('muteMusic');
             if (muteMusic == 1) {
                 SoundUtils.setMuteMusic(true);
             }
             var checkbox = new Checkbox({name: 'muteMusic', value: SoundUtils.muteMusic, onchange: function(){
                 muteMusic = checkbox.getValue();
-                KeyboardSetup.context.set('muteMusic', muteMusic ? 1 : 0);
+                KeyboardSetup.context.config.set('muteMusic', muteMusic ? 1 : 0);
                 if(muteMusic) {
                     SoundUtils.setMuteMusic(true);
                 } else {
@@ -246,16 +246,16 @@ Engine.define(
             return checkbox.container;
         },
         buildMuteButton: function () {
-            var mute = KeyboardSetup.context.get('mute');
+            var mute = KeyboardSetup.context.config.get('mute');
             if (mute == 1) {
                 SoundUtils.setMute(true);
             }
             var checkbox = new Checkbox({name: 'muteSounds', value: SoundUtils.mute, onchange: function(){
                 SoundUtils.setMute(checkbox.getValue());
                 if (SoundUtils.mute) {
-                    KeyboardSetup.context.set('mute', 1);
+                    KeyboardSetup.context.config.set('mute', 1);
                 } else {
-                    KeyboardSetup.context.remove('mute');
+                    KeyboardSetup.context.config.remove('mute');
                 }
             }});
             return checkbox.container;

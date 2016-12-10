@@ -9,15 +9,11 @@
         <to type="forward">/index.html</to>
     </rule>
     <rule>
-        <from>/map-list$</from>
-        <to type="forward">/index.html</to>
-    </rule>
-    <rule>
         <from>/map-editor$</from>
         <to type="forward">/index.html</to>
     </rule>
     <rule>
-        <from>/room-list$</from>
+        <from>/rooms-list$</from>
         <to type="forward">/index.html</to>
     </rule>
     <rule>

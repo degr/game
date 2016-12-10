@@ -58,7 +58,7 @@ public class RoomsController {
                 mapOut.setMaxPlayers(map.getMaxPlayers());
                 mapOut.setRating(map.getRating());
                 mapOut.setGameType(map.getGameType());
-                mapOut.setZones(map.getZones().stream().filter(v -> {
+                mapOut.setZones(map.getZones() == null ? null : map.getZones().stream().filter(v -> {
                     if(v instanceof Interactive) {
                         return !((Interactive) v).isTemporary();
                     } else {

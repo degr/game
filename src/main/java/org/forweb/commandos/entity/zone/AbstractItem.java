@@ -4,13 +4,24 @@ import org.forweb.commandos.controller.PersonWebSocketEndpoint;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.WebSocketResponse;
 import org.forweb.geometry.shapes.Bounds;
+import org.forweb.geometry.shapes.Rectangle;
 
 
 public abstract class AbstractItem extends AbstractZone implements Interactive, WebSocketResponse {
 
     private boolean isAvailable;
+    protected boolean shouldUpdate;
     private long timeout;
     private long time;
+
+    @Override
+    public void setUpdated() {
+        shouldUpdate = false;
+    }
+    @Override
+    public boolean shouldUpdate() {
+        return shouldUpdate;
+    }
 
     public AbstractItem(int topX, int topY, String itemName, int id, float angle) {
         super(itemName, new Bounds(
@@ -33,6 +44,7 @@ public abstract class AbstractItem extends AbstractZone implements Interactive, 
     }
 
     public void setAvailable(boolean available) {
+        shouldUpdate = true;
         isAvailable = available;
     }
 

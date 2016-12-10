@@ -3,11 +3,11 @@
 <head>
     <script>
         if (typeof Promise === 'undefined') {
-            document.write(atob("PHNjcmlwdCBzcmM9ImpzL3BvbHlmaWxsL1Byb21pc2UuanMiPjwvc2NyaXB0Pg=="));
+            document.write(atob("PHNjcmlwdCBzcmM9ImFzc2V0cy9qcy9wb2x5ZmlsbC9Qcm9taXNlLmpzIj48L3NjcmlwdD4="));
         }
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="js/Engine.js"></script>
+    <script src="assets/js/org/forweb/forweb.js"></script>
 
     <script type="application/javascript">
         Engine.log = false;
@@ -16,31 +16,42 @@
             PathBuilder.seed = "?v=3";
             Engine.define(
                 "application",
-                ['Ajax', 'Rest', 'Context', 'Dispatcher', 'UrlResolver', 'MainMenu'],
-                function (Ajax, Rest, Context, Dispatcher, UrlResolver, MainMenu) {
+                ['Ajax', 'Rest', 'Config', 'Dispatcher', 'MainMenu'],
+                function (Ajax, Rest, Config, Dispatcher, MainMenu) {
                     Ajax.headers = {
                         Accept: "application/json,text/plain",
                         'Content-Type': "application/json"
                     };
                     Rest.host = document.location.protocol + '//' + document.location.host + '/server/';
-                    var context = new Context();
-                    var dispatcher = new Dispatcher('application', context, UrlResolver);
+                    var config = new Config();
+                    var context =  {config: config};
+                    var dispatcher = new Dispatcher('application', context);
                     dispatcher.addListener('afterOpen', MainMenu.updateActive);
-                    var app = UrlResolver.findApplication();
-                    dispatcher.placeApplication(app);
+                    dispatcher.addMapping('MapList', 'map-list');
+                    dispatcher.addMapping('MapEditor', 'map-editor');
+                    dispatcher.addMapping('RoomsList', 'rooms-list');
+                    dispatcher.addMapping('Account', 'account');
+                    dispatcher.addMapping('Logout', 'logout');
+                    dispatcher.addMapping('PlayGround', 'arena');
+                    dispatcher.addMapping('Users', 'users');
+                    dispatcher.addMapping('Maps', 'maps');
+                    dispatcher.addMapping('Tiles', 'tiles');
+                    dispatcher.addMapping('Greetings', '*');
+
+                    dispatcher.placeApplication();
                     Rest.doGet(
                         'user/is-logged'
                     ).then(function(r){
-                        var isLogged = context.get('logged');
+                        var isLogged = config.get('logged');
                         if(isLogged !== r) {
-                            context.set("logged", r);
+                            config.set("logged", r);
                             MainMenu.init(context);
                             if(isLogged && app !== 'Greetings') {
                                 dispatcher.placeApplication('Greetings');
                             }
                         } else if(r && app === 'Greetings') {
                             dispatcher.placeApplication('RoomsList');
-                        } else if(!r && !context.get('username')) {
+                        } else if(!r && !config.get('username')) {
                             dispatcher.placeApplication('Greetings');
                         }
                     });

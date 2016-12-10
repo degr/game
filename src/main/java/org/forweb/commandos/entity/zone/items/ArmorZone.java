@@ -32,6 +32,7 @@ public class ArmorZone extends AbstractItem {
     public void onEnter(Person person, Room room) {
         if(ArmorZone.onEnter(person, 100)) {
             this.setAvailable(false);
+            this.shouldUpdate = true;
             super.setTimeout(System.currentTimeMillis() + getTime());
         }
     }

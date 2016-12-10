@@ -1,10 +1,13 @@
 Engine.define('RoomsList', ['MainMenu', 'RoomsChat', 'Dom', 'Pagination', 'Rest', 'Controls', 'KeyboardUtils'], 
     (function (MainMenu, RoomsChat, Dom, Pagination, Rest, Controls, KeyboardUtils) {
     
-    function RoomsList(context, placeApplication) {
-        
+    function RoomsList(context) {
+
+        var placeApplication = function(url, directives){
+            context.dispatcher.placeApplication(url, directives);
+        };
         this.TITLE = 'Room List';
-        this.URL = 'room-list';
+        this.URL = 'rooms-list';
         
         this.container = null;
         this.content = Dom.el('ul', {'class': 'games'});
@@ -86,7 +89,7 @@ Engine.define('RoomsList', ['MainMenu', 'RoomsChat', 'Dom', 'Pagination', 'Rest'
                 }
                 me.chat.update(0, "You joined as SPECTATOR");
             }
-            me.placeApplication('PlayGround', {joinGame: {map: room.map, roomId: room.id}});
+            me.placeApplication('arena', {joinGame: {map: room.map, roomId: room.id}});
         };
         descriptionLink.onclick = clb;
         descriptionLink.innerText = room.description;

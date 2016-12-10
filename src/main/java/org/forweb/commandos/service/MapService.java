@@ -177,6 +177,9 @@ public class MapService extends AbstractService<Map, MapDao> {
     }
 
     void onItemsLifecycle(List<AbstractZone> zones) {
+        if(zones == null) {
+            return;
+        }
         zones.stream()
                 .filter(zone -> zone instanceof AbstractItem)
                 .forEach(zone -> {

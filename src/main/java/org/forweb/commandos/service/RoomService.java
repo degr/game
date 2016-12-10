@@ -61,11 +61,13 @@ public class RoomService {
             while (loopMapX >= 0) {
                 cluster.setX(loopMapX * PersonWebSocketEndpoint.CLUSTER_SIZE);
                 List<AbstractZone> clusterZones = new ArrayList<>();
-                for(AbstractZone zone : map.getZones()) {
-                    boolean isIntersect = PointService.EMPTY != GeometryService.boundsRectangleIntersection(zone.getRectangle(), cluster);
-                    boolean contain = GeometryService.rectangleInsideBounds(zone.getRectangle(), cluster);
-                    if(isIntersect || contain) {
-                        clusterZones.add(zone);
+                if(map.getZones() != null) {
+                    for (AbstractZone zone : map.getZones()) {
+                        boolean isIntersect = PointService.EMPTY != GeometryService.boundsRectangleIntersection(zone.getRectangle(), cluster);
+                        boolean contain = GeometryService.rectangleInsideBounds(zone.getRectangle(), cluster);
+                        if (isIntersect || contain) {
+                            clusterZones.add(zone);
+                        }
                     }
                 }
                 clusteredMap[mapY][loopMapX] = clusterZones;

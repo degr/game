@@ -13,8 +13,10 @@ Engine.define('MapEditor', ['MapObject', 'MainMenu', 'Dom', 'Text', 'CustomTiles
         var Config = Engine.require('Config');
         
         
-        function MapEditor(context, placeApplication) {
-
+        function MapEditor(context) {
+            var placeApplication = function(url, directives){
+                context.dispatcher.placeApplication(url, directives);
+            };
             this.TITLE = 'Map Editor';
             this.URL = 'map-editor';
             
@@ -113,7 +115,7 @@ Engine.define('MapEditor', ['MapObject', 'MainMenu', 'Dom', 'Text', 'CustomTiles
             goBack.onclick = function () {
                 var c = confirm("Are you sure to leave this page?");
                 if (c) {
-                    me.placeApplication('MapList');
+                    me.placeApplication('map-list');
                 }
             };
             var createTile = Dom.el('input', {type: 'button', value: 'Create Tile'});

@@ -35,6 +35,7 @@ public abstract class WeaponZone extends AbstractItem{
             }
         }
         player.getWeaponList().add(weapon);
+        this.shouldUpdate = true;
     }
 
     @Override

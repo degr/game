@@ -7,12 +7,15 @@ Engine.define('AbstractOverview', ['StringUtils', 'Dom', 'Rest', 'Grid', 'MainMe
     var StringUtils = Engine.require('StringUtils');
     var Popup = Engine.require('Popup');
     
-    function AbstractOverview(context, placeApplication) {
+    function AbstractOverview(context) {
+        var placeApplication = function(url, directives){
+            context.dispatcher.placeApplication(url, directives);
+        };
         this.TITLE = StringUtils.normalizeText(this.getEntityName());
         this.url = this.getEntityName().toLowerCase() + 's';
         
         this.context = context;
-        var mainMenu = new MainMenu(context, placeApplication);
+        var mainMenu = new MainMenu(context);
         this.placeApplication = placeApplication;
         var me = this;
         this.page = 1;

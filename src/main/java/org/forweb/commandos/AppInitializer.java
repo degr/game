@@ -28,7 +28,7 @@ public class AppInitializer extends AbstractSecurityWebApplicationInitializer {
         super.afterSpringSecurityFilterChain(servletContext);
 
         if (DEV) {
-            HibernateSupport.init("127.0.0.1:3306", "root", "", "commandos", new String[]{BASE_PACKAGE + ".entity", WORD_PACKAGE});
+            HibernateSupport.init("127.0.0.1:3306", "root", "admin", "commandos", new String[]{BASE_PACKAGE + ".entity", WORD_PACKAGE});
         } else {
             HibernateSupport.init("localhost", "root", "aU2nYwYV", "commandos", new String[]{BASE_PACKAGE + ".entity", WORD_PACKAGE});
         }

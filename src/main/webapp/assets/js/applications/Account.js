@@ -6,7 +6,10 @@ Engine.define('Account', ['MainMenu', 'Dom', 'Rest', 'Text', 'Password'], functi
     var Text = Engine.require('Text');
     var Password = Engine.require('Password');
 
-    function Account(context, placeApplication) {
+    function Account(context) {
+        var placeApplication = function(url, directives){
+            context.dispatcher.placeApplication(url, directives);
+        };
         this.URL = 'account';
         this.TITLE = 'Account';
         var me = this;
@@ -26,7 +29,7 @@ Engine.define('Account', ['MainMenu', 'Dom', 'Rest', 'Text', 'Password'], functi
                 ).then(function(response){
                     if(response) {
                         Engine.console("Your account was deleted");
-                        placeApplication('Logout');
+                        placeApplication('logout');
                     } else {
                         Engine.console("Wrong password, can't delete account");
                     }
@@ -67,7 +70,7 @@ Engine.define('Account', ['MainMenu', 'Dom', 'Rest', 'Text', 'Password'], functi
             }
         }}});
         
-        this.mainMenu = new MainMenu(context, placeApplication);
+        this.mainMenu = new MainMenu(context);
         var changePass = Dom.el('a', {href: '#', onclick: function(e){
             e.preventDefault();
             Dom.removeClass(password.container, 'hidden');

@@ -10,4 +10,6 @@ public interface Interactive {
     void reset();
     Integer getId();
     boolean isTemporary();
+    boolean shouldUpdate();
+    void setUpdated();
 }
