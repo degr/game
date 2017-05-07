@@ -7,7 +7,7 @@ Engine.define('MapList', ['MainMenu', 'StringUtils', 'Dom', 'Pagination', 'Rest'
         var placeApplication = function(url, directives){
             context.dispatcher.placeApplication(url, directives);
         };
-        this.TITLE = 'Map List';
+        this.TITLE = 'Create Game';
         this.URL = 'map-list';
         
         this.container = null;

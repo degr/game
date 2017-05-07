@@ -36,9 +36,8 @@ public class PersonWebSocketEndpoint {
     public static final int FIRE_RADIUS = 8;
     public static final Integer LIFE_AT_START = 100;
 
-    public static final long TICK_DELAY = 10;
-    public static final double MOVEMENT_SPEED = 2;
-    public static final int SKIP_FRAMES = 1;
+    public static final long FRAME_RATE = 1000/60;
+    public static final double MOVEMENT_SPEED = 4;
 
     public static final int CLUSTER_SIZE = 100;
 

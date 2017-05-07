@@ -9,7 +9,7 @@ public abstract class Vote {
     private static final int REMINDERS_COUNT_PER_LIFE = 5;
     private static final int ONE_REMINDER = 7 * 1000;
     private static final int MAX_TIME = ONE_REMINDER * REMINDERS_COUNT_PER_LIFE;
-    private static final int REMINDER_PERIOD = (int)(ONE_REMINDER / PersonWebSocketEndpoint.TICK_DELAY);
+    private static final int REMINDER_PERIOD = (int)(ONE_REMINDER / PersonWebSocketEndpoint.FRAME_RATE);
 
     private int lifetime = 0;
     private int reminder = 0;
@@ -45,6 +45,6 @@ public abstract class Vote {
     }
 
     public boolean isOld() {
-        return MAX_TIME - (lifetime * ONE_REMINDER + reminder * PersonWebSocketEndpoint.TICK_DELAY) < 0;
+        return MAX_TIME - (lifetime * ONE_REMINDER + reminder * PersonWebSocketEndpoint.FRAME_RATE) < 0;
     }
 }

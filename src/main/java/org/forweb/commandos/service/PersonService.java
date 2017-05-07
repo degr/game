@@ -25,6 +25,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+import static org.forweb.commandos.controller.PersonWebSocketEndpoint.MOVEMENT_SPEED;
+
 @Service
 public class PersonService {
     @Autowired
@@ -152,7 +154,7 @@ public class PersonService {
     public void handlePersons(Collection<Person> persons, Room room) {
         long now = System.currentTimeMillis();
         for (Person person : persons) {
-            movementService.onMove(person, room);
+            movementService.onMove(person, room, MOVEMENT_SPEED);
             projectileService.onReload(person, now);
             projectileService.handleFire(person, room);
             turnService.onPersonChangeViewAngle(person);

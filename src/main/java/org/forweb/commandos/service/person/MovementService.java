@@ -20,10 +20,10 @@ public class MovementService {
     LocationService locationService;
 
 
-    public void onMove(Person person, Room room){
+    public void onMove(Person person, Room room, double speed){
 
         Direction direction = person.getDirection();
-        double speed = MOVEMENT_SPEED;
+        double initialSpeed = speed;
         if(person.getWeapon() instanceof Minigun) {
             speed *= 0.6;
         } else if(person.getWeapon() instanceof RocketLauncher) {
@@ -77,6 +77,11 @@ public class MovementService {
                     }
                     break;
                 default:
+                    if(initialSpeed == MOVEMENT_SPEED) {
+                        onMove(person, room, initialSpeed / 2);
+                    } else if(initialSpeed == MOVEMENT_SPEED / 4) {
+                        onMove(person, room, MOVEMENT_SPEED / 4);
+                    }
                     //do nothing
             }
         }

@@ -5,12 +5,10 @@ import org.forweb.commandos.entity.Map;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.Vote;
-import org.forweb.commandos.entity.ammo.Projectile;
 import org.forweb.commandos.game.Context;
 import org.forweb.commandos.response.Leave;
 import org.forweb.commandos.response.Status;
 import org.forweb.commandos.response.Update;
-import org.forweb.commandos.response.dto.Stats;
 import org.forweb.commandos.service.person.TurnService;
 import org.forweb.commandos.thread.RoomShootDownThread;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +19,6 @@ import java.util.Collection;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.stream.Collectors;
 
 @Service
 public class SpringDelegationService {
@@ -142,8 +139,6 @@ public class SpringDelegationService {
         room.setGameTimer(new Timer(PersonWebSocketEndpoint.class.getSimpleName() + " Timer " + new Random().nextDouble()));
 
         room.getGameTimer().scheduleAtFixedRate(new TimerTask() {
-            private int current = 0;
-
             @Override
             public void run() {
                 try {
@@ -156,38 +151,32 @@ public class SpringDelegationService {
                         return;
                     }
                     tick(room);
-                    if (current >= PersonWebSocketEndpoint.SKIP_FRAMES) {
-                        responseService.broadcast(
-                                new Update(
-                                        responseService.mapPersons(room.getPersons()),
-                                        responseService.mapProjectiles(room.getProjectiles()),
-                                        responseService.mapItems(room.getMap().getZones()),
-                                        room.getMessages(),
-                                        room.isEverybodyReady() ? room.getEndTime() - System.currentTimeMillis() : 0,
-                                        room.isEverybodyReady(),
-                                        responseService.mapTempZones(room.getMap().getZones()),
-                                        room.getTeam1Score() + ":" + room.getTeam2Score(),
-                                        responseService.mapBlood(room.getBloodList()),
-                                        (room.isDumpMap() ? room.getMap() : null)
-                                ),
-                                room
-                        );
-                        if(room.isDumpMap()) {
-                            room.setDumpMap(false);
-                        }
+                    responseService.broadcast(
+                            new Update(
+                                    responseService.mapPersons(room.getPersons()),
+                                    responseService.mapProjectiles(room.getProjectiles()),
+                                    responseService.mapItems(room.getMap().getZones()),
+                                    room.getMessages(),
+                                    room.isEverybodyReady() ? room.getEndTime() - System.currentTimeMillis() : 0,
+                                    room.isEverybodyReady(),
+                                    responseService.mapTempZones(room.getMap().getZones()),
+                                    room.getTeam1Score() + ":" + room.getTeam2Score(),
+                                    responseService.mapBlood(room.getBloodList()),
+                                    (room.isDumpMap() ? room.getMap() : null)
+                            ),
+                            room
+                    );
+                    if(room.isDumpMap()) {
+                        room.setDumpMap(false);
                     }
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     System.out.println("Caught to prevent timer from shutting down" + e.getMessage());
                     room.setTotalPlayers(room.getPersons().size());
                 }
-                if (current > PersonWebSocketEndpoint.SKIP_FRAMES) {
-                    current = 0;
-                } else {
-                    current++;
-                }
             }
-        }, PersonWebSocketEndpoint.TICK_DELAY, PersonWebSocketEndpoint.TICK_DELAY);
+        }, PersonWebSocketEndpoint.FRAME_RATE, PersonWebSocketEndpoint.FRAME_RATE);
     }
 
 

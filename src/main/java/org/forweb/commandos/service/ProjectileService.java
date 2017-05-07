@@ -232,7 +232,7 @@ public class ProjectileService {
 
 
     private void updatePosition(Projectile projectile) {
-        double distance = projectile.getRadius() * PersonWebSocketEndpoint.TICK_DELAY / projectile.getLifeTime();
+        double distance = projectile.getRadius() * PersonWebSocketEndpoint.FRAME_RATE / projectile.getLifeTime();
         double angle = projectile.getAngle() * Math.PI / 180;
         double y = distance * Math.sin(angle);
         double x = distance * Math.cos(angle);
