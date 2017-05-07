@@ -63,8 +63,14 @@ Engine.define('WeaponActions', ['Dom', 'Controls', 'Weapons'], (function () {
             }
             if (thisEvent) {
                 e.preventDefault();
-                var gunCode = WeaponActions.weapons[gun].code;
-                gun += ":";
+                var gunCode = -1;
+                for(var key in WeaponActions.weapons) {
+                    var w = WeaponActions.weapons[key];
+                    if(w.type === gun) {
+                        gunCode = w.code;
+                    }
+                }
+                gun = gunCode + ":";
                 for (var i = 0; i < guns.length; i++) {
                     var item = guns[i];
                     if (item.indexOf(gun) === 0) {

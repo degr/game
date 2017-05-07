@@ -16,7 +16,7 @@ Engine.define('ZoneActions', ['Weapons', 'Config'], (function () {
             
             for(var weapon in ZoneActions.weapons) {
                 if(ZoneActions.weapons.hasOwnProperty(weapon)) {
-                    ZoneActions.images[weapon] = ZoneActions.weapons[weapon].image;
+                    ZoneActions.images[ZoneActions.weapons[weapon].type] = ZoneActions.weapons[weapon].image;
                 }
             }
             

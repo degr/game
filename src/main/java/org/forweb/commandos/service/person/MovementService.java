@@ -77,33 +77,40 @@ public class MovementService {
                     }
                     break;
                 default:
-                    if(initialSpeed == MOVEMENT_SPEED) {
-                        onMove(person, room, initialSpeed / 2);
-                    } else if(initialSpeed == MOVEMENT_SPEED / 4) {
-                        onMove(person, room, MOVEMENT_SPEED / 4);
-                    }
                     //do nothing
             }
         }
     }
 
-    private void onGoEast(Person person, Room room, double distance, boolean allowFloat) {
-        Point[] point = locationService.canGoEast(person, room, distance);
+    private void onGoEast(Person person, Room room, double speed, boolean allowFloat) {
+        Point[] point = locationService.canGoEast(person, room, speed);
         if (point != null) {
             if(point.length == 0) {
-                person.setX(person.getX() + distance);
+                person.setX(person.getX() + speed);
             } else if(allowFloat){
-                onFloatOx(point, person, room, distance, true);
+                if(!onFloatOx(point, person, room, speed, true)) {
+                    if(speed == MOVEMENT_SPEED) {
+                        onGoEast(person, room, MOVEMENT_SPEED / 2, true);
+                    } else if(speed == MOVEMENT_SPEED / 4) {
+                        onGoEast(person, room, MOVEMENT_SPEED / 4, true);
+                    }
+                }
             }
         }
     }
-    private void onGoWest(Person person, Room room, double distance, boolean allowFloat) {
-        Point[] point = locationService.canGoWest(person, room, distance);
+    private void onGoWest(Person person, Room room, double speed, boolean allowFloat) {
+        Point[] point = locationService.canGoWest(person, room, speed);
         if (point != null) {
             if(point.length == 0) {
-                person.setX(person.getX() - distance);
+                person.setX(person.getX() - speed);
             } else  if(allowFloat){
-               onFloatOx(point, person, room, distance, false);
+                if(!onFloatOx(point, person, room, speed, true)) {
+                    if(speed == MOVEMENT_SPEED) {
+                        onGoWest(person, room, MOVEMENT_SPEED / 2, true);
+                    } else if(speed == MOVEMENT_SPEED / 4) {
+                        onGoWest(person, room, MOVEMENT_SPEED / 4, true);
+                    }
+                }
             }
         }
     }
@@ -134,7 +141,7 @@ public class MovementService {
         }
     }
 
-    private void onFloatOx(Point[] point, Person person, Room room, double distance, boolean onGoEast) {
+    private boolean onFloatOx(Point[] point, Person person, Room room, double distance, boolean onGoEast) {
         double y = person.getY();
         Point floatPoint;
         if(point.length == 1) {
@@ -147,13 +154,23 @@ public class MovementService {
                 Point[] northPoint = locationService.canGoNorth(person, room, distance);
                 if (northPoint != null && northPoint.length == 0) {
                     person.setY(y - distance);
+                    return true;
+                } else {
+                    return false;
                 }
             } else if (floatPoint.getY() < y) {
                 Point[] southPoint = locationService.canGoSouth(person, room, distance);
                 if (southPoint != null && southPoint.length == 0) {
                     person.setY(y + distance);
+                    return true;
+                } else {
+                    return false;
                 }
+            } else {
+                return false;
             }
+        } else {
+            return false;
         }
     }
 

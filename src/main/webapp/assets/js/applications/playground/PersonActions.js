@@ -3,6 +3,7 @@ Engine.define('PersonActions', ['SoundUtils', 'ZoneActions', 'Controls'], (funct
     var SoundUtils = Engine.require('SoundUtils');
     var ZoneActions = Engine.require('ZoneActions');
     var Controls = Engine.require('Controls');
+    var Weapons = Engine.require('Weapons');
 
     var PersonActions = {
         buttonTop: false,
@@ -404,8 +405,38 @@ Engine.define('PersonActions', ['SoundUtils', 'ZoneActions', 'Controls'], (funct
     PersonActions.mapPersonFromResponse = function (str) {
         var playGround = PersonActions.playGround;
         var data = str.split(":");
+        if(data[0] === 'f') {
+            return PersonActions.mapPersonFromFullResponse(data)
+        }
         var id = parseInt(data[0]);
-        var name = decodeURIComponent(data[1]);
+        var p = playGround.entities[id];
+        if(!p){
+            //mapPersonFromFullResponse was not called
+            return;
+        }
+        p.reload = parseInt(data[1]) === 1;
+        p.gun = Weapons.getInstance()[data[2]].type;
+        p.x = parseInt(data[3]);
+        p.y = parseInt(data[4]);
+        p.angle = parseFloat(data[5]);
+        p.status = PersonActions.getStatus(parseInt(data[6]));
+
+
+        if (playGround.owner.id == id) {
+            PersonActions.updateMouseDirectionByXy(
+                playGround.xMouse,
+                playGround.yMouse,
+                p,
+                playGround.canvasOffset
+            );
+        }
+        return p.id;
+    };
+
+    PersonActions.mapPersonFromFullResponse = function (data) {
+        var playGround = PersonActions.playGround;
+        var id = parseInt(data[1]);
+        var name = decodeURIComponent(data[2]);
         if (!playGround.entities[id]) {
             playGround.addPerson(id);
             if (playGround.windowInactive && playGround.newPlayerInterval == null) {
@@ -421,16 +452,16 @@ Engine.define('PersonActions', ['SoundUtils', 'ZoneActions', 'Controls'], (funct
         }
         var p = playGround.entities[id];
         p.name = name;
-        p.reload = data[2] == 1;
-        p.gun = data[3];
-        p.x = parseInt(data[4]);
-        p.y = parseInt(data[5]);
-        p.angle = parseFloat(data[6]);
-        p.score = parseInt(data[7]);
-        p.team = data[8] ? parseInt(data[8]) : 0;
-        p.opponentFlag = parseInt(data[9]) == 1;
-        p.selfFlag = parseInt(data[10]) == 1;
-        p.status = PersonActions.getStatus(parseInt(data[11]));
+        p.reload = parseInt(data[3]) === 1;
+        p.gun = Weapons.getInstance()[data[4]].type;
+        p.x = parseInt(data[5]);
+        p.y = parseInt(data[6]);
+        p.angle = parseFloat(data[7]);
+        p.score = parseInt(data[8]);
+        p.team = data[9] ? parseInt(data[9]) : 0;
+        p.opponentFlag = parseInt(data[10]) == 1;
+        p.selfFlag = parseInt(data[11]) == 1;
+        p.status = PersonActions.getStatus(parseInt(data[12]));
 
 
         if (playGround.owner.id == id) {

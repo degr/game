@@ -18,12 +18,12 @@ public class TurnService {
         double shift = Math.max(selected, current) - Math.min(selected, current);
         if(selected == current) {
             return;
-        } else if(shift < 2) {
+        } else if(shift < 3) {
             speed = 1f;
         } else if(shift < 4 || person.getWeapon() instanceof Minigun){
-            speed = 2f;
+            speed = 3f;
         } else {
-            speed = 4f;
+            speed = 6f;
         }
 
         double angle;

@@ -18,8 +18,8 @@ public class AssaultRifle extends AbstractWeapon<Bullet> {
     }
 
     @Override
-    public String getName() {
-        return "assault";
+    public int getCode() {
+        return 4;
     }
 
     @Override

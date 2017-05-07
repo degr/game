@@ -47,6 +47,7 @@ public class Room {
     private Vote vote;
     private boolean dumpMap;
     private boolean shootingDown = false;
+    private int fullResponse = 0;
 
     public ConcurrentHashMap<Integer, Session> getSessionStorage() {
         return sessionStorage;
@@ -347,5 +348,16 @@ public class Room {
 
     public void setShootingDown(boolean shootingDown) {
         this.shootingDown = shootingDown;
+    }
+
+    public void incrementFullResponse() {
+        this.fullResponse ++;
+        if(this.fullResponse > 60) {
+            fullResponse = 0;
+        }
+    }
+
+    public boolean isFullResponse() {
+        return fullResponse == 60;
     }
 }

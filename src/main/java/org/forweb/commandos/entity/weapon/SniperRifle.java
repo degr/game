@@ -17,8 +17,8 @@ public class SniperRifle extends AbstractWeapon<SniperBullet> {
     }
 
     @Override
-    public String getName() {
-        return "sniper";
+    public int getCode() {
+        return 5;
     }
 
     @Override

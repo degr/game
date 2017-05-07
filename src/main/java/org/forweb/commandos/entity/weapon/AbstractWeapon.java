@@ -3,9 +3,6 @@ package org.forweb.commandos.entity.weapon;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.WebSocketResponse;
 import org.forweb.commandos.entity.ammo.Projectile;
-import org.forweb.commandos.entity.zone.Interactive;
-
-import java.util.Random;
 
 public abstract class AbstractWeapon<T extends Projectile> implements WebSocketResponse {
     private int shotTimeout;
@@ -32,7 +29,7 @@ public abstract class AbstractWeapon<T extends Projectile> implements WebSocketR
     private int bulletsPerShot = 1;
 
 
-    public abstract String getName();
+    public abstract int getCode();
     public abstract Projectile getProjectile(Person person, double changedAngle);
 
     public int getReloadTimeout() {
@@ -105,7 +102,7 @@ public abstract class AbstractWeapon<T extends Projectile> implements WebSocketR
 
     @Override
     public String doResponse() {
-        return getName() + ":" + getTotalClip() + ":" + getCurrentClip();
+        return getCode() + ":" + getTotalClip() + ":" + getCurrentClip();
     }
 
 }

@@ -535,39 +535,10 @@ public class ProjectileService {
         if (person.isReload()) {
             return;
         }
-        String weaponTitle = "";
-        switch (weaponCode) {
-            case 1:
-                weaponTitle = "knife";
+        for (AbstractWeapon weapon : person.getWeaponList()) {
+            if (weapon.getCode() == weaponCode) {
+                person.setWeapon(weapon);
                 break;
-            case 2:
-                weaponTitle = "pistol";
-                break;
-            case 3:
-                weaponTitle = "shotgun";
-                break;
-            case 4:
-                weaponTitle = "assault";
-                break;
-            case 5:
-                weaponTitle = "sniper";
-                break;
-            case 6:
-                weaponTitle = "flamethrower";
-                break;
-            case 7:
-                weaponTitle = "minigun";
-                break;
-            case 8:
-                weaponTitle = "rocket";
-                break;
-        }
-        if (!"".equals(weaponTitle)) {
-            for (AbstractWeapon weapon : person.getWeaponList()) {
-                if (weapon.getName().equals(weaponTitle)) {
-                    person.setWeapon(weapon);
-                    break;
-                }
             }
         }
     }

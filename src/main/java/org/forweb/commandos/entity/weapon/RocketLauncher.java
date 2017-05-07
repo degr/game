@@ -17,8 +17,8 @@ public class RocketLauncher extends AbstractWeapon<Rocket> {
     }
 
     @Override
-    public String getName() {
-        return "rocket";
+    public int getCode() {
+        return 8;
     }
 
     @Override

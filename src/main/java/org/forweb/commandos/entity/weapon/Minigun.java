@@ -17,8 +17,8 @@ public class Minigun extends AbstractWeapon<Bullet> {
     }
 
     @Override
-    public String getName() {
-        return "minigun";
+    public int getCode() {
+        return 7;
     }
 
     @Override

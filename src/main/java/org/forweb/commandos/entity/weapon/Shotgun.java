@@ -24,8 +24,8 @@ public class Shotgun extends AbstractWeapon<Shot> {
     }
 
     @Override
-    public String getName() {
-        return "shotgun";
+    public int getCode() {
+        return 3;
     }
 
     @Override

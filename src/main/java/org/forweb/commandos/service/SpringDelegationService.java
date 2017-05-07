@@ -95,6 +95,7 @@ public class SpringDelegationService {
     }
 
     private void tick(Room room) {
+        room.incrementFullResponse();
 
         if (room.isEverybodyReady() && room.getEndTime() - System.currentTimeMillis() < 0) {
             room.setShowStats(true);
@@ -153,7 +154,7 @@ public class SpringDelegationService {
                     tick(room);
                     responseService.broadcast(
                             new Update(
-                                    responseService.mapPersons(room.getPersons()),
+                                    responseService.mapPersons(room.getPersons(), room),
                                     responseService.mapProjectiles(room.getProjectiles()),
                                     responseService.mapItems(room.getMap().getZones()),
                                     room.getMessages(),

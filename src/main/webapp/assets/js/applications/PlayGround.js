@@ -55,7 +55,7 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         this.interval = null;
         this.nextGameTick = 0;
         this.skipTicks = 0;
-        this.fps = 30;
+        this.fps = 60;
 
         this.showNames = false;
         this.drawBounds = false;
@@ -79,7 +79,9 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         this.chat = new Chat(this);
         this.personTracker = new PersonTracker(document.body, this);
         var canvas = this.canvas;
-        this.weaponControl = new WeaponControl();
+        this.weaponControl = new WeaponControl(function(weapon){
+            WeaponActions.setWeapon(weapon)
+        });
         
         BloodActions.playGround = this;
         this.teamControl = new TeamControl(this);
@@ -152,10 +154,9 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
 
         this.rect = canvas.getBoundingClientRect();
         CGraphics.context = this.context;
-        canvas.addEventListener('mousedown', function(e){PersonActions.startFire(e)});
-        canvas.addEventListener('mouseup', function(e){PersonActions.stopFire(e)});
-        
         this.windowListeners = {
+            mousedown: function(e){PersonActions.startFire(e)},
+            mouseup: function(e){PersonActions.stopFire(e)},
             keydown: [
                 function(e){PersonActions.onKeyDown(e)},
                 function(e){WeaponActions.changeWeapon(e)},
@@ -349,7 +350,7 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
             life: data[1],
             armor: data[2],
             gun: data[3],
-            guns: owner.guns
+            guns: owner.guns.split("|")
         };
     };
     PlayGround.prototype.onUpdate = function (packet) {

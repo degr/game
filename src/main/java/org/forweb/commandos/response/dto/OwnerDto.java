@@ -3,15 +3,15 @@ package org.forweb.commandos.response.dto;
 import java.util.List;
 
 public class OwnerDto {
-    private List<String> guns;
+    private String guns;
 
     private String owner;
 
-    public List<String> getGuns() {
+    public String getGuns() {
         return guns;
     }
 
-    public void setGuns(List<String> guns) {
+    public void setGuns(String guns) {
         this.guns = guns;
     }
 

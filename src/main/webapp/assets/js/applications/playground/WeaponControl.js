@@ -2,24 +2,24 @@ Engine.define('WeaponControl', ['Dom', 'Weapons'], (function(){
     var Dom = Engine.require('Dom');
     var Weapons = Engine.require('Weapons');
 
-    var WeaponControl = function() {
+    var WeaponControl = function(onChange) {
         this.container = Dom.el('div', {'class': 'weapon-holder'});
         this.weapons = Weapons.getInstance();
         this.updater = {};
 
         var me = this;
-        this.container.addEventListener('mouseover', function () {
+        /*this.container.addEventListener('mouseover', function () {
             if (me.rightSide) {
                 Dom.addClass(me.container, 'w-left');
             } else {
                 Dom.removeClass(me.container, 'w-left');
             }
             me.rightSide = !me.rightSide;
-        }, false);
+        }, false);*/
 
         for (var i in this.weapons) {
             if(this.weapons.hasOwnProperty(i)) {
-                this.buildWeapon(this.weapons[i]);
+                this.buildWeapon(this.weapons[i], onChange);
             }
         }
     };
@@ -29,7 +29,7 @@ Engine.define('WeaponControl', ['Dom', 'Weapons'], (function(){
         for (var i in weapons) {
             if(!weapons.hasOwnProperty(i))continue;
             var weapon = weapons[i];
-            this.updater[weapon.type](weapon);
+            this.updater[weapon.code](weapon);
         }
     };
     WeaponControl.prototype.mapResponse = function (guns, active) {
@@ -37,7 +37,7 @@ Engine.define('WeaponControl', ['Dom', 'Weapons'], (function(){
         var out = {};
         for (var i = 0; i < guns.length; i++) {
             var proto = guns[i].split(':');
-            out[proto[0]] = {type: proto[0], total: proto[1], current: proto[2], enable: true};
+            out[proto[0]] = {code: proto[0], total: proto[1], current: proto[2], enable: true};
         }
         var weapons = this.weapons;
         for (var j in weapons) {
@@ -54,7 +54,7 @@ Engine.define('WeaponControl', ['Dom', 'Weapons'], (function(){
         return out;
     };
 
-    WeaponControl.prototype.buildWeapon = function (weapon) {
+    WeaponControl.prototype.buildWeapon = function (weapon, onChange) {
         var out = document.createElement("div");
         var amount = document.createElement("div");
         var ammoholder = document.createElement("div");
@@ -73,7 +73,13 @@ Engine.define('WeaponControl', ['Dom', 'Weapons'], (function(){
             out.className = "weapon " + (weapon.enable ? "enable " : "disable ") + (weapon.active ? 'active' : '');
         };
         onUpdateCallback(weapon);
-        this.updater[weapon.type] = onUpdateCallback;
+        this.updater[weapon.code] = onUpdateCallback;
+        Dom.addListeners(out, {click: function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            e.preventBubble = true;
+            onChange(weapon.code);
+        }});
         this.container.appendChild(out);
     };
 

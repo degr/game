@@ -17,8 +17,8 @@ public class Flamethrower extends AbstractWeapon<Flame> {
     }
 
     @Override
-    public String getName() {
-        return "flamethrower";
+    public int getCode() {
+        return 6;
     }
 
     @Override

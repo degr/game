@@ -127,7 +127,7 @@ public class ResponseService {
 
         out.setGuns(person.getWeaponList().stream()
                 .map(AbstractWeapon::doResponse)
-                .collect(Collectors.toList())
+                .collect(Collectors.joining("|"))
         );
 
         return out;
@@ -148,11 +148,16 @@ public class ResponseService {
         }
     }
 
-    public List<String> mapPersons(ConcurrentHashMap<Integer, Person> persons) {
+    public List<String> mapPersons(ConcurrentHashMap<Integer, Person> persons, Room room) {
         List<String> out = new ArrayList<>(persons.size());
+        boolean doFullResponse = room.isFullResponse();
         for (Person person : persons.values()) {
             if (!person.isInPool()) {
-                out.add(person.doResponse());
+                if(doFullResponse) {
+                    out.add(person.doFullResponse());
+                } else {
+                    out.add(person.doResponse());
+                }
             }
         }
         return out;

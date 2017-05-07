@@ -7,7 +7,7 @@ Engine.define('Weapons', (function () {
     }
     
     var data = {
-        knife: {
+        1: {
             type: 'knife',
             code: 1,
             active: false,
@@ -18,7 +18,7 @@ Engine.define('Weapons', (function () {
             current: 0,
             image: getImage('knife')
         },
-        pistol: {
+        2: {
             type: 'pistol',
             code: 2,
             active: false,
@@ -29,7 +29,7 @@ Engine.define('Weapons', (function () {
             current: 0,
             image: getImage('pistol')
         },
-        shotgun: {
+        3: {
             type: 'shotgun',
             code: 3,
             active: false,
@@ -40,7 +40,7 @@ Engine.define('Weapons', (function () {
             current: 0,
             image: getImage('shotgun')
         },
-        assault: {
+        4: {
             type: 'assault',
             code: 4,
             active: false,
@@ -51,7 +51,7 @@ Engine.define('Weapons', (function () {
             current: 0,
             image: getImage('assault')
         },
-        sniper: {
+        5: {
             type: 'sniper',
             code: 5,
             active: false,
@@ -62,7 +62,7 @@ Engine.define('Weapons', (function () {
             current: 0,
             image: getImage('sniper')
         },
-        flamethrower: {
+        6: {
             type: 'flamethrower',
             code: 6,
             active: false,
@@ -73,7 +73,7 @@ Engine.define('Weapons', (function () {
             current: 0,
             image: getImage('flame')
         },
-        minigun: {
+        7: {
             type: 'minigun',
             code: 7,
             active: false,
@@ -85,7 +85,7 @@ Engine.define('Weapons', (function () {
             image: getImage('minigun')
         },
         //grenade: {type: 'grenade', code: 8,active: false, enable: false, max: 4, clip: 1, total: 0, current: 0},
-        rocket: {
+        8: {
             type: 'rocket',
             code: 8,
             active: false,

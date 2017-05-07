@@ -24,6 +24,11 @@ Engine.define('MainMenu', ['Dom', 'StringUtils'], function(){
         var a = Dom.el('a', {href: '#', class: clazz, onclick: function(e){
             e.preventDefault();
             MainMenu.placeApplication(name);
+            for(var i = 0; i < staticButtons.length; i++) {
+                var button = staticButtons[i];
+                button.a.className = '';
+            }
+            a.className = "active";
         }}, text);
         staticContainer.appendChild(a);
         staticButtons.push({a: a, name: name});
@@ -31,8 +36,9 @@ Engine.define('MainMenu', ['Dom', 'StringUtils'], function(){
 
     MainMenu.placeApplication = null;
     
-    MainMenu.updateActive = function() {
-        var app = "";//@TODO UrlResolver.findApplication();
+    MainMenu.updateActive = function(pass) {
+        if(pass !== 13)return;
+        var app = UrlResolver.resolve();
         if(!staticButtons) {
             staticButtons = [];
         }
@@ -40,7 +46,7 @@ Engine.define('MainMenu', ['Dom', 'StringUtils'], function(){
             var button = staticButtons[i];
             var a = button.a;
             var name = button.name;
-            if (app === name) {
+            if (app.url === name) {
                 if (a.className != 'active') {
                     a.className = 'active';
                 }
@@ -53,12 +59,13 @@ Engine.define('MainMenu', ['Dom', 'StringUtils'], function(){
     };
     MainMenu.init = function(context) {
         MainMenu.placeApplication = function(url, directives) {
-            context.dispatcher.placeApplication(url, directives)
+            context.dispatcher.placeApplication(url, directives);
         };
         staticContainer = Dom.el('div', 'main-menu');
         staticButtons = [];
-        MainMenu.addButton('rooms-list');
-        MainMenu.addButton('map-list');
+        MainMenu.addButton('rooms-list', "Join Game");
+        staticButtons[0].a.className = 'active';
+        MainMenu.addButton('map-list', "Create Game");
         MainMenu.addButton('map-editor');
         if (context.config.get('logged')) {
             MainMenu.addButton('account');

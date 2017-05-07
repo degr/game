@@ -7,6 +7,6 @@ public class OwnerFacade implements WebSocketResponse {
         this.owner = owner;
     }
     public String doResponse() {
-        return owner.getId() + ":" + owner.getLife() + ":" + owner.getArmor() + ":" + owner.getWeapon().getName();
+        return owner.getId() + ":" + owner.getLife() + ":" + owner.getArmor() + ":" + owner.getWeapon().getCode();
     }
 }

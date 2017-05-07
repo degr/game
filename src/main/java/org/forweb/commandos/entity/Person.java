@@ -182,12 +182,23 @@ public class Person implements WebSocketResponse {
 
     public String doResponse() {
         return getId() + ":" +
-                getName() + ":" +
-                (getWeapon().getCurrentClip() == 0 || isReload() ? 1 : 0) + ":" +
-                getWeapon().getName() + ":" +
+                (getWeapon().getCurrentClip() == 0 || isReload() ? "1" : "") + ":" +
+                getWeapon().getCode() + ":" +
                 ((int) getX()) + ":" +
                 ((int) getY()) + ":" +
-                (Math.floor(getAngle() * 10d) / 10d) + ":" +
+                (Math.floor(getAngle() * 100d) / 100d) + ":" +
+                getStatus().toString();
+    }
+
+    public String doFullResponse() {
+        return "f:"+
+                getId() + ":" +
+                getName() + ":" +
+                (getWeapon().getCurrentClip() == 0 || isReload() ? 1 : 0) + ":" +
+                getWeapon().getCode() + ":" +
+                ((int) getX()) + ":" +
+                ((int) getY()) + ":" +
+                (Math.floor(getAngle() * 100d) / 100d) + ":" +
                 getScore() + ":" +
                 (getTeam() != 0 ? getTeam() : "") + ":" +
                 (isOpponentFlag() ? "1" : "0") + ":" +

@@ -22,8 +22,8 @@ public class Knife extends AbstractWeapon<KnifeAmmo>{
     }
 
     @Override
-    public String getName() {
-        return "knife";
+    public int getCode() {
+        return 1;
     }
 
     @Override
