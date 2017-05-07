@@ -28,7 +28,7 @@ public class Shot extends Projectile {
 
     @Override
     public String getName() {
-        return "shot";
+        return "s";
     }
 
     @Override

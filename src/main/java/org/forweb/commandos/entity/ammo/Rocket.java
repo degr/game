@@ -25,4 +25,11 @@ public class Rocket extends Projectile {
     public int getDamage() {
         return 70;
     }
+
+    public String doResponse() {
+        return getId() + ":" +
+                getName() + ":" +
+                (int) getxStart() + ":" +
+                (int) getyStart()+":::"+(int)getAngle();
+    }
 }

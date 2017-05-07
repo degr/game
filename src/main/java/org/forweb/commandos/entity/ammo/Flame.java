@@ -36,7 +36,7 @@ public class Flame extends Projectile {
 
     @Override
     public String getName() {
-        return "flame";
+        return "f";
     }
 
     @Override
@@ -50,5 +50,13 @@ public class Flame extends Projectile {
 
     public void setStoped(boolean stoped) {
         isStoped = stoped;
+    }
+
+
+    public String doResponse() {
+        return getId() + ":" +
+                getName() + ":" +
+                (int) getxStart() + ":" +
+                (int) getyStart();
     }
 }

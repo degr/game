@@ -30,6 +30,12 @@ Engine.define('Score', 'Dom', (function (Dom) {
     Score.prototype.doTime = function (millis) {
         var sec = Math.floor(millis / 1000);
         var min = Math.floor(sec / 60);
+        if(isNaN(sec)) {
+            sec = 0;
+        }
+        if(isNaN(min)) {
+            min = 0;
+        }
         sec = sec % 60;
         if (sec < 10) {
             sec = '0' + sec;

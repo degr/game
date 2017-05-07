@@ -420,6 +420,10 @@ table {
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
 }
+.playground .chat ::-webkit-scrollbar {
+    display: none;
+}
+
 .playground .chat {
     position: fixed;
     left: 66px;
@@ -478,8 +482,8 @@ table {
 a.tab-name.active {
     background: #C3CFF1;
 }
-.score-overview th, .score-overview td {
-    background: transparent;
+.score-overview th, .score-overview td, .score-overview tr {
+    background: transparent !important;
     border: none !important;
     box-shadow: none !important;
 }

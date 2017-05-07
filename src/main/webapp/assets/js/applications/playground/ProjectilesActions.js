@@ -201,15 +201,19 @@ Engine.define('ProjectilesActions', 'SoundUtils', (function () {
                     p.lifeTime = 300;
                     p.maxDistance = 700;
                     break;
+                case 'b':
                 case 'bullet':
                     playGround.instantBullets.push(p);
+                    p.type = 'bullet';
                     p.created = now;
                     p.color = ProjectilesActions.generateColor();
                     p.trace = 25;
                     p.lifeTime = 300;
                     p.maxDistance = 450;
                     break;
+                case 's':
                 case 'shot':
+                    p.type = 'shot';
                     p.trace = 15;
                     p.lifeTime = 200;
                     p.maxDistance = 300;
@@ -248,7 +252,9 @@ Engine.define('ProjectilesActions', 'SoundUtils', (function () {
                     }
                     p.created = now + 50;
                     break;
+                case 'f':
                 case 'flame':
+                    p.type = 'flame';
                     var old = playGround.fireBullets[p.id];
                     if (old) {
                         existingFire.splice(existingFire.indexOf(p.id), 1);

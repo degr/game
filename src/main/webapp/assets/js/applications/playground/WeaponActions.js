@@ -93,8 +93,8 @@ Engine.define('WeaponActions', ['Dom', 'Controls', 'Weapons'], (function () {
                 var weapon = weapons[weaponId];
                 for (var i = 0; i < guns.length; i++) {
                     var iGun = guns[i];
-                    if (iGun.indexOf(weapon.type + ':') === 0) {
-                        sorted.push(weaponId);
+                    if (iGun.indexOf(weapon.code + ':') === 0) {
+                        sorted.push(weapon.type);
                         if (weaponId == gun) {
                             currentIndex = idx;
                         }
