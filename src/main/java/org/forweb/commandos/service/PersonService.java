@@ -12,6 +12,7 @@ import org.forweb.commandos.entity.zone.interactive.FlagRedTemp;
 import org.forweb.commandos.entity.zone.interactive.Respawn;
 import org.forweb.commandos.entity.zone.items.*;
 import org.forweb.commandos.game.Context;
+import org.forweb.commandos.response.Status;
 import org.forweb.commandos.service.person.MovementService;
 import org.forweb.commandos.service.person.TurnService;
 import org.forweb.commandos.service.projectile.Stoppable;
@@ -126,10 +127,15 @@ public class PersonService {
             person.setX(respawn.getX() + PersonWebSocketEndpoint.PERSON_RADIUS);
             person.setY(respawn.getY() + PersonWebSocketEndpoint.PERSON_RADIUS);
         }
-        person.setWeapon(new Pistol());
+        Pistol pistol = new Pistol();
+        Knife knife = new Knife();
+        knife.setDumpRequire(true);
+        pistol.setDumpRequire(true);
+        person.setWeapon(pistol);
         List<AbstractWeapon> weaponList = new ArrayList<>();
-        weaponList.add(new Knife());
-        weaponList.add(person.getWeapon());
+        weaponList.add(knife);
+        weaponList.add(pistol);
+
         person.setWeaponList(weaponList);
         person.setReloadCooldown(0);
         person.setOpponentFlag(false);

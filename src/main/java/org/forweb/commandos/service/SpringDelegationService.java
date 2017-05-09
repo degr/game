@@ -71,7 +71,9 @@ public class SpringDelegationService {
         }
         room.getSessionStorage().put(personId, session);
         player.setName(name);
+        player.setNewPerson(true);
         PersonService.resetState(player, gameContext.getRoom(roomId));
+        player.setStatus(Status.alive);
         room.getPersons().put(player.getId(), player);
     }
 
@@ -272,6 +274,5 @@ public class SpringDelegationService {
     public void onRestart(Person person, Room room) {
         RoomService.setMapToRoom(room, room.getMap(), true);
         PersonService.resetState(person, room);
-        person.setStatus(Status.alive);
     }
 }

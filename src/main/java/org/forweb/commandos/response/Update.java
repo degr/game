@@ -9,7 +9,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Update {
 
-    private final String type = "update";
+    private final String type = "u";
     private Long time;
     private int started;
     private OwnerDto owner;
@@ -26,7 +26,7 @@ public class Update {
                   GameMap map
     ) {
         this.persons = personDto;
-        this.projectiles = projectiles;
+        this.projectiles = projectiles == null || projectiles.isEmpty() ? null : projectiles;
         this.items = itemDtos;
         this.messages = messages;
         this.time = time;

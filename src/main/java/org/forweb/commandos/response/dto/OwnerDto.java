@@ -1,7 +1,8 @@
 package org.forweb.commandos.response.dto;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OwnerDto {
     private String guns;
 

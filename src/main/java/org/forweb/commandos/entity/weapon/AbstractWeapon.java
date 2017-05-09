@@ -27,7 +27,10 @@ public abstract class AbstractWeapon<T extends Projectile> implements WebSocketR
 
     private int spread;
     private int bulletsPerShot = 1;
-
+    private boolean dumpRequire;
+    public AbstractWeapon() {
+        setDumpRequire(true);
+    }
 
     public abstract int getCode();
     public abstract Projectile getProjectile(Person person, double changedAngle);
@@ -105,4 +108,11 @@ public abstract class AbstractWeapon<T extends Projectile> implements WebSocketR
         return getCode() + ":" + getTotalClip() + ":" + getCurrentClip();
     }
 
+    public void setDumpRequire(boolean dumpRequire) {
+        this.dumpRequire = dumpRequire;
+    }
+
+    public boolean isDumpRequire() {
+        return dumpRequire;
+    }
 }

@@ -177,119 +177,121 @@ Engine.define('ProjectilesActions', 'SoundUtils', (function () {
             }
         }
         var packageRockets = [];
-        for (var i = 0; i < projectiles.length; i++) {
-            var data = projectiles[i].split(':');
-            var p = {
-                id: data[0],
-                type: data[1],
-                x1: parseInt(data[2]),
-                y1: parseInt(data[3]),
-                x2: parseInt(data[4]),
-                y2: parseInt(data[5]),
-                angle: parseInt(data[6]),
-                personId: parseInt(data[7]),
-                realDistance: null//will be calculated in CGraphics
+        if(projectiles && projectiles.length) {
+            for (var i = 0; i < projectiles.length; i++) {
+                var data = projectiles[i].split(':');
+                var p = {
+                    id: data[0],
+                    type: data[1],
+                    x1: parseInt(data[2]),
+                    y1: parseInt(data[3]),
+                    x2: parseInt(data[4]),
+                    y2: parseInt(data[5]),
+                    angle: parseInt(data[6]),
+                    personId: parseInt(data[7]),
+                    realDistance: null//will be calculated in CGraphics
 
-            };
+                };
 
-            switch (p.type) {
-                case 'slug':
-                    p.trace = 50;
-                    playGround.instantBullets.push(p);
-                    p.created = now;
-                    p.color = ProjectilesActions.generateColor();
-                    p.lifeTime = 300;
-                    p.maxDistance = 700;
-                    break;
-                case 'b':
-                case 'bullet':
-                    playGround.instantBullets.push(p);
-                    p.type = 'bullet';
-                    p.created = now;
-                    p.color = ProjectilesActions.generateColor();
-                    p.trace = 25;
-                    p.lifeTime = 300;
-                    p.maxDistance = 450;
-                    break;
-                case 's':
-                case 'shot':
-                    p.type = 'shot';
-                    p.trace = 15;
-                    p.lifeTime = 200;
-                    p.maxDistance = 300;
-                    if (playShootgun) {
-                        p.soundPlayed = true;
-                    } else {
-                        playShootgun = true;
-                    }
-                    if (shotgunColor == null) {
-                        shotgunColor = ProjectilesActions.generateColor();
-                    }
-                    p.color = shotgunColor;
-                    playGround.instantBullets.push(p);
-                    p.created = now;
-                    break;
-                case 'explosion':
-                    playGround.instantBullets.push(p);
-                    p.created = now;
-                    p.lifeTime = 1000;
-                    p.animationFrame = 0;
-                    break;
-                case 'blade':
-                    playGround.instantBullets.push(p);
-                    var person = playGround.entities[p.personId];
-                    if (person) {
-                        if (!person.knifeLifeCycle) {
-                            if (Math.random() > 0.5) {
-                                person.isPiercingKnife = true;
-                                person.knifeShift = 0;
-                            } else {
-                                person.isPiercingKnife = false;
-                                person.knifeAngle = 0;
-                            }
-                            person.knifeLifeCycle = 1;
+                switch (p.type) {
+                    case 'slug':
+                        p.trace = 50;
+                        playGround.instantBullets.push(p);
+                        p.created = now;
+                        p.color = ProjectilesActions.generateColor();
+                        p.lifeTime = 300;
+                        p.maxDistance = 700;
+                        break;
+                    case 'b':
+                    case 'bullet':
+                        playGround.instantBullets.push(p);
+                        p.type = 'bullet';
+                        p.created = now;
+                        p.color = ProjectilesActions.generateColor();
+                        p.trace = 25;
+                        p.lifeTime = 300;
+                        p.maxDistance = 450;
+                        break;
+                    case 's':
+                    case 'shot':
+                        p.type = 'shot';
+                        p.trace = 15;
+                        p.lifeTime = 200;
+                        p.maxDistance = 300;
+                        if (playShootgun) {
+                            p.soundPlayed = true;
+                        } else {
+                            playShootgun = true;
                         }
-                    }
-                    p.created = now + 50;
-                    break;
-                case 'f':
-                case 'flame':
-                    p.type = 'flame';
-                    var old = playGround.fireBullets[p.id];
-                    if (old) {
-                        existingFire.splice(existingFire.indexOf(p.id), 1);
-                        p.animationFrame = old.animationFrame + 1;
-                        p.frameSet = old.frameSet
-                    } else {
-                        p.frameSet = Math.floor(Math.random() * ProjectilesActions.flame.length);
+                        if (shotgunColor == null) {
+                            shotgunColor = ProjectilesActions.generateColor();
+                        }
+                        p.color = shotgunColor;
+                        playGround.instantBullets.push(p);
+                        p.created = now;
+                        break;
+                    case 'explosion':
+                        playGround.instantBullets.push(p);
+                        p.created = now;
+                        p.lifeTime = 1000;
                         p.animationFrame = 0;
-                    }
-                    playGround.fireBullets[p.id] = p;
-                    playGround.projectiles.push(p);
-                    break;
-                case 'rocket':
-                    var rocketExist = false;
-                    packageRockets.push(p.id);
-                    for (var j = 0; j < playGround.rockets.length; j++) {
-                        var r = playGround.rockets[j];
-                        if (r.id === p.id) {
-                            //p.smoke = r.smoke;
-                            r.x1 = p.x1;
-                            r.y1 = p.y1;
-                            r.x2 = p.x2;
-                            r.y2 = p.y2;
-                            p = r;
-                            rocketExist = true;
-                            break;
+                        break;
+                    case 'blade':
+                        playGround.instantBullets.push(p);
+                        var person = playGround.entities[p.personId];
+                        if (person) {
+                            if (!person.knifeLifeCycle) {
+                                if (Math.random() > 0.5) {
+                                    person.isPiercingKnife = true;
+                                    person.knifeShift = 0;
+                                } else {
+                                    person.isPiercingKnife = false;
+                                    person.knifeAngle = 0;
+                                }
+                                person.knifeLifeCycle = 1;
+                            }
                         }
-                    }
-                    if (!rocketExist) {
-                        playGround.rockets.push(p);
-                    }
-                    playGround.projectiles.push(p);
-                    break;
-                default:
-                    playGround.projectiles.push(p);
+                        p.created = now + 50;
+                        break;
+                    case 'f':
+                    case 'flame':
+                        p.type = 'flame';
+                        var old = playGround.fireBullets[p.id];
+                        if (old) {
+                            existingFire.splice(existingFire.indexOf(p.id), 1);
+                            p.animationFrame = old.animationFrame + 1;
+                            p.frameSet = old.frameSet
+                        } else {
+                            p.frameSet = Math.floor(Math.random() * ProjectilesActions.flame.length);
+                            p.animationFrame = 0;
+                        }
+                        playGround.fireBullets[p.id] = p;
+                        playGround.projectiles.push(p);
+                        break;
+                    case 'rocket':
+                        var rocketExist = false;
+                        packageRockets.push(p.id);
+                        for (var j = 0; j < playGround.rockets.length; j++) {
+                            var r = playGround.rockets[j];
+                            if (r.id === p.id) {
+                                //p.smoke = r.smoke;
+                                r.x1 = p.x1;
+                                r.y1 = p.y1;
+                                r.x2 = p.x2;
+                                r.y2 = p.y2;
+                                p = r;
+                                rocketExist = true;
+                                break;
+                            }
+                        }
+                        if (!rocketExist) {
+                            playGround.rockets.push(p);
+                        }
+                        playGround.projectiles.push(p);
+                        break;
+                    default:
+                        playGround.projectiles.push(p);
+                }
             }
         }
         for (var fb = 0; fb < existingFire.length; fb++) {

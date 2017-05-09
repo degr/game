@@ -1,19 +1,19 @@
 Engine.define('ZoneActions', ['Weapons', 'Config'], (function () {
 
     var Weapons = Engine.require("Weapons");
-    var Config = Engine.require("Config");
-    
     var ZoneActions = {
         images: {},
         wallPattern: null,
         weapons: Weapons.getInstance(),
+        config: null,
         /**
          * @var PlayGround
          */
         playGround: null,
-        init: function () {
+        init: function (context) {
             var me = this;
-            
+            me.config = context.config;
+
             for(var weapon in ZoneActions.weapons) {
                 if(ZoneActions.weapons.hasOwnProperty(weapon)) {
                     ZoneActions.images[ZoneActions.weapons[weapon].type] = ZoneActions.weapons[weapon].image;
@@ -99,7 +99,7 @@ Engine.define('ZoneActions', ['Weapons', 'Config'], (function () {
                 case 'tiled':
                     if (!ZoneActions.images[zone.tileId]) {
                         var image = new Image();
-                        image.src = Config.uploadPath + zone.customSprite;
+                        image.src = ZoneActions.config.get("uploadPath") + zone.customSprite;
                         ZoneActions.images[zone.tileId] = image;
                     }
                     try {

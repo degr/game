@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class ResponseService {
@@ -125,11 +126,21 @@ public class ResponseService {
         OwnerDto out = new OwnerDto();
         out.setOwner(new OwnerFacade(person).doResponse());
 
-        out.setGuns(person.getWeaponList().stream()
-                .map(AbstractWeapon::doResponse)
-                .collect(Collectors.joining("|"))
-        );
-
+        if(person.getStatus() != Status.alive) {
+            out.setGuns("r");
+        } else {
+            out.setGuns( person.getWeaponList().stream()
+                    .filter(AbstractWeapon::isDumpRequire)
+                    .map(v -> {
+                        v.setDumpRequire(false);
+                        return v.doResponse();
+                    })
+                    .collect(Collectors.joining("|"))
+            );
+            if("".equals(out.getGuns())) {
+                out.setGuns(null);
+            }
+        }
         return out;
     }
 
@@ -153,10 +164,16 @@ public class ResponseService {
         boolean doFullResponse = room.isFullResponse();
         for (Person person : persons.values()) {
             if (!person.isInPool()) {
-                if(doFullResponse) {
+                if(doFullResponse || person.isNewPerson()) {
+                    if(person.isNewPerson()) {
+                        person.setNewPerson(false);
+                    }
                     out.add(person.doFullResponse());
                 } else {
                     out.add(person.doResponse());
+                }
+                if(person.getStatus() != Status.alive) {
+                    person.setStatus(Status.alive);
                 }
             }
         }

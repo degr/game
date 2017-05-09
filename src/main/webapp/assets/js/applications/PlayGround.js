@@ -99,7 +99,7 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
 
         PersonActions.init();
         ProjectilesActions.init();
-        ZoneActions.init();
+        ZoneActions.init(context);
         this.lifeAndArmor = new LifeAndArmor();
         KeyboardSetup.init();
 
@@ -306,11 +306,12 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
                     if (PersonActions.noPassiveReload) {
                         PersonActions.updatePassiveReload(true);
                     }
-                }, 2000)
+                }, 2000);
             },
             function onMessage(message) {
                 var data = eval('(' + message.data + ')');
                 switch (data.type) {
+                    case 'u':
                     case 'update':
                         me.onUpdate(data);
                         break;
@@ -343,15 +344,49 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         this.teamControl.show();
         this.gameStats.update(data.stats, parseInt(data.team1Score), parseInt(data.team2Score));
     };
-    PlayGround.prototype.decryptOwner = function (owner) {
+    PlayGround.prototype.decryptOwner = function (owner, person) {
         var data = owner.owner.split(":");
         return {
             id: data[0],
             life: data[1],
             armor: data[2],
             gun: data[3],
-            guns: owner.guns.split("|")
+            guns: this.prepareGuns(
+                owner.guns ? owner.guns.split("|") : null,
+                person && person.status === 'alive'
+            )
         };
+    };
+    PlayGround.prototype.prepareGuns = function (newGuns, isAlive) {
+        var out = isAlive ? this.owner.guns || [] : [];
+        if(newGuns && newGuns.length) {
+            for(var i = 0; i < newGuns.length; i++) {
+                var nGun = newGuns[i];
+                if(nGun) {
+                    var found = false;
+                    var nKey = nGun.substr(0, nGun.indexOf(":") + 1);
+                    for (var o = 0; o < out.length; o++) {
+                        var oGun = out[o];
+                        if(oGun.indexOf(nKey) === 0) {
+                            out[o] = nGun;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        out.push(nGun)
+                    }
+                }
+            }
+        }
+        return out;
+    };
+    PlayGround.prototype.lookUpForPerson = function (packetOwner, oldOwner) {
+        if(this.entities[oldOwner]) {
+            return this.entities[oldOwner]
+        } else {
+            return this.entities[packetOwner.owner.substring(packetOwner.owner.indexOf(":"))];
+        }
     };
     PlayGround.prototype.onUpdate = function (packet) {
         if (packet.map) {
@@ -364,18 +399,28 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
             this.readyToPlay = false;
             this.teamControl.show();
         }
+        var personIds = [];
+        for (var p = 0; p < packet.persons.length; p++) {
+            personIds.push(PersonActions.mapPersonFromResponse(packet.persons[p]));
+        }
+        for (var id in this.entities) {
+            if (this.entities.hasOwnProperty(id) && personIds.indexOf(parseInt(id)) === -1) {
+                delete this.entities[id];
+            }
+        }
+
         if (packet.owner !== null) {
             var oldOwnerId = this.owner.id;
-            this.owner = this.decryptOwner(packet.owner);
+            this.owner = this.decryptOwner(packet.owner, this.lookUpForPerson(packet.owner, oldOwnerId));
             if (this.owner.id != oldOwnerId) {
                 this.updateCanvas(this.map);
             }
-        }
+        };
         var owner = this.owner;
         if (packet.score) {
             this.scoreOverview.updateTeamScore(packet.score);
         }
-        this.weaponControl.update(owner);
+        this.weaponControl.update(owner, this.entities[owner.id]);
         this.lifeAndArmor.update(owner.life, owner.armor);
         this.score.update(owner, packet.time);
         if(packet.messages) {
@@ -407,15 +452,6 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
                 var tempZone = ZoneActions.decode(packet.tempZones[z]);
                 tempZone.available = true;
                 this.tempZones.push(tempZone);
-            }
-        }
-        var personIds = [];
-        for (var p = 0; p < packet.persons.length; p++) {
-            personIds.push(PersonActions.mapPersonFromResponse(packet.persons[p]));
-        }
-        for (var id in this.entities) {
-            if (this.entities.hasOwnProperty(id) && personIds.indexOf(parseInt(id)) === -1) {
-                delete this.entities[id];
             }
         }
 

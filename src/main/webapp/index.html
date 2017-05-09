@@ -24,6 +24,8 @@
                     };
                     Rest.host = document.location.protocol + '//' + document.location.host + '/server/';
                     var config = new Config();
+                    config.set("uploadPath", "upload.images/zones/");
+
                     var context =  {config: config};
                     var dispatcher = new Dispatcher('application', context);
                     dispatcher.addListener('afterOpen', MainMenu.updateActive);

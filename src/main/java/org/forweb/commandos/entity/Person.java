@@ -30,6 +30,7 @@ public class Person implements WebSocketResponse {
     private boolean opponentFlag;
     private boolean selfFlag;
     private boolean ready;
+    private boolean newPerson;
     private List<Stoppable> listeners = new ArrayList<>();
 
     public List<AbstractWeapon> getWeaponList() {
@@ -181,13 +182,17 @@ public class Person implements WebSocketResponse {
     }
 
     public String doResponse() {
-        return getId() + ":" +
-                (getWeapon().getCurrentClip() == 0 || isReload() ? "1" : "") + ":" +
-                getWeapon().getCode() + ":" +
-                ((int) getX()) + ":" +
-                ((int) getY()) + ":" +
-                (Math.floor(getAngle() * 100d) / 100d) + ":" +
-                getStatus().toString();
+        if(isNewPerson()) {
+            return doFullResponse();
+        } else {
+            return getId() + ":" +
+                    (getWeapon().getCurrentClip() == 0 || isReload() ? "1" : "") + ":" +
+                    getWeapon().getCode() + ":" +
+                    ((int) getX()) + ":" +
+                    ((int) getY()) + ":" +
+                    (Math.floor(getAngle() * 100d) / 100d) + ":" +
+                    getStatus().toString();
+        }
     }
 
     public String doFullResponse() {
@@ -279,5 +284,13 @@ public class Person implements WebSocketResponse {
 
     public List<Stoppable> getListeners() {
         return listeners;
+    }
+
+    public boolean isNewPerson() {
+        return newPerson;
+    }
+
+    public void setNewPerson(boolean newPerson) {
+        this.newPerson = newPerson;
     }
 }

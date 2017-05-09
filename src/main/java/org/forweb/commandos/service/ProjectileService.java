@@ -9,6 +9,7 @@ import org.forweb.commandos.entity.ammo.*;
 import org.forweb.commandos.entity.weapon.*;
 import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.game.Context;
+import org.forweb.commandos.response.Status;
 import org.forweb.commandos.service.projectile.ExplosionThread;
 import org.forweb.geometry.services.CircleService;
 import org.forweb.geometry.services.LineService;
@@ -109,6 +110,7 @@ public class ProjectileService {
                     Person shooter = room.getPersons().get(flame.getPersonId());
                     boolean isKilled = onDamage(shooter, flame.getDamage(), person, room);
                     if (isKilled) {
+                        person.setStatus(Status.fried);
                         room.getMessages().add("0:" + shooter.getName() + " fried " + person.getName());
                     }
                     room.getProjectiles().remove(flameBathcId);
@@ -218,6 +220,7 @@ public class ProjectileService {
                     shiftPersonAfterExplosion(person, explosion, room);
                     boolean isKilled = onDamage(shooter, (int) damage, person, room);
                     if (isKilled) {
+                        person.setStatus(Status.exploded);
                         room.getMessages().add("0:" + person.getName() + " was ripped by " + shooter.getName() + " explosion ");
                     }
                 }
@@ -321,9 +324,12 @@ public class ProjectileService {
             if (isKilled) {
                 if (projectile instanceof KnifeAmmo) {
                     room.getMessages().add("0:" + shooter.getName() + " cut into pieces  " + closestPerson.getName());
+                    closestPerson.setStatus(Status.cutted);
                 } else if (projectile instanceof SubShot) {
                     room.getMessages().add("0:" + shooter.getName() + " shot " + closestPerson.getName() + " as a dog");
+                    closestPerson.setStatus(Status.shooted);
                 } else {
+                    closestPerson.setStatus(Status.shooted);
                     room.getMessages().add("0:" + shooter.getName() + " kill " + closestPerson.getName());
                 }
             }
@@ -475,6 +481,7 @@ public class ProjectileService {
 
         gun.setTotalClip(gun.getTotalClip() - 1);
         gun.setCurrentClip(gun.getCurrentClip() - 1);
+        gun.setDumpRequire(true);
 
         Projectile projectile = getCompatibleProjectile(person);
         Integer id = room.getProjectilesIds().getAndIncrement();

@@ -5,6 +5,7 @@ Engine.define("PathBuilder", function(){
             case 'CGraphics':
             case 'SoundUtils':
             case 'UrlResolver':
+            case 'ObjectUtils':
             case 'DomComponents':
             case 'KeyboardUtils':
             case 'WebSocketUtils':
