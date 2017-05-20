@@ -5,6 +5,7 @@ Engine.define('Score', 'Dom', (function (Dom) {
         this.fragContainer = null;
         this.timeContainer = null;
         this.frags = 0;
+        this.sec = 0;
         /**
          * @var PlayGround
          */
@@ -21,14 +22,17 @@ Engine.define('Score', 'Dom', (function (Dom) {
         var p = this.playGround.entities[owner.id];
         if (!p)return;
         var score = p.score;
-        if (score != this.frags) {
+        if (score !== this.frags) {
             this.fragContainer.innerText = score;
             this.frags = score;
         }
-        this.timeContainer.innerText = this.doTime(time);
+        var sec = Math.floor(time / 1000);
+        if(sec !== this.sec) {
+            this.timeContainer.innerText = this.doTime(sec);
+            this.sec = sec;
+        }
     };
-    Score.prototype.doTime = function (millis) {
-        var sec = Math.floor(millis / 1000);
+    Score.prototype.doTime = function (sec) {
         var min = Math.floor(sec / 60);
         if(isNaN(sec)) {
             sec = 0;

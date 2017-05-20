@@ -28,6 +28,7 @@ public abstract class WeaponZone extends AbstractItem{
                     player.setReload(false);
                     player.setReloadCooldown(0);
                 }
+                personHaving.setDumpRequire(true);
                 if (personHaving.getTotalClip() > personHaving.getMaxClip()) {
                     personHaving.setTotalClip(personHaving.getMaxClip());
                 }

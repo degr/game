@@ -77,37 +77,60 @@ Engine.define('WeaponControl', ['Dom', 'Weapons', 'ObjectUtils'], (function(){
     };
 
     WeaponControl.prototype.buildWeapon = function (weapon, onChange) {
-        var out = document.createElement("div");
+        var el = document.createElement("div");
         var amount = document.createElement("div");
         var ammoholder = document.createElement("div");
-        out.appendChild(weapon.image);
-        out.appendChild(amount);
-        out.appendChild(ammoholder);
-        out.className = "weapon";
+        el.appendChild(weapon.image);
+        el.appendChild(amount);
+        el.appendChild(ammoholder);
+        el.className = "weapon";
         ammoholder.className = "ammoholder";
         var now = document.createElement("div");
         ammoholder.appendChild(now);
         now.className = "now";
-        Dom.addListeners(out, {click: function(e){
+        Dom.addListeners(el, {click: function(e){
             e.preventDefault();
             e.stopPropagation();
             e.preventBubble = true;
             onChange(weapon.code);
         }});
-        this.container.appendChild(out);
-        return {
-            el: out,
+        this.container.appendChild(el);
+        var out = {
+            el: el,
             weapon: weapon,
+            statuses: {
+                isEnabled: null,
+                isActive: null
+            },
             setStatuses: function(isEnabled, isActive){
-                out.className = "weapon " + (isEnabled ? "enable " : "disable ") + (isActive ? 'active' : '');
+                if(out.statuses.isEnabled !== isEnabled || out.statuses.isActive !== isActive) {
+                    out.statuses.isEnabled = isEnabled;
+                    out.statuses.isActive = isActive;
+                    el.className = "weapon " + (isEnabled ? "enable " : "disable ") + (isActive ? 'active' : '');
+                }
+            },
+            ammo: {
+                total: -1,
+                max: -1,
+                current: -1,
+                clip: -1
             },
             setAmmo: function(weapon) {
-                amount.innerHTML = weapon.total + "/" + weapon.max;
-                var percents = weapon.current * 100 / weapon.clip;
-                now.style.width = percents + '%';
-                now.innerHTML = weapon.current;
+                var ammo = out.ammo;
+                if(ammo.current !== weapon.current || ammo.total !== weapon.total || ammo.max !== weapon.max || ammo.clip !== weapon.clip) {
+                    amount.innerHTML = weapon.total + "/" + weapon.max;
+                    var percents = weapon.current * 100 / weapon.clip;
+                    now.style.width = percents + '%';
+                    now.innerHTML = weapon.current;
+
+                    ammo.current = weapon.current;
+                    ammo.total = weapon.total;
+                    ammo.max = weapon.max;
+                    ammo.clip = weapon.clip;
+                }
             }
-        }
+        };
+        return out;
     };
 
     return WeaponControl;

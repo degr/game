@@ -137,10 +137,6 @@ public class Person implements WebSocketResponse {
         return shotCooldown;
     }
 
-    public void setIsReload(boolean isReload) {
-        this.isReload = isReload;
-    }
-
     public boolean isReload() {
         return isReload;
     }

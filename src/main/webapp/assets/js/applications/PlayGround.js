@@ -1,7 +1,7 @@
 Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
     'PersonActions', 'SoundUtils', 'ProjectilesActions', 'PersonTracker', 'ZoneActions', 
     'WeaponActions', 'WeaponControl', 'LifeAndArmor', 'KeyboardSetup', 'GameStats', 'Score',
-    'ScoreOverview', 'TeamControl', 'WebSocketUtils', 'BloodActions', 'CGraphics', 'ScreenUtils', 'Rest'], (function () {
+    'ScoreOverview', 'TeamControl', 'WebSocketUtils', 'BloodActions', 'CGraphics', 'ScreenUtils', 'Rest', 'Weapons'], (function () {
 
     var ScreenUtils = Engine.require('ScreenUtils');
     var Person = Engine.require('Person');
@@ -26,6 +26,8 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
     var BloodActions = Engine.require('BloodActions');
     var CGraphics = Engine.require('CGraphics');
     var Rest = Engine.require('Rest');
+    var Weapons = Engine.require('Weapons');
+    var weaponInstance = Weapons.getInstance();
 
     var PlayGround = function (context) {
         var placeApplication = function(url, directives){
@@ -401,7 +403,7 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         }
         var personIds = [];
         for (var p = 0; p < packet.persons.length; p++) {
-            personIds.push(PersonActions.mapPersonFromResponse(packet.persons[p]));
+            personIds.push(PersonActions.mapPersonFromResponse(packet.persons[p], weaponInstance));
         }
         for (var id in this.entities) {
             if (this.entities.hasOwnProperty(id) && personIds.indexOf(parseInt(id)) === -1) {

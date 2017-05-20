@@ -455,7 +455,7 @@ public class ProjectileService {
 
     public void doReload(Person person, long now) {
         if (person.getWeapon().getTotalClip() > 0) {
-            person.setIsReload(true);
+            person.setReload(true);
             person.setReloadCooldown(now + person.getWeapon().getReloadTimeout());
         }
     }
@@ -463,15 +463,15 @@ public class ProjectileService {
     public void onReload(Person person, long now) {
         if (person.isReload() && person.getShotCooldown() < now && person.getReloadCooldown() < now) {
             AbstractWeapon weapon = person.getWeapon();
-            if (weapon.getTotalClip() <= 0) {
-                return;
+            if (weapon.getTotalClip() > 0) {
+                person.setReload(false);
+                weapon.setDumpRequire(true);
+                int clipToReload = weapon.getClipSize();
+                if (clipToReload > weapon.getTotalClip()) {
+                    clipToReload = weapon.getTotalClip();
+                }
+                weapon.setCurrentClip(clipToReload);
             }
-            person.setIsReload(false);
-            int clipToReload = weapon.getClipSize();
-            if (clipToReload > weapon.getTotalClip()) {
-                clipToReload = weapon.getTotalClip();
-            }
-            weapon.setCurrentClip(clipToReload);
         }
     }
 

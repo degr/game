@@ -98,21 +98,24 @@ Engine.define('Weapons', (function () {
         }
     };
     return {
-        getInstance: function() {
+        getInstance: function(withoutImage) {
             var out = {};
             for(var weapon in data) {
-                if(!data.hasOwnProperty(weapon))continue;
-                var item = {};
-                var proto = data[weapon];
-                for(var key in proto) {
-                    if(!proto.hasOwnProperty(key))continue;
-                    if(key === 'image') {
-                        item.image = proto.image.cloneNode(true);
-                    } else {
-                        item[key] = proto[key];
+                if(data.hasOwnProperty(weapon)) {
+                    var item = {};
+                    var proto = data[weapon];
+                    for (var key in proto) {
+                        if (!proto.hasOwnProperty(key))continue;
+                        if (key === 'image') {
+                            if(!withoutImage) {
+                                item.image = proto.image.cloneNode(true);
+                            }
+                        } else {
+                            item[key] = proto[key];
+                        }
                     }
+                    out[weapon] = item;
                 }
-                out[weapon] = item;
             }
             return out;
         }
