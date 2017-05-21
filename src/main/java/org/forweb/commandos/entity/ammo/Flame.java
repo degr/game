@@ -15,6 +15,7 @@ public class Flame extends Projectile {
     public Flame(Person person, double angle) {
         super(person, angle);
         int speed = r.nextInt(3);
+        this.setRadius(RADIUS);
         if(speed == 0) {
             this.setLifeTime((long)new Random().nextInt(500) + 250L );
         } else if (speed == 1) {
@@ -23,7 +24,6 @@ public class Flame extends Projectile {
             this.setLifeTime((long)new Random().nextInt(3000) + 2000L );
         }
 
-        this.setRadius(RADIUS);
         setStoped(false);
     }
 

@@ -7,8 +7,8 @@ public class Rocket extends Projectile {
 
     public Rocket(Person person, double angle) {
         super(person, angle);
-        this.setLifeTime(1400L);
         this.setRadius(700);
+        this.setLifeTime(1400L);
     }
 
     @Override

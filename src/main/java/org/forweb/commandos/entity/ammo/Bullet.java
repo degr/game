@@ -6,8 +6,8 @@ public class Bullet extends Projectile{
 
     public Bullet(Person person, double angle) {
         super(person, angle);
-        this.setLifeTime(150L);
         this.setRadius(550);
+        this.setLifeTime(150L);
     }
 
 

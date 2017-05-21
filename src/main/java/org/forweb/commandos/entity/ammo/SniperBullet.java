@@ -5,9 +5,9 @@ import org.forweb.commandos.entity.Person;
 public class SniperBullet extends Projectile {
     public SniperBullet(Person person, double angle) {
         super(person, angle);
+        this.setRadius(750);
         this.setLifeTime(100L);
         setPiercing(true);
-        this.setRadius(750);
     }
 
     @Override

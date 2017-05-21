@@ -144,6 +144,7 @@ public class SpringDelegationService {
         room.getGameTimer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
+                //long nano = System.nanoTime();
                 try {
                     int personsCount = room.getPersons().size();
                     if(personsCount < 1) {
@@ -178,6 +179,7 @@ public class SpringDelegationService {
                     System.out.println("Caught to prevent timer from shutting down" + e.getMessage());
                     room.setTotalPlayers(room.getPersons().size());
                 }
+                //System.out.println((System.nanoTime() - nano)/ 1000000000.0);
             }
         }, PersonWebSocketEndpoint.FRAME_RATE, PersonWebSocketEndpoint.FRAME_RATE);
     }

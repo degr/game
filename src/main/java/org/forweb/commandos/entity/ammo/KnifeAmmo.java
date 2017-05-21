@@ -8,8 +8,8 @@ public class KnifeAmmo extends Projectile {
 
     public KnifeAmmo(Person person, double angle) {
         super(person, angle);
-        this.setLifeTime(150L);
         this.setRadius(PersonWebSocketEndpoint.PERSON_RADIUS + 15);
+        this.setLifeTime(150L);
     }
 
     @Override

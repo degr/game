@@ -189,7 +189,7 @@ Engine.define('PersonActions', ['SoundUtils', 'ZoneActions', 'Controls'], (funct
                     person.y,
                     x - offset.left + window.scrollX,
                     y - offset.top + window.scrollY
-                ) * 10) / 10;
+                ) * 100) / 100;
 
         if (angle < 0) {
             angle = 360 + angle;

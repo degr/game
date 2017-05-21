@@ -1,11 +1,13 @@
 package org.forweb.commandos.entity.ammo;
 
+import org.forweb.commandos.controller.PersonWebSocketEndpoint;
 import org.forweb.commandos.entity.Person;
 import org.forweb.commandos.entity.WebSocketResponse;
 
 import java.util.Date;
 
 public abstract class Projectile implements WebSocketResponse {
+
     private Integer id;
     private String type;
     private double xStart;
@@ -16,10 +18,13 @@ public abstract class Projectile implements WebSocketResponse {
     private long now;
     private Long lifeTime;
     private double angle;
+    private double sin;
+    private double cos;
+
     private double radius;
     private final int personId;
-
     private boolean piercing = false;
+    private double distance;
 
     public abstract boolean isInstant();
 
@@ -92,10 +97,26 @@ public abstract class Projectile implements WebSocketResponse {
 
     public void setLifeTime(Long lifeTime) {
         this.lifeTime = lifeTime;
+        this.distance = getRadius() * PersonWebSocketEndpoint.FRAME_RATE / lifeTime;
+    }
+
+    public double getDistance() {
+        return distance;
     }
 
     public void setAngle(double angle) {
         this.angle = angle;
+        angle = angle * Math.PI / 180;
+        this.sin = Math.sin(angle);
+        this.cos = Math.cos(angle);
+    }
+
+    public double getSin() {
+        return sin;
+    }
+
+    public double getCos() {
+        return cos;
     }
 
     public double getAngle() {
