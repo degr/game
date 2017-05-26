@@ -88,12 +88,19 @@ Engine.define('WeaponControl', ['Dom', 'Weapons', 'ObjectUtils'], (function(){
         var now = document.createElement("div");
         ammoholder.appendChild(now);
         now.className = "now";
-        Dom.addListeners(el, {click: function(e){
+        var handlers = {click: function(e){
+            e.preventDefault();
+            onChange(weapon.code);
+        }, onmousedown: function(e){
             e.preventDefault();
             e.stopPropagation();
             e.preventBubble = true;
-            onChange(weapon.code);
-        }});
+        }};
+        Dom.addListeners(el, handlers);
+        /*Dom.addListeners(weapon.image, handlers);
+        Dom.addListeners(amount, handlers);
+        Dom.addListeners(ammoholder, handlers);
+        Dom.addListeners(now, handlers);*/
         this.container.appendChild(el);
         var out = {
             el: el,

@@ -2,7 +2,7 @@ package org.forweb.commandos.entity.ammo;
 
 import org.forweb.commandos.entity.Person;
 
-public class Rocket extends Projectile {
+public class Rocket extends MotionProjectile {
 
 
     public Rocket(Person person, double angle) {

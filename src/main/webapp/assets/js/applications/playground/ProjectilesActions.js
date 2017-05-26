@@ -118,6 +118,10 @@ Engine.define('ProjectilesActions', 'SoundUtils', (function () {
         var radius = 12;
         var diameter = radius * 2;
         context.drawImage(frameSet[projectile.animationFrame], projectile.x1 - 12, projectile.y1 - 12, diameter, diameter);
+        projectile.animationFrame++;
+        projectile.x1 += projectile.x2;
+        projectile.y1 += projectile.y2;
+
         if (playGround.drawBounds) {
             context.arc(projectile.x1, projectile.y1, 9, 0, 2 * Math.PI, false);
         }
@@ -170,12 +174,6 @@ Engine.define('ProjectilesActions', 'SoundUtils', (function () {
         var now = (new Date()).getTime();
         var playShootgun = false;
         var shotgunColor = null;
-        var existingFire = [];
-        for (var fireKey in playGround.fireBullets) {
-            if (playGround.fireBullets.hasOwnProperty(fireKey)) {
-                existingFire.push(playGround.fireBullets[fireKey].id);
-            }
-        }
         var packageRockets = [];
         if(projectiles && projectiles.length) {
             for (var i = 0; i < projectiles.length; i++) {
@@ -185,8 +183,8 @@ Engine.define('ProjectilesActions', 'SoundUtils', (function () {
                     type: data[1],
                     x1: parseInt(data[2]),
                     y1: parseInt(data[3]),
-                    x2: parseInt(data[4]),
-                    y2: parseInt(data[5]),
+                    x2: parseFloat(data[4]),
+                    y2: parseFloat(data[5]),
                     angle: parseInt(data[6]),
                     personId: parseInt(data[7]),
                     realDistance: null//will be calculated in CGraphics
@@ -253,12 +251,14 @@ Engine.define('ProjectilesActions', 'SoundUtils', (function () {
                         }
                         p.created = now + 50;
                         break;
+                    case 'fr':
+                        delete playGround.fireBullets[p.x1];
+                        break;
                     case 'f':
                     case 'flame':
                         p.type = 'flame';
                         var old = playGround.fireBullets[p.id];
                         if (old) {
-                            existingFire.splice(existingFire.indexOf(p.id), 1);
                             p.animationFrame = old.animationFrame + 1;
                             p.frameSet = old.frameSet
                         } else {
@@ -266,7 +266,6 @@ Engine.define('ProjectilesActions', 'SoundUtils', (function () {
                             p.animationFrame = 0;
                         }
                         playGround.fireBullets[p.id] = p;
-                        playGround.projectiles.push(p);
                         break;
                     case 'rocket':
                         var rocketExist = false;
@@ -294,15 +293,15 @@ Engine.define('ProjectilesActions', 'SoundUtils', (function () {
                 }
             }
         }
-        for (var fb = 0; fb < existingFire.length; fb++) {
-            delete playGround.fireBullets[fb];
-        }
         for (var ro = playGround.rockets.length - 1; ro >= 0; ro--) {
             var rocket = playGround.rockets[ro];
             if (packageRockets.indexOf(rocket.id) === -1) {
                 playGround.rockets.splice(ro, 1);
                 break;
             }
+        }
+        for(var k in playGround.fireBullets) {
+            playGround.projectiles.push(playGround.fireBullets[k]);
         }
 
     };

@@ -529,7 +529,7 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
             }
         }
         var fire = {isFirePlayed: false};
-        if (this.projectiles != null) {
+        if (this.projectiles !== null) {
             for (var i = 0; i < this.projectiles.length; i++) {
                 ProjectilesActions.draw(this.projectiles[i], fire);
             }

@@ -2,9 +2,11 @@ package org.forweb.commandos.entity.ammo;
 
 import org.forweb.commandos.controller.PersonWebSocketEndpoint;
 import org.forweb.commandos.entity.Person;
+import org.forweb.commandos.entity.Room;
 import org.forweb.commandos.entity.WebSocketResponse;
 
 import java.util.Date;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class Projectile implements WebSocketResponse {
 
@@ -15,16 +17,15 @@ public abstract class Projectile implements WebSocketResponse {
     private Integer xEnd;
     private Integer yEnd;
     private Long creationTime = new Date().getTime();
-    private long now;
     private Long lifeTime;
     private double angle;
     private double sin;
     private double cos;
+    private boolean responseRequired;
 
     private double radius;
     private final int personId;
     private boolean piercing = false;
-    private double distance;
 
     public abstract boolean isInstant();
 
@@ -37,6 +38,7 @@ public abstract class Projectile implements WebSocketResponse {
         this.setyStart(person.getY());
         personId = person.getId();
         this.setAngle(angle);
+        this.setResponseRequired(true);
     }
 
     public Integer getyEnd() {
@@ -97,12 +99,8 @@ public abstract class Projectile implements WebSocketResponse {
 
     public void setLifeTime(Long lifeTime) {
         this.lifeTime = lifeTime;
-        this.distance = getRadius() * PersonWebSocketEndpoint.FRAME_RATE / lifeTime;
     }
 
-    public double getDistance() {
-        return distance;
-    }
 
     public void setAngle(double angle) {
         this.angle = angle;
@@ -131,14 +129,6 @@ public abstract class Projectile implements WebSocketResponse {
         this.id = id;
     }
 
-    public void setNow(long now) {
-        this.now = now;
-    }
-
-    public long getNow() {
-        return now;
-    }
-
     public boolean isPiercing() {
         return piercing;
     }
@@ -160,5 +150,16 @@ public abstract class Projectile implements WebSocketResponse {
 
     public int getPersonId() {
         return personId;
+    }
+    public boolean isResponseRequired() {
+        return responseRequired;
+    }
+
+    public void setResponseRequired(boolean responseRequired) {
+        this.responseRequired = responseRequired;
+    }
+
+    public void onDestruct(Room room) {
+
     }
 }

@@ -11,6 +11,7 @@ import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.game.Context;
 import org.forweb.commandos.response.Status;
 import org.forweb.commandos.service.projectile.ExplosionThread;
+import org.forweb.commandos.utils.Vector;
 import org.forweb.geometry.services.CircleService;
 import org.forweb.geometry.services.LineService;
 import org.forweb.geometry.services.PointService;
@@ -21,7 +22,11 @@ import org.forweb.geometry.shapes.Rectangle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Random;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -41,9 +46,9 @@ public class ProjectileService {
         Long now = System.currentTimeMillis();
         for (Map.Entry<Integer, Projectile> entry : projectiles.entrySet()) {
             Projectile projectile = entry.getValue();
-            projectile.setNow(System.currentTimeMillis());
             if (projectile.getCreationTime() + projectile.getLifeTime() < now) {
                 projectiles.remove(entry.getKey());
+                projectile.onDestruct(room);
                 continue;
             }
             if (!projectile.isInstant()) {
@@ -114,6 +119,8 @@ public class ProjectileService {
                         room.getMessages().add("0:" + shooter.getName() + " fried " + person.getName());
                     }
                     room.getProjectiles().remove(flameBathcId);
+                    Integer id = room.getProjectilesIds().getAndIncrement();
+                    room.getProjectiles().put(id, new FlameRemove(shooter, flame));
                 }
             }
         }
@@ -234,12 +241,10 @@ public class ProjectileService {
     }
 
 
-    private void updatePosition(Projectile projectile) {
-        double distance = projectile.getDistance();
-        double y = distance * projectile.getSin();
-        double x = distance * projectile.getCos();
-        projectile.setxStart(projectile.getxStart() + x);
-        projectile.setyStart(projectile.getyStart() + y);
+    private void updatePosition(MotionProjectile projectile) {
+        Vector vector = projectile.getVector();
+        projectile.setxStart(projectile.getxStart() + vector.getX());
+        projectile.setyStart(projectile.getyStart() + vector.getY());
     }
 
     private synchronized void calculateInstantImpacts(Person shooter, Projectile projectile, Room room) {

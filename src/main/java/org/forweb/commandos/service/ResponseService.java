@@ -188,7 +188,9 @@ public class ResponseService {
                     out.add(subshot.doResponse());
                 }
             } else {
-                out.add(projectile.doResponse());
+                if(projectile.isResponseRequired()) {
+                    out.add(projectile.doResponse());
+                }
             }
         }
         return out;
