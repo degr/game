@@ -11,28 +11,31 @@ public class Update {
 
     private final String type = "u";
     private Long time;
-    private int started;
+    //is launched
+    private Integer l;
     private OwnerDto owner;
     private List<String> items;
-    private List<String> persons;
+    //persons
+    private List<String> p;
     private List<String> projectiles;
     private List<String> messages;
     private List<String> tempZones;
     private List<String> blood;
-    private String score;
+    //score
+    private String s;
     private GameMap map;
     public Update(List<String> personDto, List<String> projectiles, List<String> itemDtos, List<String> messages,
                   long time, boolean gameStarted, List<String> tempZones, String score, List<String> bloodList,
                   GameMap map
     ) {
-        this.persons = personDto;
+        this.p = personDto;
         this.projectiles = projectiles == null || projectiles.isEmpty() ? null : projectiles;
         this.items = itemDtos;
         this.messages = messages;
         this.time = time;
-        started = gameStarted ? 1 : 0;
+        l = gameStarted ? 1 : 0;
         this.tempZones = tempZones;
-        this.score = score;
+        this.s = score;
         this.blood = bloodList;
         this.map = map;
     }
@@ -49,16 +52,16 @@ public class Update {
         return type;
     }
 
-    public int getStarted() {
-        return started;
+    public Integer getL() {
+        return l == 0 ? null : l;
     }
 
     public List<String> getProjectiles() {
         return projectiles;
     }
 
-    public List<String> getPersons() {
-        return persons;
+    public List<String> getP() {
+        return p;
     }
 
     public OwnerDto getOwner() {
@@ -86,8 +89,8 @@ public class Update {
     }
 
 
-    public String getScore() {
-        return score;
+    public String getS() {
+        return s;
     }
 
     public List<String> getBlood() {

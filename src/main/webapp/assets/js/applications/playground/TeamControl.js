@@ -11,21 +11,16 @@ Engine.define('TeamControl', (function () {
          * @var PlayGround
          */
         this.playGround = playGround;
-        var ready = this.buildReadyCheckbox();
+        this.readyWrapper = this.buildReadyCheckbox();
         var teamRed = this.buildTeamSwitch('red', 1);
         var teamBlue = this.buildTeamSwitch('blue', 2);
         this.teamHolder = Dom.el('div', this.isTeamGame() ? '' : 'hidden', [teamRed, teamBlue]);
-        this.container = Dom.el('div', 'team-control', [this.teamHolder, ready]);
-        var me = this;
-        setInterval(function () {//todo add destruction logic
-            if (me.isShown) {
-                Dom.animate(
-                    me.container, {paddingTop: 60}, 2000, 10
-                ).animate(
-                    me.container, {paddingTop: 20}, 600
-                );
-            }
-        }, 10000)
+        this.container = Dom.el('div', 'team-control', [this.teamHolder, this.readyWrapper]);
+        Dom.addListeners(this.container, {onmousedown: function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            e.preventBubble = true;
+        }})
     }
     TeamControl.prototype.hide = function () {
         this.isShown = false;
@@ -38,8 +33,10 @@ Engine.define('TeamControl', (function () {
     TeamControl.prototype.updateTeamHolder = function () {
         if (this.isTeamGame()) {
             Dom.removeClass(this.teamHolder, 'hidden');
+            Dom.addClass(this.readyWrapper, 'hidden');
         } else {
             Dom.addClass(this.teamHolder, 'hidden');
+            Dom.removeClass(this.readyWrapper, 'hidden');
         }
         this.reset();
         this.show();
@@ -53,11 +50,13 @@ Engine.define('TeamControl', (function () {
     };
     TeamControl.prototype.buildTeamSwitch = function (teamName, value) {
         var playGround = this.playGround;
+        var me = this;
         var id = 'team_' + teamName;
         var radio = Dom.el('input', {type: 'radio', id: id, name: 'team_choose', value: value});
         radio.onclick = function () {
-            this.readyCheckbox.checked = false;
+            me.readyCheckbox.checked = false;
             playGround.socket.send('team:' + value);
+            playGround.socket.send('ready:1');
         };
         var label = Dom.el('label', {'for': id}, [radio, teamName]);
         return Dom.el('div', 'form-control', label);
@@ -66,20 +65,10 @@ Engine.define('TeamControl', (function () {
         var playGround = this.playGround;
         var id = 'ready_to_play';
         var checkbox = Dom.el('input', {type: 'checkbox', id: id, name: id});
-        var me = this;
         checkbox.onchange = function () {
             var person = playGround.entities[playGround.owner.id];
             if (person) {
-                if (me.isTeamGame()) {
-                    if (person.team) {
-                        playGround.socket.send('ready:' + (checkbox.checked ? '1' : '0'));
-                    } else {
-                        playGround.chat.update(0, "Please choose team at first");
-                        this.checked = false;
-                    }
-                } else {
-                    playGround.socket.send('ready:' + (checkbox.checked ? '1' : '0'));
-                }
+                playGround.socket.send('ready:' + (checkbox.checked ? '1' : '0'));
             } else {
                 checkbox.checked = false;
             }

@@ -149,6 +149,9 @@ Engine.define('ProjectilesActions', 'SoundUtils', (function () {
         context.save();
         var x = projectile.x1;
         var y = projectile.y1;
+        projectile.x1 += projectile.x2;
+        projectile.y1 += projectile.y2;
+
         context.beginPath();
         var angle = projectile.angle + 90;
         context.translate(x, y);
@@ -174,7 +177,6 @@ Engine.define('ProjectilesActions', 'SoundUtils', (function () {
         var now = (new Date()).getTime();
         var playShootgun = false;
         var shotgunColor = null;
-        var packageRockets = [];
         if(projectiles && projectiles.length) {
             for (var i = 0; i < projectiles.length; i++) {
                 var data = projectiles[i].split(':');
@@ -251,57 +253,40 @@ Engine.define('ProjectilesActions', 'SoundUtils', (function () {
                         }
                         p.created = now + 50;
                         break;
+                    case 'rr':
                     case 'fr':
-                        delete playGround.fireBullets[p.x1];
+                        delete playGround.motionBullets[p.x1];
+                        break;
+                    case 'rocket':
+                        p.type = 'rocket';
+                        var oldRocket = playGround.motionBullets[p.id];
+                        if (oldRocket) {
+                            p.smoke = oldRocket.smoke;
+                        }
+                        playGround.motionBullets[p.id] = p;
+                        break;
                         break;
                     case 'f':
                     case 'flame':
                         p.type = 'flame';
-                        var old = playGround.fireBullets[p.id];
+                        var old = playGround.motionBullets[p.id];
                         if (old) {
                             p.animationFrame = old.animationFrame + 1;
-                            p.frameSet = old.frameSet
+                            p.frameSet = old.frameSet;
                         } else {
                             p.frameSet = Math.floor(Math.random() * ProjectilesActions.flame.length);
                             p.animationFrame = 0;
                         }
-                        playGround.fireBullets[p.id] = p;
-                        break;
-                    case 'rocket':
-                        var rocketExist = false;
-                        packageRockets.push(p.id);
-                        for (var j = 0; j < playGround.rockets.length; j++) {
-                            var r = playGround.rockets[j];
-                            if (r.id === p.id) {
-                                //p.smoke = r.smoke;
-                                r.x1 = p.x1;
-                                r.y1 = p.y1;
-                                r.x2 = p.x2;
-                                r.y2 = p.y2;
-                                p = r;
-                                rocketExist = true;
-                                break;
-                            }
-                        }
-                        if (!rocketExist) {
-                            playGround.rockets.push(p);
-                        }
-                        playGround.projectiles.push(p);
+                        playGround.motionBullets[p.id] = p;
                         break;
                     default:
                         playGround.projectiles.push(p);
                 }
             }
         }
-        for (var ro = playGround.rockets.length - 1; ro >= 0; ro--) {
-            var rocket = playGround.rockets[ro];
-            if (packageRockets.indexOf(rocket.id) === -1) {
-                playGround.rockets.splice(ro, 1);
-                break;
-            }
-        }
-        for(var k in playGround.fireBullets) {
-            playGround.projectiles.push(playGround.fireBullets[k]);
+
+        for(var k in playGround.motionBullets) {
+            playGround.projectiles.push(playGround.motionBullets[k]);
         }
 
     };

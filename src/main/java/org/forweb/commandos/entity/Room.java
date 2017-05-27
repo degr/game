@@ -194,14 +194,10 @@ public class Room {
 
     public void updateFlag(int team) {
         for(AbstractZone zone : getMap().getZones()) {
-            if(team == 1) {
-                if (zone instanceof FlagBlue) {
-                    ((FlagBlue) zone).reset();
-                }
-            } else {
-                if (zone instanceof FlagRed) {
-                    ((FlagRed) zone).reset();
-                }
+            if (zone instanceof FlagBlue) {
+                ((FlagBlue) zone).reset();
+            } else if (zone instanceof FlagRed) {
+                ((FlagRed) zone).reset();
             }
         }
     }

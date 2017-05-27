@@ -65,7 +65,7 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
          this.fireRadius = 7;
          this.explosionRadius = 40;//different on 20 with server*/
         this.instantBullets = [];
-        this.fireBullets = {};
+        this.motionBullets = {};
         this.readyToPlay = false;
         this.laserSight = 1;
         this.highlightOwner = true;
@@ -74,8 +74,6 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         this.windowInactive = false;
         this.newPlayerInterval = null;
         this.statsShown = false;
-        this.rockets = [];
-        /*rockets storage. For smoke visualisation*/
         this.placeApplication = placeApplication;
         
         this.chat = new Chat(this);
@@ -132,6 +130,11 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         }, 20);
 
         var openKeyboard = Dom.el('a', {'href': "#", 'class': 'icon-keyboard'});
+        openKeyboard.onmousedown = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.preventBubble = true;
+        };
         openKeyboard.onclick = function (e) {
             e.preventDefault();
             KeyboardSetup.show()
@@ -394,16 +397,16 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
         if (packet.map) {
             this.updateCanvas(packet.map)
         }
-        if (packet.started == 1 && (this.teamControl.isShown || !this.readyToPlay)) {
+        if (packet.l === 1 && (this.teamControl.isShown || !this.readyToPlay)) {
             this.teamControl.hide();
             this.readyToPlay = true;
-        } else if (!packet.started && (!this.teamControl.isShown)) {
+        } else if (!packet.l && (!this.teamControl.isShown)) {
             this.readyToPlay = false;
             this.teamControl.show();
         }
         var personIds = [];
-        for (var p = 0; p < packet.persons.length; p++) {
-            personIds.push(PersonActions.mapPersonFromResponse(packet.persons[p], weaponInstance));
+        for (var p = 0; p < packet.p.length; p++) {
+            personIds.push(PersonActions.mapPersonFromResponse(packet.p[p], weaponInstance));
         }
         for (var id in this.entities) {
             if (this.entities.hasOwnProperty(id) && personIds.indexOf(parseInt(id)) === -1) {
@@ -417,10 +420,10 @@ Engine.define('PlayGround', ['Person', 'Dom', 'Controls', 'Chat', 'Tabs',
             if (this.owner.id != oldOwnerId) {
                 this.updateCanvas(this.map);
             }
-        };
+        }
         var owner = this.owner;
-        if (packet.score) {
-            this.scoreOverview.updateTeamScore(packet.score);
+        if (packet.s) {
+            this.scoreOverview.updateTeamScore(packet.s);
         }
         this.weaponControl.update(owner, this.entities[owner.id]);
         this.lifeAndArmor.update(owner.life, owner.armor);

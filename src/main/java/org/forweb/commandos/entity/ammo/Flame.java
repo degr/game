@@ -12,7 +12,6 @@ public class Flame extends MotionProjectile {
     public static final int RADIUS = 250;
 
     private boolean isStoped;
-    private Person person;
 
     private static final Random r = new Random();
 
@@ -28,14 +27,6 @@ public class Flame extends MotionProjectile {
             this.setLifeTime((long)r.nextInt(3000) + 2000L );
         }
         setStoped(false);
-        this.person = person;
-    }
-
-
-
-    @Override
-    public boolean isInstant() {
-        return false;
     }
 
     @Override
@@ -46,6 +37,11 @@ public class Flame extends MotionProjectile {
     @Override
     public int getDamage() {
         return 20;
+    }
+
+    @Override
+    protected Projectile generateRemovable() {
+        return new FlameRemove(getPerson(), this);
     }
 
     public boolean isStoped() {
@@ -61,19 +57,13 @@ public class Flame extends MotionProjectile {
     }
 
 
-    public void onDestruct(Room room) {
-        Integer id = room.getProjectilesIds().getAndIncrement();
-        room.getProjectiles().put(id, new FlameRemove(person, this));
-    }
-
     public String doResponse() {
         setResponseRequired(false);
-        String out = getId() + ":" +
+        return getId() + ":" +
                 getName() + ":" +
                 (int) getxStart() + ":" +
                 (int) getyStart() + ":" +
                 getVector().getX() + ":" +
                 getVector().getY();
-        return out;
     }
 }

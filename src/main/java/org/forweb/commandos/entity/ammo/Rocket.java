@@ -12,6 +12,11 @@ public class Rocket extends MotionProjectile {
     }
 
     @Override
+    protected Projectile generateRemovable() {
+        return new RocketRemove(getPerson(), this);
+    }
+
+    @Override
     public boolean isInstant() {
         return false;
     }
@@ -30,6 +35,9 @@ public class Rocket extends MotionProjectile {
         return getId() + ":" +
                 getName() + ":" +
                 (int) getxStart() + ":" +
-                (int) getyStart()+":::"+(int)getAngle();
+                (int) getyStart() + ":" +
+                getVector().getX() + ":" +
+                getVector().getY() + ":" +
+                (int)getAngle();
     }
 }

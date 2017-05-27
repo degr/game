@@ -95,5 +95,6 @@ public abstract class AbstractFlag extends AbstractZone implements Interactive {
 
     public void reset() {
         isAvailable = true;
+        this.shouldUpdate = true;
     }
 }

@@ -164,7 +164,7 @@ public class SpringDelegationService {
                                     room.isEverybodyReady() ? room.getEndTime() - System.currentTimeMillis() : 0,
                                     room.isEverybodyReady(),
                                     responseService.mapTempZones(room.getMap().getZones()),
-                                    room.getTeam1Score() + ":" + room.getTeam2Score(),
+                                    getScore(room),
                                     responseService.mapBlood(room.getBloodList()),
                                     (room.isDumpMap() ? room.getMap() : null)
                             ),
@@ -182,6 +182,14 @@ public class SpringDelegationService {
                 //System.out.println((System.nanoTime() - nano)/ 1000000000.0);
             }
         }, PersonWebSocketEndpoint.FRAME_RATE, PersonWebSocketEndpoint.FRAME_RATE);
+    }
+
+    private String getScore(Room room) {
+        if(room.getTeam1Score() > 0 || room.getTeam2Score() > 0) {
+            return room.getTeam1Score() + ":" + room.getTeam2Score();
+        } else {
+            return null;
+        }
     }
 
 

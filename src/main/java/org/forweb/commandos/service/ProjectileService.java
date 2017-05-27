@@ -119,8 +119,7 @@ public class ProjectileService {
                         room.getMessages().add("0:" + shooter.getName() + " fried " + person.getName());
                     }
                     room.getProjectiles().remove(flameBathcId);
-                    Integer id = room.getProjectilesIds().getAndIncrement();
-                    room.getProjectiles().put(id, new FlameRemove(shooter, flame));
+                    flame.onDestruct(room);
                 }
             }
         }
@@ -215,7 +214,7 @@ public class ProjectileService {
                     explosion.getyStart(),
                     explosion.getRadius()
             );
-            Person shooter = room.getPersons().get(rocket.getPersonId());
+            Person shooter = rocket.getPerson();
 
             for (Person person : room.getPersons().values()) {
                 double damageFactor = PointService.pointBelongToCircle(
@@ -233,6 +232,7 @@ public class ProjectileService {
                 }
             }
             room.getProjectiles().remove(rocketBatchId);
+            rocket.onDestruct(room);
         }
     }
 

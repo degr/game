@@ -1,18 +1,17 @@
 package org.forweb.commandos.entity.ammo;
 
 import org.forweb.commandos.entity.Person;
-import org.forweb.commandos.utils.Vector;
 
 import java.util.Random;
 
-public class FlameRemove extends Projectile {
+public class RocketRemove extends Projectile {
 
-    private final Integer flameId;
+    private final Integer rocketId;
 
-    public FlameRemove(Person person, Flame flame) {
+    public RocketRemove(Person person, Rocket rocket) {
         super(person, 0L);
         this.setLifeTime(150L);
-        this.flameId = flame.getId();
+        this.rocketId = rocket.getId();
     }
 
     @Override
@@ -22,7 +21,7 @@ public class FlameRemove extends Projectile {
 
     @Override
     public String getName() {
-        return "fr";
+        return "rr";
     }
 
     @Override
@@ -32,6 +31,6 @@ public class FlameRemove extends Projectile {
 
     public String doResponse() {
         return getId() + ":" +
-                getName()+ ":" + flameId;
+                getName()+ ":" + rocketId;
     }
 }
