@@ -32,6 +32,7 @@ public class Rocket extends MotionProjectile {
     }
 
     public String doResponse() {
+        setResponseRequired(false);
         return getId() + ":" +
                 getName() + ":" +
                 (int) getxStart() + ":" +
