@@ -356,4 +356,8 @@ public class Room {
     public boolean isFullResponse() {
         return fullResponse == 60;
     }
+
+    public Bounds getBounds() {
+        return map.getBounds();
+    }
 }

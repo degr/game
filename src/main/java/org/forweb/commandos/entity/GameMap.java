@@ -2,6 +2,7 @@ package org.forweb.commandos.entity;
 
 import org.forweb.commandos.entity.zone.AbstractZone;
 import org.forweb.commandos.entity.zone.Zone;
+import org.forweb.geometry.shapes.Bounds;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ public class GameMap {
     private String gameType;
     private Integer rating;
     private String mapHash;
+    private Bounds bounds;
 
     public Integer getX() {
         return x;
@@ -23,6 +25,9 @@ public class GameMap {
 
     public void setX(Integer x) {
         this.x = x;
+        if(this.y != null) {
+            this.bounds = new Bounds(0, 0, x, y);
+        }
     }
 
     public Integer getY() {
@@ -31,6 +36,9 @@ public class GameMap {
 
     public void setY(Integer y) {
         this.y = y;
+        if(this.x != null) {
+            this.bounds = new Bounds(0, 0, x, y);
+        }
     }
 
     public Integer getMaxPlayers() {
@@ -96,5 +104,9 @@ public class GameMap {
 
     public void setMapHash(String mapHash) {
         this.mapHash = mapHash;
+    }
+
+    public Bounds getBounds() {
+        return bounds;
     }
 }

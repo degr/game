@@ -4,9 +4,13 @@ import org.forweb.commandos.controller.PersonWebSocketEndpoint;
 import org.forweb.commandos.entity.weapon.AbstractWeapon;
 import org.forweb.commandos.response.Status;
 import org.forweb.commandos.service.projectile.Stoppable;
+import org.forweb.commandos.utils.Vector;
+import org.forweb.geometry.shapes.Circle;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.forweb.commandos.controller.PersonWebSocketEndpoint.PERSON_RADIUS;
 
 public class Person implements WebSocketResponse {
 
@@ -32,6 +36,8 @@ public class Person implements WebSocketResponse {
     private boolean ready;
     private boolean newPerson;
     private List<Stoppable> listeners = new ArrayList<>();
+    private Vector customVector;
+    private Vector alternativeVector;
 
     public List<AbstractWeapon> getWeaponList() {
         return weaponList;
@@ -53,6 +59,9 @@ public class Person implements WebSocketResponse {
         this.id = id;
     }
 
+    public Circle createCircle(double x, double y) {
+        return new Circle(this.getX() + x, this.getY() + y, PERSON_RADIUS);
+    }
     public int getId() {
         return id;
     }
@@ -288,5 +297,21 @@ public class Person implements WebSocketResponse {
 
     public void setNewPerson(boolean newPerson) {
         this.newPerson = newPerson;
+    }
+
+    public Vector getCustomVector() {
+        return customVector;
+    }
+
+    public void setCustomVector(Vector customVector) {
+        this.customVector = customVector;
+    }
+
+    public Vector getAlternativeVector() {
+        return alternativeVector;
+    }
+
+    public void setAlternativeVector(Vector alternativeVector) {
+        this.alternativeVector = alternativeVector;
     }
 }

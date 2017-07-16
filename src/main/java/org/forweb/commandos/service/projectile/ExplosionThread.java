@@ -57,13 +57,13 @@ public class ExplosionThread extends Thread implements Stoppable {
                 double delta = cos * currentShift;
                 double newPosition = delta - (person.getX() - xCurrent);
                 double currentPostion = person.getX() + newPosition;
-                if (
+                /*if (
                         currentPostion <= PersonWebSocketEndpoint.PERSON_RADIUS ||
                                 currentPostion >= room.getMap().getX() - PersonWebSocketEndpoint.PERSON_RADIUS ||
                                 locationService.calculateCollistions(person, room, newPosition, 0) != PointService.EMPTY
                         ) {
                     xBlocked = true;
-                }
+                }*/
                 if (!xBlocked) {
                     xShift = delta;
                 }
@@ -72,13 +72,13 @@ public class ExplosionThread extends Thread implements Stoppable {
                 double delta = sin * currentShift;
                 double newPosition = delta - (person.getY() - yCurrent);
                 double currentPostion = person.getY() + newPosition;
-                if (
+                /*if (
                         currentPostion <= PersonWebSocketEndpoint.PERSON_RADIUS ||
                                 currentPostion + PersonWebSocketEndpoint.PERSON_RADIUS >= room.getMap().getY() ||
                                 locationService.calculateCollistions(person, room, 0, newPosition) != PointService.EMPTY
                         ) {
                     yBlocked = true;
-                }
+                }*/
                 if (!yBlocked) {
                     yShift = delta;
                 }

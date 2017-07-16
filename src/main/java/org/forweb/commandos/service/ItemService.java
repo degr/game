@@ -11,9 +11,9 @@ import org.forweb.commandos.entity.zone.items.MinigunZone;
 import org.springframework.stereotype.Service;
 
 @Service
-class ItemService {
+public class ItemService {
 
-    void onGetItem(Interactive item, Person player, Room room) {
+    public void onGetItem(Interactive item, Person player, Room room) {
 
         if (item.isAvailable()) {
             item.onEnter(player, room);

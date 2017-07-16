@@ -155,6 +155,7 @@ public class PersonService {
 
     public void handleDirection(Person person, String message) {
         person.setDirection(Direction.valueOf(message.toUpperCase()));
+        person.setAlternativeVector(null);
     }
 
     public void handlePersons(Collection<Person> persons, Room room) {

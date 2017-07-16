@@ -202,9 +202,9 @@ Engine.define(
                 value = playGround.bloodTime;
             }
             var input = Dom.el('input', {id: id, type: 'text', value: value});
-            input.onclick = function (e) {
+            /*input.onclick = function (e) {
                 input.focus();
-            };
+            };*/
             input.onkeyup = function (e) {
                 e.preventDefault();
                 var value = parseInt(this.value);
@@ -329,10 +329,10 @@ Engine.define(
                 type: 'text',
                 id: 'chat_' + key,
                 value: me.chat.binds[key] || ''
-            });
+            });/*
             messageInput.onclick = function () {
                 messageInput.focus();
-            };
+            };*/
             messageInput.onblur = function () {
                 me.chat.binds[key] = this.value;
                 me.chat.save();
@@ -348,7 +348,7 @@ Engine.define(
             var input = Dom.el('input', {id: id, type: 'text', value: KeyboardUtils.translateButton(Controls[key])});
             input.onclick = function(e){
                 input.focus();
-                input.setSelectionRange(0, input.value.length())
+                input.setSelectionRange(0, input.value.length)
             };
             input.onkeydown = function (e) {
                 e.preventDefault();
